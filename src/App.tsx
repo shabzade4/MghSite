@@ -12,11 +12,13 @@ import { InvoiceModal } from './components/InvoiceModal';
 import { StudentPanel } from './components/StudentPanel';
 import { WordPressAdmin } from './components/WordPressAdmin';
 import { SupabaseGuideModal } from './components/SupabaseGuideModal';
+import { BlogView } from './components/BlogView';
+import { ArticleDetailModal } from './components/ArticleDetailModal';
 import { Footer } from './components/Footer';
 
-import { Course, DigitalFile, Order, OrderItem } from './types';
+import { Course, DigitalFile, Order, OrderItem, Article } from './types';
 import { store } from './services/store';
-import { BookOpen, Download, FileText, Terminal, ArrowLeft, ShieldCheck, CheckCircle2, Star } from 'lucide-react';
+import { BookOpen, Download, FileText, Terminal, ArrowLeft, ShieldCheck, CheckCircle2, Star, Bell, Radio } from 'lucide-react';
 
 export default function App() {
   const [currentTab, setCurrentTab] = useState<'home' | 'courses' | 'files' | 'blog' | 'student-panel' | 'admin-panel'>('home');
@@ -26,12 +28,13 @@ export default function App() {
   // Store data
   const [courses, setCourses] = useState<Course[]>(store.courses);
   const [files, setFiles] = useState<DigitalFile[]>(store.files);
-  const [articles, setArticles] = useState(store.articles);
+  const [articles, setArticles] = useState<Article[]>(store.articles);
 
   // Modals & Drawers state
   const [selectedCourseForDetails, setSelectedCourseForDetails] = useState<Course | null>(null);
   const [selectedCourseForPlayer, setSelectedCourseForPlayer] = useState<Course | null>(null);
   const [selectedFileForDetails, setSelectedFileForDetails] = useState<DigitalFile | null>(null);
+  const [selectedArticleForDetails, setSelectedArticleForDetails] = useState<Article | null>(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isSupabaseGuideOpen, setIsSupabaseGuideOpen] = useState(false);
 
@@ -294,55 +297,89 @@ export default function App() {
                 </section>
               )}
 
-              {/* SECTION 3: Technical Blog Articles */}
-              {(currentTab === 'home' || currentTab === 'blog') && (
+              {/* SECTION 3: Technical Blog, Announcements, News & Events */}
+              {currentTab === 'home' && (
                 <section className="pt-6">
-                  <div className="flex items-center justify-between mb-8">
+                  <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
                     <div>
                       <div className="text-xs font-bold text-indigo-600 mb-1 flex items-center gap-1.5">
-                        <FileText className="w-4 h-4" />
-                        <span>دانشنامه و مقالات تخصصی</span>
+                        <Radio className="w-4 h-4" />
+                        <span>پایگاه دانش، اطلاعیه‌ها و رویدادها</span>
                       </div>
                       <h2 className="text-xl sm:text-2xl font-black text-slate-900">
-                        آخرین مقالات آموزشی شبکه، سیسکو و فرانت‌اند
+                        آخرین نوشته‌ها، اطلاعیه‌ها، اخبار و وبینارهای آکادمی
                       </h2>
                     </div>
+
+                    <button
+                      onClick={() => {
+                        setCurrentTab('blog');
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 self-start sm:self-auto"
+                    >
+                      <span>مشاهده همه نوشته‌ها و رویدادها ({articles.length})</span>
+                      <ArrowLeft className="w-3.5 h-3.5" />
+                    </button>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {articles.map(article => (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {articles.slice(0, 3).map(article => (
                       <div
                         key={article.id}
-                        className="bg-white rounded-2xl border border-slate-200/90 p-5 hover:border-indigo-300 transition-all flex flex-col justify-between"
+                        onClick={() => setSelectedArticleForDetails(article)}
+                        className="bg-white rounded-2xl border border-slate-200/90 p-5 hover:border-indigo-300 hover:shadow-md transition-all flex flex-col justify-between cursor-pointer group"
                       >
                         <div>
-                          <div className="flex items-center gap-2 text-xs text-slate-500 mb-2 font-mono">
-                            <span>{article.category}</span>
-                            <span aria-hidden="true">·</span>
-                            <span>{article.readTime} مطالعه</span>
-                            <span aria-hidden="true">·</span>
-                            <span>{article.createdAt}</span>
+                          <div className="flex items-center justify-between gap-2 mb-2">
+                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
+                              article.type === 'announcement'
+                                ? 'bg-red-50 text-red-700'
+                                : article.type === 'event'
+                                ? 'bg-amber-50 text-amber-700'
+                                : article.type === 'news'
+                                ? 'bg-cyan-50 text-cyan-700'
+                                : 'bg-indigo-50 text-indigo-700'
+                            }`}>
+                              {article.type === 'announcement'
+                                ? 'اطلاعیه'
+                                : article.type === 'event'
+                                ? 'وبینار'
+                                : article.type === 'news'
+                                ? 'خبر'
+                                : 'مقاله'}
+                            </span>
+                            <span className="text-[11px] font-mono text-slate-400">{article.createdAt}</span>
                           </div>
 
-                          <h3 className="text-base font-bold text-slate-900 hover:text-indigo-600 transition-colors mb-2">
+                          <h3 className="text-sm font-bold text-slate-900 group-hover:text-indigo-600 transition-colors mb-2 line-clamp-2 leading-snug">
                             {article.title}
                           </h3>
 
-                          <p className="text-xs text-slate-600 leading-relaxed font-light mb-4">
+                          <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed font-light mb-4">
                             {article.excerpt}
                           </p>
                         </div>
 
                         <div className="flex items-center justify-between pt-3 border-t border-slate-100 text-xs">
-                          <span className="text-slate-500">نویسنده: {article.author}</span>
-                          <span className="text-indigo-600 font-semibold cursor-pointer">
-                            ادامه مطلب ←
+                          <span className="text-slate-400 font-mono text-[11px] truncate max-w-[140px]">{article.author}</span>
+                          <span className="text-indigo-600 font-bold group-hover:text-indigo-800 flex items-center gap-1">
+                            <span>مطالعه</span>
+                            <ArrowLeft className="w-3.5 h-3.5" />
                           </span>
                         </div>
                       </div>
                     ))}
                   </div>
                 </section>
+              )}
+
+              {/* DEDICATED BLOG VIEW */}
+              {currentTab === 'blog' && (
+                <BlogView
+                  articles={articles}
+                  onOpenArticle={(art) => setSelectedArticleForDetails(art)}
+                />
               )}
             </div>
           </>
@@ -430,6 +467,14 @@ export default function App() {
             setIsSupabaseGuideOpen(false);
             setCurrentTab('admin-panel');
           }}
+        />
+      )}
+
+      {/* 8. Article & Event Detail Modal */}
+      {selectedArticleForDetails && (
+        <ArticleDetailModal
+          article={selectedArticleForDetails}
+          onClose={() => setSelectedArticleForDetails(null)}
         />
       )}
     </div>

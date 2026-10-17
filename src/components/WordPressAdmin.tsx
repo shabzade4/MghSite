@@ -25,7 +25,7 @@ import {
   Check,
   RefreshCw
 } from 'lucide-react';
-import { Course, DigitalFile, Order, Ticket, User, SiteSettings } from '../types';
+import { Course, DigitalFile, Order, Ticket, User, SiteSettings, Article } from '../types';
 import { store } from '../services/store';
 import { SUPABASE_SQL_SCHEMA, testSupabaseConnection } from '../services/supabase';
 
@@ -46,6 +46,7 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
   const [files, setFiles] = useState<DigitalFile[]>(store.files);
   const [orders, setOrders] = useState<Order[]>(store.orders);
   const [tickets, setTickets] = useState<Ticket[]>(store.tickets);
+  const [articles, setArticles] = useState<Article[]>(store.articles);
   const [settings, setSettings] = useState<SiteSettings>(store.settings);
 
   // Search filter
@@ -81,6 +82,24 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
     features: ['شامل فایل‌های پروژه آماده', 'راهنمای فارسی']
   });
 
+  // Article / Announcement / Event Add/Edit Form State
+  const [isEditingArticle, setIsEditingArticle] = useState(false);
+  const [articleFilterType, setArticleFilterType] = useState<string>('all');
+  const [articleFormData, setArticleFormData] = useState<Partial<Article>>({
+    title: '',
+    type: 'article',
+    category: 'آموزش شبکه',
+    excerpt: '',
+    content: '',
+    author: 'مهندس محمدرضا قاسمی',
+    readTime: '۵ دقیقه',
+    coverImage: '/src/assets/images/course_network_engineering_1791894523440.jpg',
+    eventDate: '',
+    eventLocation: 'اسکای‌روم آنلاین آکادمی پارس‌نت',
+    isPinned: false,
+    tags: ['آموزش', 'شبکه']
+  });
+
   // Ticket reply in admin
   const [adminTicketReply, setAdminTicketReply] = useState<Record<string, string>>({});
 
@@ -97,6 +116,7 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
       setFiles([...store.files]);
       setOrders([...store.orders]);
       setTickets([...store.tickets]);
+      setArticles([...store.articles]);
       setSettings({ ...store.settings });
     });
   }, []);
@@ -210,6 +230,49 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
   const handleDeleteFile = (id: string) => {
     if (confirm('آیا از حذف این محصول دانلودی اطمینان دارید؟')) {
       store.deleteFile(id);
+    }
+  };
+
+  // Article handlers
+  const handleSaveArticle = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!articleFormData.title) return;
+
+    if (articleFormData.id) {
+      const existing = articles.find(a => a.id === articleFormData.id);
+      if (existing) {
+        store.updateArticle({
+          ...existing,
+          ...articleFormData
+        } as Article);
+      }
+    } else {
+      const newArticle: Article = {
+        id: `post-${Date.now()}`,
+        title: articleFormData.title || 'مطلب جدید',
+        slug: (articleFormData.title || 'new-post').toLowerCase().replace(/\s+/g, '-'),
+        type: articleFormData.type || 'article',
+        category: articleFormData.category || 'آموزش تخصصی',
+        excerpt: articleFormData.excerpt || '',
+        content: articleFormData.content || '',
+        author: articleFormData.author || 'مدیر آموزش پارس‌نت',
+        readTime: articleFormData.readTime || '۵ دقیقه',
+        coverImage: articleFormData.coverImage || '/src/assets/images/course_network_engineering_1791894523440.jpg',
+        eventDate: articleFormData.eventDate,
+        eventLocation: articleFormData.eventLocation,
+        isPinned: articleFormData.isPinned || false,
+        tags: articleFormData.tags || ['فناوری', 'آموزش'],
+        createdAt: new Date().toLocaleDateString('fa-IR')
+      };
+      store.addArticle(newArticle);
+    }
+
+    setIsEditingArticle(false);
+  };
+
+  const handleDeleteArticle = (id: string) => {
+    if (confirm('آیا از حذف این نوشته یا رویداد اطمینان دارید؟')) {
+      store.deleteArticle(id);
     }
   };
 
@@ -364,6 +427,21 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
               <span className="flex-1">تیکت‌های پشتیبانی</span>
               <span className="bg-red-500/20 text-red-300 px-1.5 py-0.2 text-[10px] rounded font-mono">
                 {tickets.filter(t => t.status === 'open').length}
+              </span>
+            </button>
+
+            <button
+              onClick={() => { setActiveMenu('articles'); setIsEditingArticle(false); }}
+              className={`w-full px-4 py-2.5 text-right flex items-center gap-2.5 transition-colors ${
+                activeMenu === 'articles'
+                  ? 'bg-indigo-600 text-white font-bold'
+                  : 'hover:bg-slate-800/80 hover:text-white'
+              }`}
+            >
+              <FileText className="w-4 h-4 text-slate-400" />
+              <span className="flex-1">نوشته‌ها و رویدادها</span>
+              <span className="bg-slate-800 px-1.5 py-0.2 text-[10px] rounded font-mono">
+                {articles.length}
               </span>
             </button>
 
@@ -1141,6 +1219,304 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* SUB-VIEW: ARTICLES, ANNOUNCEMENTS, NEWS & EVENTS (مدیریت نوشته‌ها و رویدادها) */}
+          {activeMenu === 'articles' && (
+            <div className="space-y-6 max-w-6xl">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h1 className="text-xl font-black text-slate-900">مدیریت نوشته‌ها، اطلاعیه‌ها، اخبار و رویدادها</h1>
+                  <p className="text-xs text-slate-500 mt-1">
+                    افزودن و ویرایش مقالات علمی، اطلاعیه‌های فوری، اخبار فناوری و وبینارهای آنلاین آکادمی
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    setArticleFormData({
+                      title: '',
+                      type: 'article',
+                      category: 'آموزش تخصصی',
+                      excerpt: '',
+                      content: '',
+                      author: 'مدیر آموزش پارس‌نت',
+                      readTime: '۵ دقیقه',
+                      coverImage: '/src/assets/images/course_network_engineering_1791894523440.jpg',
+                      eventDate: '',
+                      eventLocation: 'اسکای‌روم آنلاین آکادمی پارس‌نت',
+                      isPinned: false,
+                      tags: ['فناوری', 'آموزش']
+                    });
+                    setIsEditingArticle(true);
+                  }}
+                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 transition-colors shadow-xs"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>افزودن نوشته / رویداد تازه</span>
+                </button>
+              </div>
+
+              {isEditingArticle ? (
+                // Add / Edit Post Form
+                <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs max-w-3xl">
+                  <div className="flex items-center justify-between pb-4 border-b border-slate-200 mb-6">
+                    <h3 className="text-sm font-bold text-slate-900">
+                      {articleFormData.id ? 'ویرایش مطلب' : 'افزودن مطلب / اطلاعیه / رویداد تازه'}
+                    </h3>
+                    <button
+                      onClick={() => setIsEditingArticle(false)}
+                      className="text-xs text-slate-500 hover:text-slate-800"
+                    >
+                      انصراف
+                    </button>
+                  </div>
+
+                  <form onSubmit={handleSaveArticle} className="space-y-4 text-xs">
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">عنوان مطلب یا رویداد</label>
+                      <input
+                        type="text"
+                        value={articleFormData.title || ''}
+                        onChange={(e) => setArticleFormData({ ...articleFormData, title: e.target.value })}
+                        placeholder="مثال: وبینار تخصصی امنیت زیرساخت شبکه"
+                        className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-600"
+                        required
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <div>
+                        <label className="block font-bold text-slate-700 mb-1">نوع مطلب</label>
+                        <select
+                          value={articleFormData.type || 'article'}
+                          onChange={(e: any) => setArticleFormData({ ...articleFormData, type: e.target.value })}
+                          className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-600"
+                        >
+                          <option value="article">مقاله آموزشی تخصصی</option>
+                          <option value="announcement">اطلاعیه مهم و فوری</option>
+                          <option value="news">اخبار فناوری و وب</option>
+                          <option value="event">رویداد / وبینار آنلاین</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block font-bold text-slate-700 mb-1">دسته‌بندی موضوعی</label>
+                        <input
+                          type="text"
+                          value={articleFormData.category || ''}
+                          onChange={(e) => setArticleFormData({ ...articleFormData, category: e.target.value })}
+                          placeholder="مثال: آموزش سیسکو، اخبار وب"
+                          className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block font-bold text-slate-700 mb-1">نویسنده / ارائه‌دهنده</label>
+                        <input
+                          type="text"
+                          value={articleFormData.author || ''}
+                          onChange={(e) => setArticleFormData({ ...articleFormData, author: e.target.value })}
+                          placeholder="مثال: مهندس محمدرضا قاسمی"
+                          className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Conditional fields for events */}
+                    {articleFormData.type === 'event' && (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-amber-50/60 p-3.5 rounded-xl border border-amber-200/70">
+                        <div>
+                          <label className="block font-bold text-amber-900 mb-1">تاریخ و ساعت برگزاری</label>
+                          <input
+                            type="text"
+                            value={articleFormData.eventDate || ''}
+                            onChange={(e) => setArticleFormData({ ...articleFormData, eventDate: e.target.value })}
+                            placeholder="مثال: جمعه ۲۸ مهر - ساعت ۱۸:۳۰"
+                            className="w-full px-3 py-2 bg-white border border-amber-200 rounded-xl"
+                          />
+                        </div>
+                        <div>
+                          <label className="block font-bold text-amber-900 mb-1">مکان یا بستر برگزاری</label>
+                          <input
+                            type="text"
+                            value={articleFormData.eventLocation || ''}
+                            onChange={(e) => setArticleFormData({ ...articleFormData, eventLocation: e.target.value })}
+                            placeholder="مثال: اسکای‌روم آنلاین آکادمی پارس‌نت"
+                            className="w-full px-3 py-2 bg-white border border-amber-200 rounded-xl"
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block font-bold text-slate-700 mb-1">زمان تخمینی مطالعه یا مدت وبینار</label>
+                        <input
+                          type="text"
+                          value={articleFormData.readTime || ''}
+                          onChange={(e) => setArticleFormData({ ...articleFormData, readTime: e.target.value })}
+                          placeholder="مثال: ۶ دقیقه یا رویداد زنده ۲ ساعته"
+                          className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl"
+                        />
+                      </div>
+
+                      <div className="flex items-center gap-2 pt-6">
+                        <input
+                          type="checkbox"
+                          id="isPinnedCheck"
+                          checked={articleFormData.isPinned || false}
+                          onChange={(e) => setArticleFormData({ ...articleFormData, isPinned: e.target.checked })}
+                          className="rounded text-indigo-600 focus:ring-indigo-500"
+                        />
+                        <label htmlFor="isPinnedCheck" className="text-slate-800 font-bold select-none cursor-pointer">
+                          سنجاق کردن به عنوان اطلاعیه/رویداد برگزیده در بالای سایت
+                        </label>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">چکیده / خلاصه متن (Excerpt)</label>
+                      <textarea
+                        rows={2}
+                        value={articleFormData.excerpt || ''}
+                        onChange={(e) => setArticleFormData({ ...articleFormData, excerpt: e.target.value })}
+                        placeholder="متن کوتاه برای نمایش در کارت‌ها..."
+                        className="w-full p-2.5 bg-white border border-slate-200 rounded-xl"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">متن کامل مطلب / شرح رویداد</label>
+                      <textarea
+                        rows={7}
+                        value={articleFormData.content || ''}
+                        onChange={(e) => setArticleFormData({ ...articleFormData, content: e.target.value })}
+                        placeholder="شرح کامل، سرفصل‌ها، توضیحات رویداد و نکات فنی..."
+                        className="w-full p-3 bg-white border border-slate-200 rounded-xl"
+                        required
+                      />
+                    </div>
+
+                    <button
+                      type="submit"
+                      className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-colors shadow-xs"
+                    >
+                      ذخیره و انتشار در وب‌سایت
+                    </button>
+                  </form>
+                </div>
+              ) : (
+                // Posts Table
+                <div className="space-y-4">
+                  {/* Category Filter tabs */}
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {[
+                      { id: 'all', label: 'همه مطالب' },
+                      { id: 'article', label: 'مقالات تخصصی' },
+                      { id: 'announcement', label: 'اطلاعیه‌ها' },
+                      { id: 'news', label: 'اخبار فناوری' },
+                      { id: 'event', label: 'رویدادها و وبینارها' }
+                    ].map(tab => (
+                      <button
+                        key={tab.id}
+                        onClick={() => setArticleFilterType(tab.id)}
+                        className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
+                          articleFilterType === tab.id
+                            ? 'bg-slate-900 text-white font-bold'
+                            : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                        }`}
+                      >
+                        {tab.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden">
+                    <table className="w-full text-right text-xs">
+                      <thead className="bg-slate-50 text-slate-600 border-b border-slate-200 font-bold">
+                        <tr>
+                          <th className="p-3">عنوان مطلب</th>
+                          <th className="p-3">نوع نوشته</th>
+                          <th className="p-3">دسته‌بندی</th>
+                          <th className="p-3">نویسنده</th>
+                          <th className="p-3">تاریخ</th>
+                          <th className="p-3">وضعیت سنجاق</th>
+                          <th className="p-3">عملیات</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {articles
+                          .filter(a => articleFilterType === 'all' || a.type === articleFilterType)
+                          .map(post => (
+                            <tr key={post.id} className="hover:bg-slate-50">
+                              <td className="p-3 font-bold text-slate-900 flex items-center gap-2.5">
+                                <img
+                                  src={post.coverImage}
+                                  alt={post.title}
+                                  referrerPolicy="no-referrer"
+                                  className="w-10 h-8 rounded-lg object-cover shrink-0"
+                                />
+                                <span className="line-clamp-1">{post.title}</span>
+                              </td>
+                              <td className="p-3">
+                                <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                                  post.type === 'announcement'
+                                    ? 'bg-red-50 text-red-700'
+                                    : post.type === 'event'
+                                    ? 'bg-amber-50 text-amber-700'
+                                    : post.type === 'news'
+                                    ? 'bg-cyan-50 text-cyan-700'
+                                    : 'bg-indigo-50 text-indigo-700'
+                                }`}>
+                                  {post.type === 'announcement'
+                                    ? 'اطلاعیه'
+                                    : post.type === 'event'
+                                    ? 'رویداد'
+                                    : post.type === 'news'
+                                    ? 'خبر'
+                                    : 'مقاله'}
+                                </span>
+                              </td>
+                              <td className="p-3 text-slate-600">{post.category}</td>
+                              <td className="p-3 text-slate-600">{post.author}</td>
+                              <td className="p-3 font-mono text-slate-500">{post.createdAt}</td>
+                              <td className="p-3">
+                                {post.isPinned ? (
+                                  <span className="text-[11px] font-bold text-amber-600">سنجاق شده ✓</span>
+                                ) : (
+                                  <span className="text-[11px] text-slate-400">عادی</span>
+                                )}
+                              </td>
+                              <td className="p-3">
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    onClick={() => {
+                                      setArticleFormData(post);
+                                      setIsEditingArticle(true);
+                                    }}
+                                    className="p-1.5 text-slate-600 hover:text-indigo-600 hover:bg-slate-100 rounded-lg"
+                                    title="ویرایش نوشته"
+                                  >
+                                    <Edit3 className="w-4 h-4" />
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeleteArticle(post.id)}
+                                    className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
+                                    title="حذف نوشته"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

@@ -1,13 +1,61 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: 'IRANSans';
+  font-style: normal;
+  font-weight: 300;
+  src: url('https://cdn.jsdelivr.net/gh/rastikerdar/iransans-webfont@v1.0.0/dist/fonts/woff2/IRANSansWeb_Light.woff2') format('woff2'),
+       url('https://cdn.jsdelivr.net/gh/rastikerdar/iransans-webfont@v1.0.0/dist/fonts/woff/IRANSansWeb_Light.woff') format('woff');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'IRANSans';
+  font-style: normal;
+  font-weight: 400;
+  src: url('https://cdn.jsdelivr.net/gh/rastikerdar/iransans-webfont@v1.0.0/dist/fonts/woff2/IRANSansWeb.woff2') format('woff2'),
+       url('https://cdn.jsdelivr.net/gh/rastikerdar/iransans-webfont@v1.0.0/dist/fonts/woff/IRANSansWeb.woff') format('woff');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'IRANSans';
+  font-style: normal;
+  font-weight: 500;
+  src: url('https://cdn.jsdelivr.net/gh/rastikerdar/iransans-webfont@v1.0.0/dist/fonts/woff2/IRANSansWeb_Medium.woff2') format('woff2'),
+       url('https://cdn.jsdelivr.net/gh/rastikerdar/iransans-webfont@v1.0.0/dist/fonts/woff/IRANSansWeb_Medium.woff') format('woff');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'IRANSans';
+  font-style: normal;
+  font-weight: 700;
+  src: url('https://cdn.jsdelivr.net/gh/rastikerdar/iransans-webfont@v1.0.0/dist/fonts/woff2/IRANSansWeb_Bold.woff2') format('woff2'),
+       url('https://cdn.jsdelivr.net/gh/rastikerdar/iransans-webfont@v1.0.0/dist/fonts/woff/IRANSansWeb_Bold.woff') format('woff');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'IRANSans';
+  font-style: normal;
+  font-weight: 900;
+  src: url('https://cdn.jsdelivr.net/gh/rastikerdar/iransans-webfont@v1.0.0/dist/fonts/woff2/IRANSansWeb_Black.woff2') format('woff2');
+  font-display: swap;
+}
+
 @layer base {
+  *, ::before, ::after {
+    font-family: 'IRANSans', 'IRANSansX', 'IRANSansMobile', 'Vazirmatn', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
   body {
-    font-family: 'Vazirmatn', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'IRANSans', 'IRANSansX', 'IRANSansMobile', 'Vazirmatn', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     letter-spacing: -0.015em;
   }
   
   .font-mono {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', monospace !important;
   }
 }
 

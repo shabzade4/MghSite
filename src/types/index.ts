@@ -145,16 +145,23 @@ export interface Ticket {
   updatedAt: string;
 }
 
+export type PostType = 'article' | 'announcement' | 'news' | 'event';
+
 export interface Article {
   id: string;
   title: string;
   slug: string;
+  type: PostType; // 'article' | 'announcement' | 'news' | 'event'
   excerpt: string;
   content: string;
   category: string;
   author: string;
   readTime: string;
   coverImage: string;
+  eventDate?: string;
+  eventLocation?: string;
+  isPinned?: boolean;
+  tags?: string[];
   createdAt: string;
 }
 

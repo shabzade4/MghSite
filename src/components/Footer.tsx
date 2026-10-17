@@ -93,6 +93,11 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenSupabaseGuide 
                 </button>
               </li>
               <li>
+                <button onClick={() => onNavigate('blog')} className="hover:text-white transition-colors">
+                  نوشته‌ها، اطلاعیه‌ها و رویدادها
+                </button>
+              </li>
+              <li>
                 <button onClick={() => onNavigate('student-panel')} className="hover:text-white transition-colors">
                   ورود به پنل کاربری دانشجویان
                 </button>

@@ -62,30 +62,50 @@ export const SupabaseGuideModal: React.FC<SupabaseGuideModalProps> = ({
             </div>
           </div>
 
-          {/* Step 2 */}
-          <div className="space-y-2 pt-2 border-t border-slate-100">
+          {/* Step 2: How to find keys */}
+          <div className="space-y-3 pt-2 border-t border-slate-100">
             <div className="flex items-center gap-2 font-bold text-slate-900 text-sm">
               <span className="w-6 h-6 rounded-full bg-indigo-100 text-indigo-800 flex items-center justify-center font-mono">۲</span>
-              <span>تنظیم کلیدها در پیشخوان مدیریت</span>
+              <span>محل پیدا کردن کدهای VITE_SUPABASE_URL و VITE_SUPABASE_ANON_KEY در سوپابیس</span>
             </div>
-            <p className="text-slate-600">
-              از بخش <strong className="font-mono">Project Settings -&gt; API</strong> در سوپابیس، دو مقدار <strong className="font-mono">Project URL</strong> و <strong className="font-mono">anon public key</strong> را کپی کرده و در بخش <strong>تنظیمات پیشخوان وردپرس</strong> این سایت وارد کنید. دکمه تست اتصال بلافاصله ارتباط زنده را تایید می‌کند.
-            </p>
+            
+            <div className="bg-indigo-50/60 p-4 rounded-2xl border border-indigo-100 text-slate-700 space-y-3">
+              <div>
+                <strong className="text-indigo-900 block mb-1">روش اول (سریع‌ترین روش - دکمه Connect):</strong>
+                <p>در بالای صفحه داشبورد پروژه‌تان در سایت Supabase، روی دکمه سبز رنگ <strong>Connect</strong> در هدر بالا کلیک کنید. سپس تب <strong>Vite</strong> یا <strong>App Frameworks</strong> را انتخاب کنید؛ هر دو کد با یک دکمه Copy در اختیارتان قرار می‌گیرد!</p>
+              </div>
+
+              <div className="pt-2 border-t border-indigo-200/50">
+                <strong className="text-indigo-900 block mb-1">روش دوم (از منوی تنظیمات Settings):</strong>
+                <ol className="list-decimal list-inside space-y-1.5 text-slate-700">
+                  <li>در سایدبار سمت چپ پنل Supabase، روی آیکون <strong>چرخ‌دنده (Project Settings)</strong> کلیک کنید.</li>
+                  <li>از زیرمنوی باز شده، روی گزینه <strong>API</strong> (یا <strong>Data API</strong>) کلیک نمایید.</li>
+                  <li>
+                    در بخش <strong>Project URL</strong>: آدرسی شبیه به <code className="bg-white px-1.5 py-0.5 rounded border border-indigo-200 font-mono text-[11px] text-indigo-700">https://xxxx.supabase.co</code> مشاهده می‌کنید که همان <strong>VITE_SUPABASE_URL</strong> است.
+                  </li>
+                  <li>
+                    در بخش <strong>Project API Keys</strong>: کلید ردیف <strong>anon public</strong> را کپی کنید. این همان <strong>VITE_SUPABASE_ANON_KEY</strong> است.
+                    <span className="text-amber-700 block text-[11px] mt-0.5 font-medium">⚠️ توجه: هرگز کلید service_role را در سایت قرار ندهید؛ فقط کلید anon را کپی کنید.</span>
+                  </li>
+                </ol>
+              </div>
+            </div>
           </div>
 
-          {/* Step 3 */}
-          <div className="space-y-2 pt-2 border-t border-slate-100">
+          {/* Step 3: Put into Vercel and Redeploy */}
+          <div className="space-y-3 pt-2 border-t border-slate-100">
             <div className="flex items-center gap-2 font-bold text-slate-900 text-sm">
               <span className="w-6 h-6 rounded-full bg-cyan-100 text-cyan-800 flex items-center justify-center font-mono">۳</span>
-              <span>استقرار بر روی Vercel (دیپلوی آسان)</span>
+              <span>نحوه اضافه کردن به Vercel و فعال‌سازی نهایی</span>
             </div>
-            <p className="text-slate-600">
-              این پروژه با فریمورک استاندارد Vite و React و بدون هرگونه خطای باندل ساخته شده است. هنگام ایمپورت در Vercel کافی است در فیلد <strong>Environment Variables</strong> دو متغیر زیر را تعریف نمایید:
-            </p>
-            <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 font-mono text-[11px] space-y-1 text-slate-800" dir="ltr">
-              <div>VITE_SUPABASE_URL = https://your-project.supabase.co</div>
-              <div>VITE_SUPABASE_ANON_KEY = eyJhbGci...</div>
-            </div>
+            <ol className="list-decimal list-inside space-y-1.5 text-slate-700">
+              <li>در داشبورد <strong>Vercel</strong>، وارد پروژه خود شده و به تب <strong>Settings</strong> و سپس <strong>Environment Variables</strong> بروید.</li>
+              <li>متغیر اول: نام را <code className="font-mono bg-slate-100 px-1 py-0.5 rounded">VITE_SUPABASE_URL</code> و مقدار را آدرس کپی شده قرار دهید و دکمه Save را بزنید.</li>
+              <li>متغیر دوم: نام را <code className="font-mono bg-slate-100 px-1 py-0.5 rounded">VITE_SUPABASE_ANON_KEY</code> و مقدار را کلید anon قرار دهید و Save کنید.</li>
+              <li>
+                <strong className="text-red-600">خیلی مهم (Redeploy):</strong> چون Vite متغیرها را حین ساخت تزریق می‌کند، بعد از ذخیره کلیدها، در ورسل به تب <strong>Deployments</strong> رفته، روی سه نقطه <code className="font-mono">...</code> آخرین دیپلوی کلیک کرده و گزینه <strong>Redeploy</strong> را بزنید تا سایت با کلیدهای دیتابیس آنلاین شود!
+              </li>
+            </ol>
           </div>
         </div>
 

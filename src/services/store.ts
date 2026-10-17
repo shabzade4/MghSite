@@ -460,28 +460,103 @@ export const INITIAL_TICKETS: Ticket[] = [
 
 export const INITIAL_ARTICLES: Article[] = [
   {
+    id: 'post-announcement-ccna-update',
+    title: 'اطلاعیه مهم: به‌روزرسانی سرفصل‌های آزمون بین‌المللی Cisco CCNA و ارائه سناریوهای جدید',
+    slug: 'ccna-200-301-new-blueprint-announcement',
+    type: 'announcement',
+    category: 'اطلاعیه آموزشی',
+    isPinned: true,
+    excerpt: 'کلیه دانشجویان دوره مهندسی شبکه سیسکو توجه فرمایند: آخرین تغییرات استانداردهای آزمون جدید سیسکو در بخش‌های اتوماسیون با پایتون و امنیت شبکه به پنل اضافه شد.',
+    content: `با سلام و درود خدمت کلیه دانشجویان و همراهان آکادمی پارس‌نت،
+
+به اطلاع می‌رساند شرکت سیسکو نسخه جدید سرفصل‌های رسمی آزمون CCNA 200-301 را به عنوان سرفصل مبنای ارزیابی اعلام نموده است. در همین راستا، سرفصل‌های زیر به پکیج دوره و سناریوهای پکت‌تریسر و EVE-NG افزوده گردید:
+۱. مباحث پیشرفته‌تر REST APIs و تحلیل خروجی‌های JSON در تجهیزات Cisco IOS XE
+۲. پیکربندی و عیب‌یابی مکانیزم‌های امنیتی لایه ۲ شامل DAI و IP Source Guard
+۳. پیکربندی پروتکل‌های افزونگی FHRP و بهینه‌سازی مسیرها
+
+تمامی دانشجویانی که قبلاً دوره را خریداری نموده‌اند، می‌توانند این آپدیت‌ها را به صورت کاملاً رایگان در پنل دانشجویی خود مشاهده و دانلود نمایند.`,
+    author: 'آموزش و پژوهش پارس‌نت',
+    readTime: '۴ دقیقه',
+    coverImage: NETWORK_COURSE_IMAGE,
+    tags: ['سیسکو', 'CCNA', 'اطلاعیه', 'آزمون بین‌المللی'],
+    createdAt: '۱۴۰۳/۰۷/۱۵'
+  },
+  {
+    id: 'post-webinar-mikrotik-cisco',
+    title: 'وبینار تخصصی رایگان: معماری امن شبکه‌های سازمانی با فایروال میکروتیک و سوئیچ‌های سیسکو',
+    slug: 'enterprise-network-security-webinar',
+    type: 'event',
+    category: 'رویداد و وبینار',
+    isPinned: true,
+    eventDate: 'جمعه ۲۸ مهرماه ۱۴۰۳ - ساعت ۱۸:۳۰ الی ۲۱:۰۰',
+    eventLocation: 'اسکای‌روم آنلاین آکادمی پارس‌نت',
+    excerpt: 'بررسی عملی توپولوژی‌های پرکاربرد زیرساخت شبکه در شرکت‌های ایرانی، پیاده‌سازی روتینگ افزونه و مسدودسازی نفوذ به سرورها.',
+    content: `در این وبینار تخصصی ۳ ساعته، به بررسی عملی و کیس‌استادی‌های واقعی زیرساخت شبکه در سازمان‌ها می‌پردازیم:
+- نحوه ترکیب روتربوردهای MikroTik به عنوان فایروال مرزی و سوئیچ‌های Cisco Catalyst در لایه Core/Distribution
+- راه‌اندازی تانل‌های رمزنگاری‌شده امن برای شعب راه دور (Site-to-Site WireGuard & IPSec)
+- روش‌های مقابله با حملات DDOS و محدودسازی پهنای باند کاربران
+- پرسش و پاسخ زنده با مهندس قاسمی
+
+حضور در این وبینار برای تمام اعضا و دانشجویان آکادمی رایگان می‌باشد. لینک ورود به وبینار ۳۰ دقیقه قبل از شروع برای ثبت‌نام‌کنندگان پیامک خواهد شد.`,
+    author: 'مهندس محمدرضا قاسمی',
+    readTime: 'رویداد زنده',
+    coverImage: HERO_IMAGE,
+    tags: ['وبینار', 'میکروتیک', 'فایروال', 'امنیت'],
+    createdAt: '۱۴۰۳/۰۷/۱۸'
+  },
+  {
+    id: 'post-tech-news-react-19',
+    title: 'اخبار دنیای وب: انتشار رسمی React 19 با معماری کامپایلر هوشمند و Server Actions',
+    slug: 'react-19-stable-release-tech-news',
+    type: 'news',
+    category: 'اخبار فناوری',
+    excerpt: 'تیم توسعه فیسبوک نسخه نهایی و پایدار React 19 را با ارتقای شگفت‌انگیز سرعت رندر و حذف نیاز به useMemo و useCallback به شکل عمومی عرضه کرد.',
+    content: `تیم مهندسی React نسخه رسمی و مورد انتظار React 19 را به صورت عمومی منتشر نمود. مهم‌ترین ویژگی‌های این نسخه عبارتند از:
+۱. کامپایلر اتوماتیک ری‌اکت (React Compiler): دیگر نیازی به نوشتن دستی useMemo، useCallback و memo برای جلوگیری از رندرهای تکراری نیست.
+۲. فرم اکشن‌ها (Server Actions & useActionState): مدیریت آسان فرم‌ها و ارسال داده به سرور با کمترین کد ممکن.
+۳. پشتیبانی بومی از تگ‌های سند و استایل‌ها و استریمینگ هوشمند.
+
+این تغییرات در جدیدترین آپدیت دوره آموزشی طراحی سایت آکادمی پارس‌نت نیز گنجانده شده است.`,
+    author: 'مهندس آرش سپهری',
+    readTime: '۵ دقیقه',
+    coverImage: WEB_COURSE_IMAGE,
+    tags: ['React 19', 'Next.js', 'اخبار', 'فرانت‌اند'],
+    createdAt: '۱۴۰۳/۰۷/۱۲'
+  },
+  {
     id: 'art-1',
     title: 'راهنمای گام‌به‌گام پیاده‌سازی پروتکل OSPF در شبکه‌های سازمانی',
     slug: 'ospf-configuration-enterprise-networks',
-    excerpt: 'بررسی جامع نحوه کارکرد پروتکل داینامیک روتینگ OSPFv2، مفاهیم Area صفر، تایمرهای Hello و نحوه جلوگیری از لوپ در روتینگ.',
-    content: 'پروتکل OSPF یکی از محبوب‌ترین پروتکل‌های مسیریابی Link-State در شبکه‌های جهان است...',
+    type: 'article',
     category: 'آموزش شبکه',
+    excerpt: 'بررسی جامع نحوه کارکرد پروتکل داینامیک روتینگ OSPFv2، مفاهیم Area صفر، تایمرهای Hello و نحوه جلوگیری از لوپ در روتینگ.',
+    content: `پروتکل OSPF (Open Shortest Path First) یکی از استانداردترین و قدرتمندترین پروتکل‌های مسیریابی داینامیک از نوع Link-State است که در اکثر شبکه‌های بزرگ اداری و دیتاسنترها به عنوان پروتکل اصلی لایه ۳ به کار گرفته می‌شود.
+
+الگوریتم دایکسترا (SPF) پایه و اساس محاسبات OSPF است. هر روتر نقشه‌ای کامل از کل توپولوژی شبکه (LSDB) ایجاد می‌کند تا کوتاه‌ترین مسیر به هر شبکه مقصد را کشف کند.
+در سناریوهای Multi-Area، بخش Area 0 یا Backbone Area نقش حیاتی در اتصال سایر بخش‌ها ایفا می‌کند. جهت دانلود فایل آزمایشگاهی سناریوی این مقاله می‌توانید به بخش محصولات دانلودی مراجعه نمایید.`,
     author: 'مهندس محمدرضا قاسمی',
     readTime: '۸ دقیقه',
     coverImage: NETWORK_COURSE_IMAGE,
+    tags: ['سیسکو', 'OSPF', 'روتینگ', 'آموزش'],
     createdAt: '۱۴۰۳/۰۷/۰۵'
   },
   {
     id: 'art-2',
-    title: 'تفاوت‌های کلیدی Server Components در React 19 و نحوه عملکرد آن',
-    slug: 'react-19-server-components-guide',
-    excerpt: 'چگونه سرور کامپوننت‌ها زمان بارگذاری صفحات وب را تا ۴۰٪ کاهش می‌دهند و سئوی سایت را دگرگون می‌کنند؟',
-    content: 'در نسخه جدید React 19 معماری سرور کامپوننت‌ها به مرحله بلوغ کامل رسیده است...',
-    category: 'توسعه وب',
-    author: 'مهندس آرش سپهری',
-    readTime: '۶ دقیقه',
-    coverImage: WEB_COURSE_IMAGE,
-    createdAt: '۱۴۰۳/۰۷/۰۸'
+    title: 'راهنمای جامع سخت‌سازی و ایمن‌سازی سرورهای لینوکس اوبونتو برای استقرار برنامه‌های وب',
+    slug: 'ubuntu-linux-server-hardening-security-guide',
+    type: 'article',
+    category: 'دواپس و لینوکس',
+    excerpt: 'چگونه سرورهای ابری Ubuntu Server را در برابر اسکنرهای خودکار، بروت‌فورس پورت SSH و نفوذهای امنیتی با fail2ban و ufw محافظت کنیم؟',
+    content: `پس از خرید یک سرور مجازی یا اختصاصی لینوکس، اولین گام ایمن‌سازی پورت‌های ورودی و سرویس‌های سیستمی است:
+۱. تغییر پورت پیش‌فرض SSH از ۲۲ به پورت غیرمعمول و غیرفعال‌سازی لاگین با رمز عبور و استفاده انحصاری از SSH Key.
+۲. فعال‌سازی فایروال UFW و بستن تمام پورت‌های ورودی به جز پورت‌های ۸۰، ۴۴۳ و پورت امن SSH.
+۳. نصب و کانفیگ ابزار Fail2ban برای مسدودسازی خودکار IPهایی که اقدام به حملات حدس رمز عبور می‌کنند.
+۴. به‌روزرسانی مداوم پکیج‌ها با دستورات امنیتی خودکار unattended-upgrades.`,
+    author: 'مهندس نوید رادمنش',
+    readTime: '۷ دقیقه',
+    coverImage: HERO_IMAGE,
+    tags: ['لینوکس', 'دواپس', 'امنیت سرور', 'SSH'],
+    createdAt: '۱۴۰۳/۰۷/۰۹'
   }
 ];
 
@@ -535,7 +610,16 @@ class Store {
       this.currentUser = storedUser ? JSON.parse(storedUser) : INITIAL_USER;
 
       const storedSettings = localStorage.getItem('parsnet_settings');
-      this.settings = storedSettings ? JSON.parse(storedSettings) : INITIAL_SETTINGS;
+      if (storedSettings) {
+        const parsed = JSON.parse(storedSettings);
+        this.settings = {
+          ...parsed,
+          supabaseUrl: parsed.supabaseUrl || import.meta.env.VITE_SUPABASE_URL || '',
+          supabaseAnonKey: parsed.supabaseAnonKey || import.meta.env.VITE_SUPABASE_ANON_KEY || ''
+        };
+      } else {
+        this.settings = INITIAL_SETTINGS;
+      }
 
       const storedCart = localStorage.getItem('parsnet_cart');
       this.cart = storedCart ? JSON.parse(storedCart) : [];
@@ -631,6 +715,22 @@ class Store {
 
   deleteFile(fileId: string) {
     this.files = this.files.filter(f => f.id !== fileId);
+    this.saveToStorage();
+  }
+
+  // Article / Blog / News / Announcement / Event actions
+  addArticle(article: Article) {
+    this.articles = [article, ...this.articles];
+    this.saveToStorage();
+  }
+
+  updateArticle(updatedArticle: Article) {
+    this.articles = this.articles.map(a => a.id === updatedArticle.id ? updatedArticle : a);
+    this.saveToStorage();
+  }
+
+  deleteArticle(articleId: string) {
+    this.articles = this.articles.filter(a => a.id !== articleId);
     this.saveToStorage();
   }
 

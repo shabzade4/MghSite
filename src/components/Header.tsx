@@ -111,7 +111,7 @@ export const Header: React.FC<HeaderProps> = ({
                 currentTab === 'blog' ? 'text-indigo-600 font-semibold' : ''
               }`}
             >
-              مقالات تخصصی
+              نوشته‌ها و رویدادها
               {currentTab === 'blog' && (
                 <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-600 rounded-full" />
               )}
