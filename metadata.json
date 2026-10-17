@@ -1,0 +1,6 @@
+{
+  "name": "آکادمی شبکه و وب پارس نت | سامانه جامع آموزش و فروش فایل",
+  "description": "سامانه جامع آموزش تخصصی کامپیوتر، شبکه، طراحی سایت و فروش فایل‌های آموزشی، پنل کاربری دانشجویان، درگاه پرداخت آنلاین و مدیریت وردپرسی با پایگاه داده Supabase و آماده اجرا در Vercel",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

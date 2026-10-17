@@ -1,0 +1,437 @@
+import React, { useState, useEffect } from 'react';
+import { Header } from './components/Header';
+import { Hero } from './components/Hero';
+import { CourseCard } from './components/CourseCard';
+import { FileCard } from './components/FileCard';
+import { CourseDetailModal } from './components/CourseDetailModal';
+import { CoursePlayerModal } from './components/CoursePlayerModal';
+import { FileDetailModal } from './components/FileDetailModal';
+import { CartDrawer } from './components/CartDrawer';
+import { PaymentGatewayModal } from './components/PaymentGatewayModal';
+import { InvoiceModal } from './components/InvoiceModal';
+import { StudentPanel } from './components/StudentPanel';
+import { WordPressAdmin } from './components/WordPressAdmin';
+import { SupabaseGuideModal } from './components/SupabaseGuideModal';
+import { Footer } from './components/Footer';
+
+import { Course, DigitalFile, Order, OrderItem } from './types';
+import { store } from './services/store';
+import { BookOpen, Download, FileText, Terminal, ArrowLeft, ShieldCheck, CheckCircle2, Star } from 'lucide-react';
+
+export default function App() {
+  const [currentTab, setCurrentTab] = useState<'home' | 'courses' | 'files' | 'blog' | 'student-panel' | 'admin-panel'>('home');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+
+  // Store data
+  const [courses, setCourses] = useState<Course[]>(store.courses);
+  const [files, setFiles] = useState<DigitalFile[]>(store.files);
+  const [articles, setArticles] = useState(store.articles);
+
+  // Modals & Drawers state
+  const [selectedCourseForDetails, setSelectedCourseForDetails] = useState<Course | null>(null);
+  const [selectedCourseForPlayer, setSelectedCourseForPlayer] = useState<Course | null>(null);
+  const [selectedFileForDetails, setSelectedFileForDetails] = useState<DigitalFile | null>(null);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isSupabaseGuideOpen, setIsSupabaseGuideOpen] = useState(false);
+
+  // Checkout & Payment State
+  const [isPaymentGatewayOpen, setIsPaymentGatewayOpen] = useState(false);
+  const [checkoutItems, setCheckoutItems] = useState<OrderItem[]>([]);
+  const [checkoutTotal, setCheckoutTotal] = useState(0);
+  const [checkoutDiscount, setCheckoutDiscount] = useState(0);
+  const [checkoutPayable, setCheckoutPayable] = useState(0);
+  const [activeInvoiceOrder, setActiveInvoiceOrder] = useState<Order | null>(null);
+
+  useEffect(() => {
+    return store.subscribe(() => {
+      setCourses([...store.courses]);
+      setFiles([...store.files]);
+      setArticles([...store.articles]);
+    });
+  }, []);
+
+  // Filtered courses
+  const filteredCourses = courses.filter(c => {
+    const matchesSearch = !searchQuery || 
+      c.title.includes(searchQuery) || 
+      c.shortDescription.includes(searchQuery) ||
+      c.whatYouWillLearn.some(w => w.includes(searchQuery));
+
+    const matchesCat = selectedCategory === 'all' || 
+      selectedCategory === 'files' ? true : 
+      (selectedCategory === 'network' ? c.category === 'network' : 
+       selectedCategory === 'web' ? c.category === 'web' : 
+       selectedCategory === 'devops' ? (c.category === 'devops' || c.category === 'security') : true);
+
+    return matchesSearch && matchesCat;
+  });
+
+  // Filtered files
+  const filteredFiles = files.filter(f => {
+    const matchesSearch = !searchQuery || 
+      f.title.includes(searchQuery) || 
+      f.description.includes(searchQuery) ||
+      f.fileFormat.includes(searchQuery);
+
+    const matchesCat = selectedCategory === 'all' || selectedCategory === 'files';
+    return matchesSearch && matchesCat;
+  });
+
+  // Handle Cart Proceed to Checkout
+  const handleProceedFromCart = (discountPercent: number) => {
+    const items: OrderItem[] = store.cart.map(c => ({
+      id: c.id,
+      type: c.type,
+      title: c.title,
+      price: c.price
+    }));
+
+    const rawTotal = items.reduce((acc, i) => acc + i.price, 0);
+    const discountAmount = Math.round((rawTotal * discountPercent) / 100);
+    const payable = Math.max(0, rawTotal - discountAmount);
+
+    setCheckoutItems(items);
+    setCheckoutTotal(rawTotal);
+    setCheckoutDiscount(discountAmount);
+    setCheckoutPayable(payable);
+
+    setIsCartOpen(false);
+    setIsPaymentGatewayOpen(true);
+  };
+
+  // Handle direct checkout for single item
+  const handleDirectCourseCheckout = (course: Course) => {
+    const items: OrderItem[] = [{
+      id: course.id,
+      type: 'course',
+      title: course.title,
+      price: course.price
+    }];
+    setCheckoutItems(items);
+    setCheckoutTotal(course.price);
+    setCheckoutDiscount(0);
+    setCheckoutPayable(course.price);
+
+    setSelectedCourseForDetails(null);
+    setIsPaymentGatewayOpen(true);
+  };
+
+  const handleDirectFileCheckout = (file: DigitalFile) => {
+    const items: OrderItem[] = [{
+      id: file.id,
+      type: 'file',
+      title: file.title,
+      price: file.price
+    }];
+    setCheckoutItems(items);
+    setCheckoutTotal(file.price);
+    setCheckoutDiscount(0);
+    setCheckoutPayable(file.price);
+
+    setSelectedFileForDetails(null);
+    setIsPaymentGatewayOpen(true);
+  };
+
+  // Payment Success
+  const handlePaymentSuccess = (order: Order) => {
+    setIsPaymentGatewayOpen(false);
+    setActiveInvoiceOrder(order);
+  };
+
+  // If in WordPress Admin Mode, render the full admin console
+  if (currentTab === 'admin-panel') {
+    return (
+      <WordPressAdmin
+        onBackToSite={() => setCurrentTab('home')}
+        onOpenInvoice={(order) => setActiveInvoiceOrder(order)}
+      />
+    );
+  }
+
+  return (
+    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 selection:bg-indigo-500 selection:text-white" dir="rtl">
+      {/* Top Header Bar */}
+      <Header
+        currentTab={currentTab}
+        onNavigate={(tab) => {
+          setCurrentTab(tab);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenCart={() => setIsCartOpen(true)}
+        onOpenSupabaseGuide={() => setIsSupabaseGuideOpen(true)}
+      />
+
+      {/* Main Views Container */}
+      <main className="flex-1">
+        {/* STUDENT PANEL VIEW */}
+        {currentTab === 'student-panel' ? (
+          <StudentPanel
+            onOpenPlayer={(course) => setSelectedCourseForPlayer(course)}
+            onOpenInvoice={(order) => setActiveInvoiceOrder(order)}
+            onBackToHome={() => setCurrentTab('home')}
+          />
+        ) : (
+          <>
+            {/* HERO SECTION (Shown on Home) */}
+            {currentTab === 'home' && (
+              <Hero
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
+                onSelectCategory={setSelectedCategory}
+                selectedCategory={selectedCategory}
+              />
+            )}
+
+            {/* Sub-header for other tabs */}
+            {currentTab !== 'home' && (
+              <div className="bg-slate-900 text-white py-12 px-4 sm:px-6 lg:px-8 border-b border-slate-800">
+                <div className="max-w-7xl mx-auto">
+                  <div className="text-xs text-indigo-400 font-mono mb-2">
+                    {currentTab === 'courses' ? 'آموزش‌های تخصصی' : currentTab === 'files' ? 'فروشگاه فایل و سناریو' : 'مقالات و آموزش‌ها'}
+                  </div>
+                  <h1 className="text-2xl sm:text-3xl font-black text-white">
+                    {currentTab === 'courses'
+                      ? 'دوره‌های جامع مهندسی شبکه، سیسکو و طراحی سایت'
+                      : currentTab === 'files'
+                      ? 'پکیج سناریوهای پکت‌تریسر، اسکریپت‌ها و فایل‌های پروژه'
+                      : 'مقالات و راهنماهای تخصصی فناوری اطلاعات'}
+                  </h1>
+                </div>
+              </div>
+            )}
+
+            {/* CONTENT SECTIONS */}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16">
+              {/* SECTION 1: Featured Courses */}
+              {(currentTab === 'home' || currentTab === 'courses') && (
+                <section>
+                  <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+                    <div>
+                      <div className="text-xs font-bold text-indigo-600 mb-1 flex items-center gap-1.5">
+                        <BookOpen className="w-4 h-4" />
+                        <span>دوره‌های آموزشی با گارانتی یادگیری</span>
+                      </div>
+                      <h2 className="text-xl sm:text-2xl font-black text-slate-900">
+                        {selectedCategory === 'network'
+                          ? 'دوره‌های تخصصی مهندسی شبکه و سیسکو'
+                          : selectedCategory === 'web'
+                          ? 'دوره‌های فرانت‌اند و طراحی وب مدرن'
+                          : 'محبوب‌ترین دوره‌های تخصصی شبکه و برنامه‌نویسی'}
+                      </h2>
+                    </div>
+
+                    {currentTab === 'home' && (
+                      <button
+                        onClick={() => setCurrentTab('courses')}
+                        className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 self-start sm:self-auto"
+                      >
+                        <span>مشاهده همه دوره‌ها ({courses.length})</span>
+                        <ArrowLeft className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </div>
+
+                  {filteredCourses.length === 0 ? (
+                    <div className="text-center py-12 text-slate-400 bg-white rounded-2xl border border-slate-200">
+                      موردی با شرایط جستجوی شما یافت نشد.
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {filteredCourses.map(course => (
+                        <CourseCard
+                          key={course.id}
+                          course={course}
+                          onOpenDetails={(c) => setSelectedCourseForDetails(c)}
+                          onOpenPlayer={(c) => setSelectedCourseForPlayer(c)}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </section>
+              )}
+
+              {/* SECTION 2: Downloadable Files & Scenarios */}
+              {(currentTab === 'home' || currentTab === 'files') && (
+                <section>
+                  <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+                    <div>
+                      <div className="text-xs font-bold text-cyan-600 mb-1 flex items-center gap-1.5">
+                        <Download className="w-4 h-4" />
+                        <span>فایل‌ها و سناریوهای آماده دانلود</span>
+                      </div>
+                      <h2 className="text-xl sm:text-2xl font-black text-slate-900">
+                        سناریوهای شبیه‌سازی، اسکریپت‌های شبکه و سورس‌کدها
+                      </h2>
+                    </div>
+
+                    {currentTab === 'home' && (
+                      <button
+                        onClick={() => setCurrentTab('files')}
+                        className="text-xs font-semibold text-cyan-600 hover:text-cyan-800 flex items-center gap-1 self-start sm:self-auto"
+                      >
+                        <span>مشاهده همه فایل‌ها ({files.length})</span>
+                        <ArrowLeft className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </div>
+
+                  {filteredFiles.length === 0 ? (
+                    <div className="text-center py-12 text-slate-400 bg-white rounded-2xl border border-slate-200">
+                      فایلی با شرایط جستجوی شما یافت نشد.
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                      {filteredFiles.map(file => (
+                        <FileCard
+                          key={file.id}
+                          file={file}
+                          onOpenDetails={(f) => setSelectedFileForDetails(f)}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </section>
+              )}
+
+              {/* SECTION 3: Technical Blog Articles */}
+              {(currentTab === 'home' || currentTab === 'blog') && (
+                <section className="pt-6">
+                  <div className="flex items-center justify-between mb-8">
+                    <div>
+                      <div className="text-xs font-bold text-indigo-600 mb-1 flex items-center gap-1.5">
+                        <FileText className="w-4 h-4" />
+                        <span>دانشنامه و مقالات تخصصی</span>
+                      </div>
+                      <h2 className="text-xl sm:text-2xl font-black text-slate-900">
+                        آخرین مقالات آموزشی شبکه، سیسکو و فرانت‌اند
+                      </h2>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {articles.map(article => (
+                      <div
+                        key={article.id}
+                        className="bg-white rounded-2xl border border-slate-200/90 p-5 hover:border-indigo-300 transition-all flex flex-col justify-between"
+                      >
+                        <div>
+                          <div className="flex items-center gap-2 text-xs text-slate-500 mb-2 font-mono">
+                            <span>{article.category}</span>
+                            <span aria-hidden="true">·</span>
+                            <span>{article.readTime} مطالعه</span>
+                            <span aria-hidden="true">·</span>
+                            <span>{article.createdAt}</span>
+                          </div>
+
+                          <h3 className="text-base font-bold text-slate-900 hover:text-indigo-600 transition-colors mb-2">
+                            {article.title}
+                          </h3>
+
+                          <p className="text-xs text-slate-600 leading-relaxed font-light mb-4">
+                            {article.excerpt}
+                          </p>
+                        </div>
+
+                        <div className="flex items-center justify-between pt-3 border-t border-slate-100 text-xs">
+                          <span className="text-slate-500">نویسنده: {article.author}</span>
+                          <span className="text-indigo-600 font-semibold cursor-pointer">
+                            ادامه مطلب ←
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
+            </div>
+          </>
+        )}
+      </main>
+
+      {/* FOOTER */}
+      <Footer
+        onNavigate={(tab) => {
+          setCurrentTab(tab);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenSupabaseGuide={() => setIsSupabaseGuideOpen(true)}
+      />
+
+      {/* ALL MODALS & DRAWERS */}
+      {/* 1. Course Details Modal */}
+      {selectedCourseForDetails && (
+        <CourseDetailModal
+          course={selectedCourseForDetails}
+          onClose={() => setSelectedCourseForDetails(null)}
+          onOpenPlayer={(c) => {
+            setSelectedCourseForDetails(null);
+            setSelectedCourseForPlayer(c);
+          }}
+          onDirectCheckout={handleDirectCourseCheckout}
+        />
+      )}
+
+      {/* 2. Course Video Player Modal */}
+      {selectedCourseForPlayer && (
+        <CoursePlayerModal
+          course={selectedCourseForPlayer}
+          onClose={() => setSelectedCourseForPlayer(null)}
+          onEnrollCourse={handleDirectCourseCheckout}
+        />
+      )}
+
+      {/* 3. File Details Modal */}
+      {selectedFileForDetails && (
+        <FileDetailModal
+          file={selectedFileForDetails}
+          onClose={() => setSelectedFileForDetails(null)}
+          onDirectCheckout={handleDirectFileCheckout}
+        />
+      )}
+
+      {/* 4. Cart Drawer */}
+      <CartDrawer
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+        onProceedToCheckout={handleProceedFromCart}
+      />
+
+      {/* 5. Payment Gateway Simulator */}
+      {isPaymentGatewayOpen && (
+        <PaymentGatewayModal
+          items={checkoutItems}
+          totalAmount={checkoutTotal}
+          discountAmount={checkoutDiscount}
+          payableAmount={checkoutPayable}
+          onSuccess={handlePaymentSuccess}
+          onCancel={() => setIsPaymentGatewayOpen(false)}
+        />
+      )}
+
+      {/* 6. Invoice Modal */}
+      {activeInvoiceOrder && (
+        <InvoiceModal
+          order={activeInvoiceOrder}
+          onClose={() => setActiveInvoiceOrder(null)}
+          onGoToStudentPanel={() => {
+            setActiveInvoiceOrder(null);
+            setCurrentTab('student-panel');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+        />
+      )}
+
+      {/* 7. Supabase & Vercel Guide Modal */}
+      {isSupabaseGuideOpen && (
+        <SupabaseGuideModal
+          onClose={() => setIsSupabaseGuideOpen(false)}
+          onOpenAdminSettings={() => {
+            setIsSupabaseGuideOpen(false);
+            setCurrentTab('admin-panel');
+          }}
+        />
+      )}
+    </div>
+  );
+}
