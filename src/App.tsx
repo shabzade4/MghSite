@@ -11,17 +11,21 @@ import { PaymentGatewayModal } from './components/PaymentGatewayModal';
 import { InvoiceModal } from './components/InvoiceModal';
 import { StudentPanel } from './components/StudentPanel';
 import { WordPressAdmin } from './components/WordPressAdmin';
+import { AdminLogin } from './components/AdminLogin';
 import { SupabaseGuideModal } from './components/SupabaseGuideModal';
 import { BlogView } from './components/BlogView';
 import { ArticleDetailModal } from './components/ArticleDetailModal';
+import { AboutUsView } from './components/AboutUsView';
+import { ContactUsView } from './components/ContactUsView';
+import { TermsAndSitemapView } from './components/TermsAndSitemapView';
 import { Footer } from './components/Footer';
 
-import { Course, DigitalFile, Order, OrderItem, Article } from './types';
+import { Course, DigitalFile, Order, OrderItem, Article, NavigationTab } from './types';
 import { store } from './services/store';
-import { BookOpen, Download, FileText, Terminal, ArrowLeft, ShieldCheck, CheckCircle2, Star, Bell, Radio } from 'lucide-react';
+import { BookOpen, Download, Terminal, ArrowLeft, Radio } from 'lucide-react';
 
 export default function App() {
-  const [currentTab, setCurrentTab] = useState<'home' | 'courses' | 'files' | 'blog' | 'student-panel' | 'admin-panel'>('home');
+  const [currentTab, setCurrentTab] = useState<NavigationTab>('home');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
 
@@ -29,6 +33,7 @@ export default function App() {
   const [courses, setCourses] = useState<Course[]>(store.courses);
   const [files, setFiles] = useState<DigitalFile[]>(store.files);
   const [articles, setArticles] = useState<Article[]>(store.articles);
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState<boolean>(store.isAdminLoggedIn);
 
   // Modals & Drawers state
   const [selectedCourseForDetails, setSelectedCourseForDetails] = useState<Course | null>(null);
@@ -51,6 +56,7 @@ export default function App() {
       setCourses([...store.courses]);
       setFiles([...store.files]);
       setArticles([...store.articles]);
+      setIsAdminLoggedIn(store.isAdminLoggedIn);
     });
   }, []);
 
@@ -142,8 +148,19 @@ export default function App() {
     setActiveInvoiceOrder(order);
   };
 
-  // If in WordPress Admin Mode, render the full admin console
+  // IF ADMIN PANEL MODE: Check Login status
   if (currentTab === 'admin-panel') {
+    if (!isAdminLoggedIn) {
+      return (
+        <AdminLogin
+          onSuccess={() => {
+            setIsAdminLoggedIn(true);
+          }}
+          onBackToSite={() => setCurrentTab('home')}
+        />
+      );
+    }
+
     return (
       <WordPressAdmin
         onBackToSite={() => setCurrentTab('home')}
@@ -167,14 +184,82 @@ export default function App() {
 
       {/* Main Views Container */}
       <main className="flex-1">
-        {/* STUDENT PANEL VIEW */}
-        {currentTab === 'student-panel' ? (
+        {/* VIEW: STUDENT PANEL */}
+        {currentTab === 'student-panel' && (
           <StudentPanel
             onOpenPlayer={(course) => setSelectedCourseForPlayer(course)}
             onOpenInvoice={(order) => setActiveInvoiceOrder(order)}
             onBackToHome={() => setCurrentTab('home')}
           />
-        ) : (
+        )}
+
+        {/* VIEW: ABOUT US */}
+        {currentTab === 'about' && (
+          <AboutUsView
+            onNavigateToCourses={() => {
+              setCurrentTab('courses');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onNavigateToContact={() => {
+              setCurrentTab('contact');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+          />
+        )}
+
+        {/* VIEW: CONTACT US */}
+        {currentTab === 'contact' && <ContactUsView />}
+
+        {/* VIEW: TERMS & CONDITIONS */}
+        {currentTab === 'terms' && (
+          <TermsAndSitemapView
+            initialMode="terms"
+            onNavigateToCourse={(id) => {
+              const c = courses.find(item => item.id === id);
+              if (c) setSelectedCourseForDetails(c);
+            }}
+            onNavigateToFile={(id) => {
+              const f = files.find(item => item.id === id);
+              if (f) setSelectedFileForDetails(f);
+            }}
+            onNavigateToArticle={(id) => {
+              const a = articles.find(item => item.id === id);
+              if (a) setSelectedArticleForDetails(a);
+            }}
+          />
+        )}
+
+        {/* VIEW: SITEMAP */}
+        {currentTab === 'sitemap' && (
+          <TermsAndSitemapView
+            initialMode="sitemap"
+            onNavigateToCourse={(id) => {
+              const c = courses.find(item => item.id === id);
+              if (c) setSelectedCourseForDetails(c);
+            }}
+            onNavigateToFile={(id) => {
+              const f = files.find(item => item.id === id);
+              if (f) setSelectedFileForDetails(f);
+            }}
+            onNavigateToArticle={(id) => {
+              const a = articles.find(item => item.id === id);
+              if (a) setSelectedArticleForDetails(a);
+            }}
+          />
+        )}
+
+        {/* VIEW: DEDICATED BLOG VIEW */}
+        {currentTab === 'blog' && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <BlogView
+              articles={articles}
+              onOpenArticle={(art) => setSelectedArticleForDetails(art)}
+            />
+          </div>
+        )}
+
+        {/* VIEW: HOME, COURSES, FILES */}
+        {(currentTab === 'home' || currentTab === 'courses' || currentTab === 'files') && (
           <>
             {/* HERO SECTION (Shown on Home) */}
             {currentTab === 'home' && (
@@ -186,19 +271,17 @@ export default function App() {
               />
             )}
 
-            {/* Sub-header for other tabs */}
+            {/* Sub-header for courses and files */}
             {currentTab !== 'home' && (
               <div className="bg-slate-900 text-white py-12 px-4 sm:px-6 lg:px-8 border-b border-slate-800">
                 <div className="max-w-7xl mx-auto">
                   <div className="text-xs text-indigo-400 font-mono mb-2">
-                    {currentTab === 'courses' ? 'آموزش‌های تخصصی' : currentTab === 'files' ? 'فروشگاه فایل و سناریو' : 'مقالات و آموزش‌ها'}
+                    {currentTab === 'courses' ? 'آموزش‌های تخصصی' : 'فروشگاه فایل و سناریو'}
                   </div>
                   <h1 className="text-2xl sm:text-3xl font-black text-white">
                     {currentTab === 'courses'
                       ? 'دوره‌های جامع مهندسی شبکه، سیسکو و طراحی سایت'
-                      : currentTab === 'files'
-                      ? 'پکیج سناریوهای پکت‌تریسر، اسکریپت‌ها و فایل‌های پروژه'
-                      : 'مقالات و راهنماهای تخصصی فناوری اطلاعات'}
+                      : 'پکیج سناریوهای پکت‌تریسر، اسکریپت‌ها و فایل‌های پروژه'}
                   </h1>
                 </div>
               </div>
@@ -227,7 +310,7 @@ export default function App() {
                     {currentTab === 'home' && (
                       <button
                         onClick={() => setCurrentTab('courses')}
-                        className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 self-start sm:self-auto"
+                        className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 self-start sm:self-auto cursor-pointer"
                       >
                         <span>مشاهده همه دوره‌ها ({courses.length})</span>
                         <ArrowLeft className="w-3.5 h-3.5" />
@@ -271,7 +354,7 @@ export default function App() {
                     {currentTab === 'home' && (
                       <button
                         onClick={() => setCurrentTab('files')}
-                        className="text-xs font-semibold text-cyan-600 hover:text-cyan-800 flex items-center gap-1 self-start sm:self-auto"
+                        className="text-xs font-semibold text-cyan-600 hover:text-cyan-800 flex items-center gap-1 self-start sm:self-auto cursor-pointer"
                       >
                         <span>مشاهده همه فایل‌ها ({files.length})</span>
                         <ArrowLeft className="w-3.5 h-3.5" />
@@ -297,7 +380,7 @@ export default function App() {
                 </section>
               )}
 
-              {/* SECTION 3: Technical Blog, Announcements, News & Events */}
+              {/* SECTION 3: Technical Blog, Announcements, News & Events (Home preview) */}
               {currentTab === 'home' && (
                 <section className="pt-6">
                   <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
@@ -316,7 +399,7 @@ export default function App() {
                         setCurrentTab('blog');
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                       }}
-                      className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 self-start sm:self-auto"
+                      className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 self-start sm:self-auto cursor-pointer"
                     >
                       <span>مشاهده همه نوشته‌ها و رویدادها ({articles.length})</span>
                       <ArrowLeft className="w-3.5 h-3.5" />
@@ -372,14 +455,6 @@ export default function App() {
                     ))}
                   </div>
                 </section>
-              )}
-
-              {/* DEDICATED BLOG VIEW */}
-              {currentTab === 'blog' && (
-                <BlogView
-                  articles={articles}
-                  onOpenArticle={(art) => setSelectedArticleForDetails(art)}
-                />
               )}
             </div>
           </>

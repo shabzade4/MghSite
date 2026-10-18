@@ -1,4 +1,7 @@
-import { Course, DigitalFile, User, Order, Ticket, Article, SiteSettings, CartItem } from '../types';
+import {
+  Course, DigitalFile, User, Order, Ticket, Article, SiteSettings,
+  CartItem, MediaItem, ContactMessage, Review, Coupon, CourseQuiz, Certificate, ToastMessage, VideoNote
+} from '../types';
 import { getSupabaseClient } from './supabase';
 
 // Generated asset image paths
@@ -363,6 +366,22 @@ export const INITIAL_USER: User = {
   avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=250&q=80',
   enrolledCourseIds: ['course-ccna-200-301'],
   purchasedFileIds: ['file-cisco-labs-bundle'],
+  completedEpisodeIds: ['ep-1-1', 'ep-1-2'],
+  certificates: [
+    {
+      id: 'cert-101',
+      certificateNumber: 'PN-CERT-2024-8841',
+      userId: 'usr-student-demo',
+      userName: 'علی حسینی',
+      userPhone: '09123456789',
+      courseId: 'course-ccna-200-301',
+      courseTitle: 'دوره جامع مهندسی شبکه سیسکو (Cisco CCNA 200-301)',
+      instructorName: 'مهندس محمدرضا قاسمی',
+      issueDate: '۱۴۰۳/۰۷/۱۰',
+      gradeScore: 96,
+      verificationCode: 'CCNA-96-8841-VERIFIED'
+    }
+  ],
   walletBalance: 250000,
   createdAt: '۱۴۰۳/۰۱/۱۵'
 };
@@ -560,18 +579,261 @@ export const INITIAL_ARTICLES: Article[] = [
   }
 ];
 
+export const INITIAL_MEDIA: MediaItem[] = [
+  {
+    id: 'media-1',
+    title: 'تصویر لابراتوار تخصصی شبکه و دیتاسنتر',
+    fileName: 'hero_tech_academy.jpg',
+    fileType: 'image',
+    url: HERO_IMAGE,
+    size: '۲۴۰ کیلوبایت',
+    dimensions: '۱۹۲۰ × ۱۰۸۰',
+    altText: 'لابراتوار تخصصی آموزش شبکه و سرور پارس‌نت',
+    tags: ['شبکه', 'هدر', 'سرور'],
+    uploadedAt: '۱۴۰۳/۰۷/۱۰'
+  },
+  {
+    id: 'media-2',
+    title: 'تصویر رک سوئیچ‌های سیسکو و کابل‌کشی پچ‌پنل',
+    fileName: 'cisco_switch_rack.jpg',
+    fileType: 'image',
+    url: NETWORK_COURSE_IMAGE,
+    size: '۱۸۰ کیلوبایت',
+    dimensions: '۱۲۰۰ × ۹۰۰',
+    altText: 'رک تجهیزات سیسکو و مهندسی شبکه',
+    tags: ['سیسکو', 'سوئیچینگ', 'کلاس'],
+    uploadedAt: '۱۴۰۳/۰۷/۱۱'
+  },
+  {
+    id: 'media-3',
+    title: 'میز کار برنامه‌نویسی و طراحی وب ری‌اکت',
+    fileName: 'web_dev_workspace.jpg',
+    fileType: 'image',
+    url: WEB_COURSE_IMAGE,
+    size: '۲۱۰ کیلوبایت',
+    dimensions: '۱۲۰۰ × ۹۰۰',
+    altText: 'محیط توسعه وب مدرن با React و Next.js',
+    tags: ['برنامه‌نویسی', 'فرانت‌اند', 'ری‌اکت'],
+    uploadedAt: '۱۴۰۳/۰۷/۱۱'
+  },
+  {
+    id: 'media-4',
+    title: 'بسته سناریوها و نقشه‌های شبکه پکت‌تریسر',
+    fileName: 'network_labs_bundle.jpg',
+    fileType: 'image',
+    url: DIGITAL_PACK_IMAGE,
+    size: '۱۹۵ کیلوبایت',
+    dimensions: '۱۲۰۰ × ۹۰۰',
+    altText: 'پکیج دانلودی سناریوهای شبکه',
+    tags: ['فایل', 'دانلود', 'پکت‌تریسر'],
+    uploadedAt: '۱۴۰۳/۰۷/۱۲'
+  }
+];
+
+export const INITIAL_CONTACT_MESSAGES: ContactMessage[] = [
+  {
+    id: 'msg-c-1',
+    name: 'مهندس کامران رستمی',
+    email: 'rostami.k@gmail.com',
+    phone: '09121112233',
+    subject: 'درخواست برگزاری دوره سازمانی CCNA برای پرسنل انفورماتیک',
+    message: 'با سلام و احترام، تمایل داریم دوره مهندسی شبکه سیسکو را برای تیم پشتیبانی شبکه شرکت به صورت اختصاصی برگزار نماییم. لطفا سرفصل‌ها و نحوه هماهنگی را ارسال فرمایید.',
+    createdAt: '۱۴۰۳/۰۷/۱۶ - ۱۰:۳۰',
+    isRead: false
+  }
+];
+
+export const INITIAL_REVIEWS: Review[] = [
+  {
+    id: 'rev-1',
+    courseId: 'course-ccna-200-301',
+    courseTitle: 'دوره جامع مهندسی شبکه سیسکو (Cisco CCNA 200-301)',
+    userName: 'مهندس وحید کاظمی',
+    userAvatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80',
+    rating: 5,
+    comment: 'بهترین و دقیق‌ترین دوره سیسکو به زبان فارسی بود. تسلط مهندس قاسمی روی سناریوهای EVE-NG و پکت‌تریسر و تحلیل با وایرشارک فوق‌العاده است. با همین آموزش موفق شدم آزمون بین‌المللی را پاس کنم.',
+    createdAt: '۱۴۰۳/۰۷/۱۰',
+    isApproved: true
+  },
+  {
+    id: 'rev-2',
+    courseId: 'course-ccna-200-301',
+    courseTitle: 'دوره جامع مهندسی شبکه سیسکو (Cisco CCNA 200-301)',
+    userName: 'سارا میرزایی',
+    userAvatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80',
+    rating: 5,
+    comment: 'روش توضیح مباحث ساب‌نتینگ و پیکربندی VLAN و ترانک عالی بود. پشتیبانی تیکتی هم بسیار سریع و دلسوزانه است.',
+    createdAt: '۱۴۰۳/۰۷/۱۴',
+    isApproved: true
+  },
+  {
+    id: 'rev-3',
+    courseId: 'course-react-fullstack',
+    courseTitle: 'دوره جامع آموزش طراحی سایت با React 19، Next.js و Tailwind CSS',
+    userName: 'امیررضا کریمی',
+    userAvatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=150&q=80',
+    rating: 5,
+    comment: 'پروژه‌محور بودن دوره و اتصال به دیتابیس Supabase و استقرار روی Vercel واقعاً نیاز بازار کار امروز است. دست مریزاد به مهندس سپهری.',
+    createdAt: '۱۴۰۳/۰۷/۱۵',
+    isApproved: true
+  }
+];
+
+export const INITIAL_COUPONS: Coupon[] = [
+  {
+    id: 'cp-1',
+    code: 'CCNA30',
+    discountPercent: 30,
+    maxUses: 100,
+    usedCount: 24,
+    expiresAt: '۱۴۰۳/۰۸/۳۰',
+    isActive: true,
+    description: 'تخفیف ویژه ۳۰ درصدی دوره‌ها و سناریوهای شبکه'
+  },
+  {
+    id: 'cp-2',
+    code: 'PARSNET20',
+    discountPercent: 20,
+    maxUses: 250,
+    usedCount: 88,
+    expiresAt: '۱۴۰۳/۰۹/۱۵',
+    isActive: true,
+    description: 'کد تخفیف عمومی ۲۰ درصدی کل سبد خرید'
+  },
+  {
+    id: 'cp-3',
+    code: 'REACT15',
+    discountPercent: 15,
+    maxUses: 50,
+    usedCount: 12,
+    expiresAt: '۱۴۰۳/۰۸/۱۵',
+    isActive: true,
+    description: 'تخفیف اختصاصی طراحی سایت و فرانت‌اند'
+  }
+];
+
+export const INITIAL_QUIZZES: CourseQuiz[] = [
+  {
+    id: 'quiz-ccna-exam',
+    courseId: 'course-ccna-200-301',
+    courseTitle: 'دوره جامع مهندسی شبکه سیسکو (Cisco CCNA 200-301)',
+    title: 'آزمون شبیه‌ساز رسمی پایان دوره مهندسی شبکه سیسکو (CCNA)',
+    timeLimitMinutes: 20,
+    passScorePercent: 70,
+    questions: [
+      {
+        id: 'q-1',
+        question: 'کدام پروتکل مسیریابی از الگوریتم SPF (Dijkstra) برای پیدا کردن کوتاه‌ترین مسیر در شبکه استفاده می‌کند؟',
+        options: ['RIPv2', 'OSPF', 'BGP', 'EIGRP'],
+        correctOptionIndex: 1,
+        explanation: 'پروتکل OSPF یک پروتکل Link-State است که از الگوریتم SPF یا دایکسترا برای محاسبه بهترین مسیر بدون ایجاد لوپ استفاده می‌نماید.'
+      },
+      {
+        id: 'q-2',
+        question: 'پروتکل استاندارد صنعتی مورد استفاده برای ترانکینگ بین سوئیچ‌های لایه ۲ کدام است؟',
+        options: ['ISL', 'IEEE 802.1Q (dot1q)', 'VTP', 'STP 802.1D'],
+        correctOptionIndex: 1,
+        explanation: 'استاندارد IEEE 802.1Q به عنوان پروتکل استاندارد باز برای برچسب‌گذاری (Tagging) فریم‌های VLAN روی پورت‌های ترانک در تمام برندها کاربرد دارد.'
+      },
+      {
+        id: 'q-3',
+        question: 'در آدرس‌دهی شبکه، ماسک شبکه 255.255.255.192 برابر با کدام پیشوند CIDR است؟',
+        options: ['/24', '/25', '/26', '/27'],
+        correctOptionIndex: 2,
+        explanation: 'مقدار 192 در اکتت آخر برابر با دو بیت ۱ (۱۲۸ + ۶۴) است؛ بنابراین ۲۴ + ۲ = ۲۶ بیت ماسک شبکه (/26).'
+      },
+      {
+        id: 'q-4',
+        question: 'وظیفه مکانیزم امنیتی Port Security روی سوئیچ‌های سیسکو چیست؟',
+        options: [
+          'رمزنگاری ترافیک کابل‌های اترنت',
+          'محدودسازی دسترسی پورت فقط به مک‌آدرس‌های مجاز جهت جلوگیری از نفوذ',
+          'جلوگیری از حملات DDoS لایه ۷',
+          'تخصیص اتوماتیک آدرس IP'
+        ],
+        correctOptionIndex: 1,
+        explanation: 'پورت سکیوریتی به مدیر شبکه امکان می‌دهد با ثبت MAC Addressهای مجاز، از اتصال کلاینت‌های غیرمجاز به پورت سوئیچ جلوگیری کند.'
+      },
+      {
+        id: 'q-5',
+        question: 'در پروتکل OSPF، تمام ناحیه‌ها (Non-Backbone Areas) الزماً باید به کدام ناحیه متصل باشند؟',
+        options: ['Area 1', 'Area 10', 'Area 0 (Backbone)', 'Area 99'],
+        correctOptionIndex: 2,
+        explanation: 'در ساختار چند ناحیه‌ای OSPF، تمام بخش‌ها برای تبادل مسیرهای Inter-Area باید مستقیماً یا از طریق Virtual-Link به Area 0 (Backbone) متصل باشند.'
+      }
+    ]
+  },
+  {
+    id: 'quiz-react-exam',
+    courseId: 'course-react-fullstack',
+    courseTitle: 'دوره جامع آموزش طراحی سایت با React 19، Next.js و Tailwind CSS',
+    title: 'آزمون پایان دوره تخصصی توسعه وب مدرن (React 19 & Next.js)',
+    timeLimitMinutes: 15,
+    passScorePercent: 70,
+    questions: [
+      {
+        id: 'rq-1',
+        question: 'ویژگی اصلی Server Components در معماری React 19 و Next.js چیست؟',
+        options: [
+          'اجرای کدها فقط روی مرورگر کلاینت',
+          'رندر کامپوننت روی سرور بدون ارسال کدهای جاوااسکریپت آن به مرورگر، که منجر به کاهش حجم باندل می‌شود',
+          'عدم امکان ارتباط با پایگاه داده',
+          'استفاده اجباری از هوک useState'
+        ],
+        correctOptionIndex: 1,
+        explanation: 'کامپوننت‌های سروری به صورت پیش‌فرض کدهای سنگین خود را روی سرور اجرا می‌کنند و فقط HTML/JSON خروجی را به مرورگر می‌فرستند.'
+      },
+      {
+        id: 'rq-2',
+        question: 'کدام دستور Tailwind CSS در نسخه ۴ برای بارگذاری استایل‌ها در فایل CSS استفاده می‌شود؟',
+        options: ['@tailwind base;', '@import "tailwindcss";', 'import "tailwind.css";', '@apply all;'],
+        correctOptionIndex: 1,
+        explanation: 'در نسخه ۴ تیل‌ویند CSS از دستور استاندارد مدرن CSS یعنی @import "tailwindcss"; استفاده می‌شود.'
+      },
+      {
+        id: 'rq-3',
+        question: 'مزیت استفاده از Supabase در برابر ساخت بک‌اند سنتی چیست؟',
+        options: [
+          'عدم نیاز به پایگاه داده',
+          'فراهم آوردن PostgreSQL ابری، سیستم احراز هویت، اشتراک ریل‌تایم و REST API آنی',
+          'تنها برای ذخیره فایل کاربرد دارد',
+          'عدم سازگاری با React'
+        ],
+        correctOptionIndex: 1,
+        explanation: 'سوپابیس به عنوان جایگزین متن‌باز Firebase، پایگاه داده واقعی PostgreSQL را به همراه APIهای آماده و RLS امن در اختیار توسعه‌دهنده قرار می‌دهد.'
+      }
+    ]
+  }
+];
+
 export const INITIAL_SETTINGS: SiteSettings = {
   siteTitle: 'آکادمی شبکه و وب پارس نت',
   tagline: 'مرجع تخصصی آموزش زیرساخت شبکه، سیسکو، لینوکس و برنامه‌نویسی وب',
   supportPhone: '۰۲۱-۸۸۴۵۶۷۸۹',
   supportEmail: 'support@parsnet-academy.com',
   address: 'تهران، خیابان شریعتی، بالاتر از مطهری، برج فناوری طبقه ۵',
+  workHours: 'شنبه تا چهارشنبه ۹:۰۰ الی ۱۸:۰۰ - پنج‌شنبه‌ها ۹:۰۰ الی ۱۴:۰۰',
   zarinpalMerchantId: 'a1b2c3d4-e5f6-7890-abcd-1234567890ab',
   isGatewaySandbox: true,
   supabaseUrl: import.meta.env.VITE_SUPABASE_URL || '',
   supabaseAnonKey: import.meta.env.VITE_SUPABASE_ANON_KEY || '',
   telegramUsername: 'parsnet_academy',
-  instagramUsername: 'parsnet.academy'
+  instagramUsername: 'parsnet.academy',
+  adminUsername: 'admin',
+  adminPassword: 'admin',
+  aboutText: `آکادمی تخصصی پارس‌نت از سال ۱۳۹۶ با هدف ارتقای دانش مهندسی شبکه، فناوری اطلاعات و توسعه وب در کشور فعالیت خود را آغاز نموده است.
+ما باور داریم که یادگیری فناوری باید کاملاً عملی، پروژه‌محور و منطبق بر نیازهای واقعی دیتاسنترها و شرکت‌های پیشرو باشد. به همین منظور تمامی دوره‌های سیسکو (Cisco)، میکروتیک (MikroTik)، سیستم‌عامل لینوکس سرور و فریمورک‌های مدرن فرانت‌اند و بک‌اند با سناریوهای آماده، فایل‌های شبیه‌سازی و پشتیبانی مستقیم اساتید ارائه می‌گردند.
+
+افتخارات ما:
+• آموزش بیش از ۳,۵۰۰ دانشجوی متخصص در سراسر کشور
+• ارائه بیش از ۱۲۰ فایل سناریوی عملی تست شده
+• گارانتی اصالت محتوا و پشتیبانی فنی مستقیم با مدرسین`,
+  termsText: `قوانین و دستورالعمل‌های استفاده از آکادمی پارس‌نت:
+
+۱. مالکیت معنوی: کلیه ویدیوها، کدهای سناریو و فایل‌های دانلودی متعلق به آکادمی پارس‌نت بوده و انتشار عمومی یا فروش مجدد آن‌ها بدون اجازه کتبی پیگرد قانونی دارد.
+۲. لایسنس کاربری: هر خرید متعلق به یک شخص یا یک حساب کاربری است و دانشجو می‌تواند فایل‌ها را بر روی سیستم شخصی خود دانلود و اجرا نماید.
+۳. پشتیبانی علمی: سوالات و تیکت‌های پشتیبانی مربوط به دوره‌ها حداکثر ظرف ۲۴ ساعت کاری توسط مدرس دوره بررسی و پاسخ داده می‌شود.
+۴. بازگشت وجه: در صورت وجود مغایرت در سرفصل‌های اعلامی با محتوای دوره تا ۴۸ ساعت پس از خرید امکان استرداد وجه طبق ضوابط مالی فراهم است.`
 };
 
 class Store {
@@ -580,9 +842,19 @@ class Store {
   orders: Order[] = [];
   tickets: Ticket[] = [];
   articles: Article[] = [];
+  media: MediaItem[] = [];
+  contactMessages: ContactMessage[] = [];
+  reviews: Review[] = [];
+  coupons: Coupon[] = [];
+  quizzes: CourseQuiz[] = INITIAL_QUIZZES;
+  videoNotes: VideoNote[] = [];
+  playbackTimes: Record<string, number> = {};
+  theme: 'light' | 'dark' = 'light';
+  toasts: ToastMessage[] = [];
   currentUser: User = INITIAL_USER;
   settings: SiteSettings = INITIAL_SETTINGS;
   cart: CartItem[] = [];
+  isAdminLoggedIn: boolean = false;
   listeners: (() => void)[] = [];
 
   constructor() {
@@ -606,6 +878,34 @@ class Store {
       const storedArticles = localStorage.getItem('parsnet_articles');
       this.articles = storedArticles ? JSON.parse(storedArticles) : INITIAL_ARTICLES;
 
+      const storedMedia = localStorage.getItem('parsnet_media');
+      this.media = storedMedia ? JSON.parse(storedMedia) : INITIAL_MEDIA;
+
+      const storedContact = localStorage.getItem('parsnet_contact_messages');
+      this.contactMessages = storedContact ? JSON.parse(storedContact) : INITIAL_CONTACT_MESSAGES;
+
+      const storedReviews = localStorage.getItem('parsnet_reviews');
+      this.reviews = storedReviews ? JSON.parse(storedReviews) : INITIAL_REVIEWS;
+
+      const storedCoupons = localStorage.getItem('parsnet_coupons');
+      this.coupons = storedCoupons ? JSON.parse(storedCoupons) : INITIAL_COUPONS;
+
+      const storedNotes = localStorage.getItem('parsnet_video_notes');
+      this.videoNotes = storedNotes ? JSON.parse(storedNotes) : [];
+
+      const storedPlayback = localStorage.getItem('parsnet_playback_times');
+      this.playbackTimes = storedPlayback ? JSON.parse(storedPlayback) : {};
+
+      const storedTheme = localStorage.getItem('parsnet_theme') as 'light' | 'dark';
+      this.theme = storedTheme || 'light';
+      if (typeof document !== 'undefined') {
+        if (this.theme === 'dark') {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      }
+
       const storedUser = localStorage.getItem('parsnet_user');
       this.currentUser = storedUser ? JSON.parse(storedUser) : INITIAL_USER;
 
@@ -613,6 +913,7 @@ class Store {
       if (storedSettings) {
         const parsed = JSON.parse(storedSettings);
         this.settings = {
+          ...INITIAL_SETTINGS,
           ...parsed,
           supabaseUrl: parsed.supabaseUrl || import.meta.env.VITE_SUPABASE_URL || '',
           supabaseAnonKey: parsed.supabaseAnonKey || import.meta.env.VITE_SUPABASE_ANON_KEY || ''
@@ -623,6 +924,8 @@ class Store {
 
       const storedCart = localStorage.getItem('parsnet_cart');
       this.cart = storedCart ? JSON.parse(storedCart) : [];
+
+      this.isAdminLoggedIn = localStorage.getItem('parsnet_admin_auth') === 'true';
     } catch (e) {
       console.error('Failed to load store from localStorage', e);
       this.courses = INITIAL_COURSES;
@@ -630,9 +933,15 @@ class Store {
       this.orders = INITIAL_ORDERS;
       this.tickets = INITIAL_TICKETS;
       this.articles = INITIAL_ARTICLES;
+      this.media = INITIAL_MEDIA;
+      this.contactMessages = INITIAL_CONTACT_MESSAGES;
+      this.reviews = INITIAL_REVIEWS;
+      this.coupons = INITIAL_COUPONS;
+      this.theme = 'light';
       this.currentUser = INITIAL_USER;
       this.settings = INITIAL_SETTINGS;
       this.cart = [];
+      this.isAdminLoggedIn = false;
     }
   }
 
@@ -643,9 +952,17 @@ class Store {
       localStorage.setItem('parsnet_orders', JSON.stringify(this.orders));
       localStorage.setItem('parsnet_tickets', JSON.stringify(this.tickets));
       localStorage.setItem('parsnet_articles', JSON.stringify(this.articles));
+      localStorage.setItem('parsnet_media', JSON.stringify(this.media));
+      localStorage.setItem('parsnet_contact_messages', JSON.stringify(this.contactMessages));
+      localStorage.setItem('parsnet_reviews', JSON.stringify(this.reviews));
+      localStorage.setItem('parsnet_coupons', JSON.stringify(this.coupons));
+      localStorage.setItem('parsnet_video_notes', JSON.stringify(this.videoNotes));
+      localStorage.setItem('parsnet_playback_times', JSON.stringify(this.playbackTimes));
+      localStorage.setItem('parsnet_theme', this.theme);
       localStorage.setItem('parsnet_user', JSON.stringify(this.currentUser));
       localStorage.setItem('parsnet_settings', JSON.stringify(this.settings));
       localStorage.setItem('parsnet_cart', JSON.stringify(this.cart));
+      localStorage.setItem('parsnet_admin_auth', this.isAdminLoggedIn ? 'true' : 'false');
     } catch (e) {
       console.error('Failed to save to localStorage', e);
     }
@@ -820,6 +1137,85 @@ class Store {
     this.saveToStorage();
   }
 
+  // Admin Authentication
+  adminLogin(username: string, pass: string): { success: boolean; message: string } {
+    const trimmedUser = username.trim();
+    const trimmedPass = pass.trim();
+    const validUser = (this.settings.adminUsername || 'admin').trim();
+    const validPass = (this.settings.adminPassword || 'admin').trim();
+
+    if (trimmedUser === validUser && trimmedPass === validPass) {
+      this.isAdminLoggedIn = true;
+      this.saveToStorage();
+      return { success: true, message: 'ورود با موفقیت انجام شد' };
+    }
+    return { success: false, message: 'نام کاربری یا رمز عبور اشتباه است' };
+  }
+
+  adminLogout() {
+    this.isAdminLoggedIn = false;
+    this.saveToStorage();
+  }
+
+  changeAdminCredentials(currentPassword: string, newUsername: string, newPassword: string): { success: boolean; message: string } {
+    const currentPass = (this.settings.adminPassword || 'admin').trim();
+    if (currentPassword.trim() !== currentPass) {
+      return { success: false, message: 'رمز عبور فعلی نامعتبر است' };
+    }
+    if (!newUsername.trim() || newUsername.trim().length < 3) {
+      return { success: false, message: 'نام کاربری جدید باید حداقل ۳ کاراکتر باشد' };
+    }
+    if (!newPassword.trim() || newPassword.trim().length < 4) {
+      return { success: false, message: 'رمز عبور جدید باید حداقل ۴ کاراکتر باشد' };
+    }
+
+    this.settings = {
+      ...this.settings,
+      adminUsername: newUsername.trim(),
+      adminPassword: newPassword.trim()
+    };
+    this.saveToStorage();
+    return { success: true, message: 'مشخصات ورود مدیر با موفقیت تغییر یافت' };
+  }
+
+  // Media Library actions
+  addMediaItem(item: MediaItem) {
+    this.media = [item, ...this.media];
+    this.saveToStorage();
+  }
+
+  updateMediaItem(id: string, updates: Partial<MediaItem>) {
+    this.media = this.media.map(m => m.id === id ? { ...m, ...updates } : m);
+    this.saveToStorage();
+  }
+
+  deleteMediaItem(id: string) {
+    this.media = this.media.filter(m => m.id !== id);
+    this.saveToStorage();
+  }
+
+  // Contact Messages actions
+  addContactMessage(data: Omit<ContactMessage, 'id' | 'createdAt' | 'isRead'>) {
+    const newMessage: ContactMessage = {
+      id: `contact-${Date.now()}`,
+      ...data,
+      createdAt: new Date().toLocaleDateString('fa-IR') + ' - ' + new Date().toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' }),
+      isRead: false
+    };
+    this.contactMessages = [newMessage, ...this.contactMessages];
+    this.saveToStorage();
+  }
+
+  markContactMessageRead(id: string, isRead: boolean = true) {
+    this.contactMessages = this.contactMessages.map(m => m.id === id ? { ...m, isRead } : m);
+    this.saveToStorage();
+  }
+
+  deleteContactMessage(id: string) {
+    this.contactMessages = this.contactMessages.filter(m => m.id !== id);
+    this.saveToStorage();
+  }
+
   // Check enrollment
   hasAccessToCourse(courseId: string): boolean {
     return this.currentUser.enrolledCourseIds.includes(courseId);
@@ -827,6 +1223,226 @@ class Store {
 
   hasAccessToFile(fileId: string): boolean {
     return this.currentUser.purchasedFileIds.includes(fileId);
+  }
+
+  // Toast Notifications
+  showToast(type: 'success' | 'error' | 'info', message: string) {
+    const id = `toast-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`;
+    this.toasts = [...this.toasts, { id, type, message }];
+    this.notify();
+    setTimeout(() => {
+      this.dismissToast(id);
+    }, 4000);
+  }
+
+  dismissToast(id: string) {
+    this.toasts = this.toasts.filter(t => t.id !== id);
+    this.notify();
+  }
+
+  // Theme Management
+  toggleTheme() {
+    this.setTheme(this.theme === 'light' ? 'dark' : 'light');
+  }
+
+  setTheme(newTheme: 'light' | 'dark') {
+    this.theme = newTheme;
+    if (typeof document !== 'undefined') {
+      if (newTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    }
+    this.saveToStorage();
+  }
+
+  // Coupon Management
+  validateCoupon(code: string): { valid: boolean; discountPercent: number; message: string } {
+    const trimmed = code.trim().toUpperCase();
+    const found = this.coupons.find(c => c.code.toUpperCase() === trimmed && c.isActive);
+
+    if (!found) {
+      return { valid: false, discountPercent: 0, message: 'کد تخفیف وارد شده معتبر یا فعال نیست' };
+    }
+
+    if (found.usedCount >= found.maxUses) {
+      return { valid: false, discountPercent: 0, message: 'ظرفیت استفاده از این کد تخفیف به پایان رسیده است' };
+    }
+
+    return {
+      valid: true,
+      discountPercent: found.discountPercent,
+      message: `کد تخفیف با ${found.discountPercent}٪ تخفیف اعمال گردید`
+    };
+  }
+
+  addCoupon(coupon: Coupon) {
+    this.coupons = [coupon, ...this.coupons];
+    this.saveToStorage();
+  }
+
+  deleteCoupon(id: string) {
+    this.coupons = this.coupons.filter(c => c.id !== id);
+    this.saveToStorage();
+  }
+
+  toggleCouponStatus(id: string) {
+    this.coupons = this.coupons.map(c => c.id === id ? { ...c, isActive: !c.isActive } : c);
+    this.saveToStorage();
+  }
+
+  // Review Management
+  addReview(data: Omit<Review, 'id' | 'createdAt' | 'isApproved'>) {
+    const newReview: Review = {
+      id: `rev-${Date.now()}`,
+      ...data,
+      createdAt: new Date().toLocaleDateString('fa-IR'),
+      isApproved: false // Requires admin moderation
+    };
+    this.reviews = [newReview, ...this.reviews];
+    this.saveToStorage();
+    this.showToast('success', 'دیدگاه شما با موفقیت ثبت شد و پس از بررسی منتشر خواهد شد.');
+  }
+
+  approveReview(id: string, isApproved: boolean = true) {
+    this.reviews = this.reviews.map(r => r.id === id ? { ...r, isApproved } : r);
+    this.saveToStorage();
+  }
+
+  deleteReview(id: string) {
+    this.reviews = this.reviews.filter(r => r.id !== id);
+    this.saveToStorage();
+  }
+
+  getCourseReviews(courseId: string): Review[] {
+    return this.reviews.filter(r => r.courseId === courseId && r.isApproved);
+  }
+
+  // Learning Progress Tracking
+  markEpisodeCompleted(episodeId: string, completed: boolean = true) {
+    const currentCompleted = this.currentUser.completedEpisodeIds || [];
+    let updated: string[];
+    if (completed) {
+      if (!currentCompleted.includes(episodeId)) {
+        updated = [...currentCompleted, episodeId];
+      } else {
+        updated = currentCompleted;
+      }
+    } else {
+      updated = currentCompleted.filter(id => id !== episodeId);
+    }
+
+    this.currentUser = {
+      ...this.currentUser,
+      completedEpisodeIds: updated
+    };
+    this.saveToStorage();
+  }
+
+  isEpisodeCompleted(episodeId: string): boolean {
+    return (this.currentUser.completedEpisodeIds || []).includes(episodeId);
+  }
+
+  getCourseProgress(courseId: string): { completedCount: number; totalCount: number; percent: number } {
+    const course = this.courses.find(c => c.id === courseId);
+    if (!course) return { completedCount: 0, totalCount: 0, percent: 0 };
+
+    let total = 0;
+    course.seasons.forEach(s => {
+      total += s.episodes.length;
+    });
+
+    if (total === 0) return { completedCount: 0, totalCount: 0, percent: 0 };
+
+    const completed = (this.currentUser.completedEpisodeIds || []).filter(epId => {
+      return course.seasons.some(s => s.episodes.some(ep => ep.id === epId));
+    }).length;
+
+    const percent = Math.min(100, Math.round((completed / total) * 100));
+    return { completedCount: completed, totalCount: total, percent };
+  }
+
+  // Playback state memory
+  saveEpisodePlaybackTime(episodeId: string, seconds: number) {
+    if (!episodeId) return;
+    this.playbackTimes = {
+      ...this.playbackTimes,
+      [episodeId]: Math.floor(seconds)
+    };
+    this.saveToStorage();
+  }
+
+  getEpisodePlaybackTime(episodeId: string): number {
+    return this.playbackTimes[episodeId] || 0;
+  }
+
+  // Video Notes Management
+  addVideoNote(data: Omit<VideoNote, 'id' | 'createdAt'>) {
+    const newNote: VideoNote = {
+      id: `vnote-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+      ...data,
+      createdAt: new Date().toLocaleDateString('fa-IR') + ' ' + new Date().toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' })
+    };
+    this.videoNotes = [newNote, ...this.videoNotes];
+    this.saveToStorage();
+    this.showToast('success', 'یادداشت زمان‌دار شما با موفقیت ذخیره شد.');
+  }
+
+  getVideoNotes(courseId: string, episodeId?: string): VideoNote[] {
+    return this.videoNotes.filter(n => n.courseId === courseId && (!episodeId || n.episodeId === episodeId));
+  }
+
+  deleteVideoNote(id: string) {
+    this.videoNotes = this.videoNotes.filter(n => n.id !== id);
+    this.saveToStorage();
+  }
+
+  // Certificate Issuance
+  generateCertificate(courseId: string, gradeScore: number): Certificate {
+    const course = this.courses.find(c => c.id === courseId);
+    const existing = (this.currentUser.certificates || []).find(c => c.courseId === courseId);
+    if (existing) return existing;
+
+    const certNumber = `PN-CERT-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+    const newCert: Certificate = {
+      id: `cert-${Date.now()}`,
+      certificateNumber: certNumber,
+      userId: this.currentUser.id,
+      userName: this.currentUser.name,
+      userPhone: this.currentUser.phone,
+      courseId,
+      courseTitle: course?.title || 'دوره تخصصی پارس‌نت',
+      instructorName: course?.instructor.name || 'مدرس رسمی آکادمی پارس‌نت',
+      issueDate: new Date().toLocaleDateString('fa-IR'),
+      gradeScore,
+      verificationCode: `PN-${gradeScore}-${Math.floor(100000 + Math.random() * 900000)}`
+    };
+
+    this.currentUser = {
+      ...this.currentUser,
+      certificates: [...(this.currentUser.certificates || []), newCert]
+    };
+    this.saveToStorage();
+    this.showToast('success', 'تبریک! گواهینامه معتبر پایان دوره برای شما صادر شد.');
+    return newCert;
+  }
+
+  // Secure Expiring Download URLs
+  generateSignedDownloadUrl(fileId: string): { url: string; token: string; expiresAt: string; expiresSeconds: number } {
+    const file = this.files.find(f => f.id === fileId);
+    const token = `sig_${Date.now()}_${Math.random().toString(36).substr(2, 8)}`;
+    const expiryDate = new Date(Date.now() + 2 * 60 * 60 * 1000); // 2 hours
+    const expiresAt = expiryDate.toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' });
+    const directUrl = file ? file.downloadUrl : 'https://parsnet-academy.com/downloads/secure.zip';
+    const signedUrl = `${directUrl}?token=${token}&expires=${Math.floor(expiryDate.getTime() / 1000)}`;
+
+    return {
+      url: signedUrl,
+      token,
+      expiresAt,
+      expiresSeconds: 7200
+    };
   }
 
   // Quiet sync to Supabase if configured

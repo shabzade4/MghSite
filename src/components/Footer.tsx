@@ -1,9 +1,10 @@
 import React from 'react';
-import { Terminal, ShieldCheck, Headphones, Award, Phone, Mail, MapPin } from 'lucide-react';
+import { Terminal, ShieldCheck, Headphones, Award, Phone, Mail, MapPin, FileText, Globe } from 'lucide-react';
 import { store } from '../services/store';
+import { NavigationTab } from '../types';
 
 interface FooterProps {
-  onNavigate: (tab: 'home' | 'courses' | 'files' | 'blog' | 'student-panel' | 'admin-panel') => void;
+  onNavigate: (tab: NavigationTab) => void;
   onOpenSupabaseGuide: () => void;
 }
 
@@ -11,7 +12,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenSupabaseGuide 
   const settings = store.settings;
 
   return (
-    <footer className="bg-slate-900 text-slate-300 border-t border-slate-800 pt-16 pb-12 text-right">
+    <footer className="bg-slate-900 text-slate-300 border-t border-slate-800 pt-16 pb-12 text-right selection:bg-indigo-500 selection:text-white" dir="rtl">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Top 3 Trust Indicators */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pb-12 border-b border-slate-800">
@@ -49,7 +50,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenSupabaseGuide 
         {/* Links & Info Grid */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 py-12">
           {/* Brand & About */}
-          <div className="md:col-span-5 space-y-4">
+          <div className="md:col-span-4 space-y-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-black">
                 <Terminal className="w-5 h-5" />
@@ -57,7 +58,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenSupabaseGuide 
               <span className="text-lg font-black text-white">{settings.siteTitle}</span>
             </div>
 
-            <p className="text-xs text-slate-400 leading-relaxed font-light max-w-md">
+            <p className="text-xs text-slate-400 leading-relaxed font-light max-w-sm">
               آکادمی تخصصی پارس‌نت به عنوان مرجع یادگیری علوم کامپیوتر، سیسکو، میکروتیک، لینوکس و برنامه‌نویسی وب فرانت‌اند و بک‌اند با ارائه سورس‌کدهای آماده و پروژه‌های عملی به متخصصان کشور خدمت‌رسانی می‌کند.
             </p>
 
@@ -110,8 +111,40 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenSupabaseGuide 
             </ul>
           </div>
 
+          {/* Guidelines, Terms & Sitemap */}
+          <div className="md:col-span-2 space-y-3">
+            <h4 className="text-xs font-bold text-white uppercase tracking-wider">راهنما و مقررات</h4>
+            <ul className="space-y-2 text-xs text-slate-400">
+              <li>
+                <button onClick={() => onNavigate('about')} className="hover:text-white transition-colors">
+                  درباره ما و اساتید
+                </button>
+              </li>
+              <li>
+                <button onClick={() => onNavigate('contact')} className="hover:text-white transition-colors">
+                  تماس با ما و مشاوره
+                </button>
+              </li>
+              <li>
+                <button onClick={() => onNavigate('terms')} className="hover:text-white transition-colors">
+                  قوانین و دستورالعمل‌ها
+                </button>
+              </li>
+              <li>
+                <button onClick={() => onNavigate('terms')} className="hover:text-white transition-colors">
+                  حفظ حریم خصوصی
+                </button>
+              </li>
+              <li>
+                <button onClick={() => onNavigate('sitemap')} className="hover:text-indigo-400 transition-colors">
+                  نقشه کامل سایت (Sitemap)
+                </button>
+              </li>
+            </ul>
+          </div>
+
           {/* Contact Details */}
-          <div className="md:col-span-4 space-y-3">
+          <div className="md:col-span-3 space-y-3">
             <h4 className="text-xs font-bold text-white uppercase tracking-wider">تماس با آکادمی</h4>
             <div className="space-y-2.5 text-xs text-slate-400">
               <div className="flex items-center gap-2">
