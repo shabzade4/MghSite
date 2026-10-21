@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   X,
   Play,
@@ -14,9 +14,13 @@ import {
   Award,
   Shield,
   Clock,
-  Sparkles
+  Sparkles,
+  Bookmark,
+  Gauge,
+  Trash2,
+  Plus
 } from 'lucide-react';
-import { Course, Episode } from '../types';
+import { Course, Episode, VideoNote } from '../types';
 import { store } from '../services/store';
 
 interface CoursePlayerModalProps {
@@ -34,6 +38,7 @@ export const CoursePlayerModal: React.FC<CoursePlayerModalProps> = ({
 }) => {
   const isEnrolled = store.hasAccessToCourse(course.id);
   const currentUser = store.currentUser;
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   // Find all episodes
   const allEpisodes = course.seasons.flatMap(s => s.episodes);
@@ -45,6 +50,12 @@ export const CoursePlayerModal: React.FC<CoursePlayerModalProps> = ({
   const [openSeasons, setOpenSeasons] = useState<Record<string, boolean>>({
     [course.seasons[0]?.id || '']: true
   });
+
+  // Sidebar Tab: playlist or notes
+  const [sidebarTab, setSidebarTab] = useState<'playlist' | 'notes'>('playlist');
+  const [playbackSpeed, setPlaybackSpeed] = useState<number>(1);
+  const [newNoteText, setNewNoteText] = useState('');
+  const [videoNotes, setVideoNotes] = useState<VideoNote[]>(store.getVideoNotes(course.id, activeEpisode.id));
 
   // Dynamic Floating Watermark State
   const [watermarkPos, setWatermarkPos] = useState({ top: '15%', left: '20%' });
@@ -60,6 +71,11 @@ export const CoursePlayerModal: React.FC<CoursePlayerModalProps> = ({
     return () => clearInterval(interval);
   }, []);
 
+  // Update notes list when episode or store changes
+  useEffect(() => {
+    setVideoNotes(store.getVideoNotes(course.id, activeEpisode.id));
+  }, [activeEpisode.id, course.id]);
+
   const toggleSeason = (seasonId: string) => {
     setOpenSeasons(prev => ({ ...prev, [seasonId]: !prev[seasonId] }));
   };
@@ -69,6 +85,46 @@ export const CoursePlayerModal: React.FC<CoursePlayerModalProps> = ({
       return;
     }
     setActiveEpisode(ep);
+  };
+
+  const handleSpeedChange = (speed: number) => {
+    setPlaybackSpeed(speed);
+    if (videoRef.current) {
+      videoRef.current.playbackRate = speed;
+    }
+  };
+
+  const handleAddNote = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newNoteText.trim() || !videoRef.current) return;
+
+    const currentSec = Math.floor(videoRef.current.currentTime);
+    const mins = Math.floor(currentSec / 60);
+    const secs = currentSec % 60;
+    const timeFormatted = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+
+    store.addVideoNote({
+      courseId: course.id,
+      episodeId: activeEpisode.id,
+      timestampSeconds: currentSec,
+      timestampFormatted: timeFormatted,
+      noteText: newNoteText.trim()
+    });
+
+    setNewNoteText('');
+    setVideoNotes(store.getVideoNotes(course.id, activeEpisode.id));
+  };
+
+  const handleJumpToTimestamp = (seconds: number) => {
+    if (videoRef.current) {
+      videoRef.current.currentTime = seconds;
+      videoRef.current.play();
+    }
+  };
+
+  const handleDeleteNote = (noteId: string) => {
+    store.deleteVideoNote(noteId);
+    setVideoNotes(store.getVideoNotes(course.id, activeEpisode.id));
   };
 
   const progress = store.getCourseProgress(course.id);
@@ -101,6 +157,25 @@ export const CoursePlayerModal: React.FC<CoursePlayerModalProps> = ({
           </div>
 
           <div className="flex items-center gap-3 self-end sm:self-auto">
+            {/* Speed Selector */}
+            <div className="hidden sm:flex items-center gap-1 bg-slate-800/80 px-2 py-1 rounded-xl text-xs border border-slate-700/60">
+              <Gauge className="w-3.5 h-3.5 text-slate-400" />
+              <span className="text-[11px] text-slate-400 ml-1">سرعت:</span>
+              {[1, 1.25, 1.5, 2].map((speed) => (
+                <button
+                  key={speed}
+                  onClick={() => handleSpeedChange(speed)}
+                  className={`px-1.5 py-0.5 rounded text-[10px] font-mono transition-colors cursor-pointer ${
+                    playbackSpeed === speed
+                      ? 'bg-indigo-600 text-white font-bold'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  {speed}x
+                </button>
+              ))}
+            </div>
+
             {/* Progress bar (if enrolled) */}
             {isEnrolled && (
               <div className="hidden md:flex items-center gap-3 bg-slate-800/80 px-3 py-1.5 rounded-xl border border-slate-700/60">
@@ -151,11 +226,28 @@ export const CoursePlayerModal: React.FC<CoursePlayerModalProps> = ({
           <div className="lg:col-span-8 flex flex-col bg-black p-4 sm:p-6 overflow-y-auto">
             <div className="relative aspect-video bg-slate-950 rounded-2xl overflow-hidden border border-slate-800 shadow-2xl flex items-center justify-center select-none">
               <video
+                ref={videoRef}
                 key={activeEpisode.id}
                 controls
                 autoPlay
                 className="w-full h-full object-contain"
                 src={activeEpisode.videoUrl}
+                onLoadedMetadata={(e) => {
+                  const saved = store.getEpisodePlaybackTime(activeEpisode.id);
+                  if (saved > 0 && e.currentTarget) {
+                    e.currentTarget.currentTime = saved;
+                  }
+                  e.currentTarget.playbackRate = playbackSpeed;
+                }}
+                onTimeUpdate={(e) => {
+                  const time = e.currentTarget.currentTime;
+                  if (Math.floor(time) % 4 === 0) {
+                    store.saveEpisodePlaybackTime(activeEpisode.id, time);
+                  }
+                }}
+                onEnded={() => {
+                  store.markEpisodeCompleted(activeEpisode.id, true);
+                }}
               >
                 مرورگر شما از پخش ویدیو پشتیبانی نمی‌کند.
               </video>
@@ -218,9 +310,9 @@ export const CoursePlayerModal: React.FC<CoursePlayerModalProps> = ({
                         href="#"
                         onClick={(e) => {
                           e.preventDefault();
-                          alert(`دانلود امن فایل ${activeEpisode.attachmentFileName} با موفقیت آغاز شد.`);
+                          store.showToast('success', `دانلود فایل ${activeEpisode.attachmentFileName} آغاز شد.`);
                         }}
-                        className="px-3.5 py-1.5 text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl flex items-center gap-1.5 transition-colors"
+                        className="px-3.5 py-1.5 text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl flex items-center gap-1.5 transition-colors cursor-pointer"
                       >
                         <Download className="w-3.5 h-3.5" />
                         <span>دانلود ({activeEpisode.attachmentSize})</span>
@@ -258,76 +350,175 @@ export const CoursePlayerModal: React.FC<CoursePlayerModalProps> = ({
             </div>
           </div>
 
-          {/* Playlist & Seasons sidebar (4 Columns on desktop) */}
-          <div className="lg:col-span-4 bg-slate-900 border-t lg:border-t-0 lg:border-r border-slate-800 overflow-y-auto max-h-[400px] lg:max-h-full">
-            <div className="p-4 border-b border-slate-800">
-              <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">سرفصل‌ها و جلسات دوره</h4>
-              <div className="text-[11px] text-slate-500 mt-1">
-                {isEnrolled ? `دانشجوی رسمی دوره (${progress.completedCount} از ${progress.totalCount} جلسه دیده‌شده)` : 'جلسات دارای پیش‌نمایش رایگان قابل مشاهده است'}
+          {/* Playlist & Notes Sidebar (4 Columns on desktop) */}
+          <div className="lg:col-span-4 bg-slate-900 border-t lg:border-t-0 lg:border-r border-slate-800 flex flex-col max-h-[460px] lg:max-h-full overflow-hidden">
+            {/* Sidebar Tab Header */}
+            <div className="grid grid-cols-2 p-2 bg-slate-950/60 border-b border-slate-800 gap-1 shrink-0">
+              <button
+                onClick={() => setSidebarTab('playlist')}
+                className={`py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
+                  sidebarTab === 'playlist'
+                    ? 'bg-indigo-600 text-white shadow-xs'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+                }`}
+              >
+                سرفصل‌ها و جلسات
+              </button>
+
+              <button
+                onClick={() => setSidebarTab('notes')}
+                className={`py-2 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                  sidebarTab === 'notes'
+                    ? 'bg-indigo-600 text-white shadow-xs'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+                }`}
+              >
+                <Bookmark className="w-3.5 h-3.5" />
+                <span>یادداشت‌ها</span>
+                <span className="font-mono text-[10px] bg-slate-800 px-1.5 py-0.2 rounded-full">
+                  {videoNotes.length}
+                </span>
+              </button>
+            </div>
+
+            {/* TAB 1: PLAYLIST */}
+            {sidebarTab === 'playlist' && (
+              <div className="flex-1 overflow-y-auto divide-y divide-slate-800/60">
+                <div className="p-3 bg-slate-950/30 text-[11px] text-slate-400 border-b border-slate-800/60">
+                  {isEnrolled ? `دانشجوی رسمی دوره (${progress.completedCount} از ${progress.totalCount} جلسه دیده‌شده)` : 'جلسات دارای پیش‌نمایش رایگان قابل مشاهده است'}
+                </div>
+
+                {course.seasons.map((season) => {
+                  const isOpen = openSeasons[season.id] ?? true;
+                  return (
+                    <div key={season.id} className="bg-slate-900">
+                      <button
+                        onClick={() => toggleSeason(season.id)}
+                        className="w-full px-4 py-3 text-right flex items-center justify-between hover:bg-slate-800/50 transition-colors cursor-pointer"
+                      >
+                        <span className="text-xs font-bold text-slate-200">{season.title}</span>
+                        {isOpen ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+                      </button>
+
+                      {isOpen && (
+                        <div className="bg-slate-950/40 divide-y divide-slate-800/40">
+                          {season.episodes.map((ep) => {
+                            const isActive = activeEpisode.id === ep.id;
+                            const canPlay = isEnrolled || ep.isFreePreview;
+                            const isDone = store.isEpisodeCompleted(ep.id);
+
+                            return (
+                              <button
+                                key={ep.id}
+                                onClick={() => handleSelectEpisode(ep)}
+                                disabled={!canPlay}
+                                className={`w-full px-4 py-3 text-right flex items-center justify-between transition-colors cursor-pointer ${
+                                  isActive
+                                    ? 'bg-indigo-900/40 text-indigo-300 font-semibold'
+                                    : canPlay
+                                    ? 'text-slate-300 hover:bg-slate-800/60'
+                                    : 'text-slate-600 cursor-not-allowed bg-slate-950/80'
+                                }`}
+                              >
+                                <div className="flex items-center gap-2.5 overflow-hidden">
+                                  {isDone ? (
+                                    <CheckCircle className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                                  ) : canPlay ? (
+                                    <Play className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-indigo-400 fill-current' : 'text-slate-400'}`} />
+                                  ) : (
+                                    <Lock className="w-3.5 h-3.5 shrink-0 text-slate-600" />
+                                  )}
+                                  <span className="text-xs truncate">{ep.title}</span>
+                                </div>
+
+                                <div className="flex items-center gap-2 shrink-0 mr-2">
+                                  {ep.isFreePreview && !isEnrolled && (
+                                    <span className="text-[10px] text-emerald-400 bg-emerald-950/60 border border-emerald-800/60 px-1.5 py-0.5 rounded">
+                                      رایگان
+                                    </span>
+                                  )}
+                                  <span className="text-[11px] font-mono text-slate-500 tabular-nums">{ep.duration}</span>
+                                </div>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
-            </div>
+            )}
 
-            <div className="divide-y divide-slate-800/60">
-              {course.seasons.map((season) => {
-                const isOpen = openSeasons[season.id] ?? true;
-                return (
-                  <div key={season.id} className="bg-slate-900">
-                    <button
-                      onClick={() => toggleSeason(season.id)}
-                      className="w-full px-4 py-3 text-right flex items-center justify-between hover:bg-slate-800/50 transition-colors"
-                    >
-                      <span className="text-xs font-bold text-slate-200">{season.title}</span>
-                      {isOpen ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
-                    </button>
-
-                    {isOpen && (
-                      <div className="bg-slate-950/40 divide-y divide-slate-800/40">
-                        {season.episodes.map((ep) => {
-                          const isActive = activeEpisode.id === ep.id;
-                          const canPlay = isEnrolled || ep.isFreePreview;
-                          const isDone = store.isEpisodeCompleted(ep.id);
-
-                          return (
-                            <button
-                              key={ep.id}
-                              onClick={() => handleSelectEpisode(ep)}
-                              disabled={!canPlay}
-                              className={`w-full px-4 py-3 text-right flex items-center justify-between transition-colors ${
-                                isActive
-                                  ? 'bg-indigo-900/40 text-indigo-300 font-semibold'
-                                  : canPlay
-                                  ? 'text-slate-300 hover:bg-slate-800/60'
-                                  : 'text-slate-600 cursor-not-allowed bg-slate-950/80'
-                              }`}
-                            >
-                              <div className="flex items-center gap-2.5 overflow-hidden">
-                                {isDone ? (
-                                  <CheckCircle className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                                ) : canPlay ? (
-                                  <Play className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-indigo-400 fill-current' : 'text-slate-400'}`} />
-                                ) : (
-                                  <Lock className="w-3.5 h-3.5 shrink-0 text-slate-600" />
-                                )}
-                                <span className="text-xs truncate">{ep.title}</span>
-                              </div>
-
-                              <div className="flex items-center gap-2 shrink-0 mr-2">
-                                {ep.isFreePreview && !isEnrolled && (
-                                  <span className="text-[10px] text-emerald-400 bg-emerald-950/60 border border-emerald-800/60 px-1.5 py-0.5 rounded">
-                                    رایگان
-                                  </span>
-                                )}
-                                <span className="text-[11px] font-mono text-slate-500 tabular-nums">{ep.duration}</span>
-                              </div>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    )}
+            {/* TAB 2: PERSONAL TIMESTAMPED NOTES */}
+            {sidebarTab === 'notes' && (
+              <div className="flex-1 flex flex-col overflow-hidden p-4">
+                {/* Note creation input */}
+                <form onSubmit={handleAddNote} className="mb-4 space-y-2">
+                  <div className="flex items-center justify-between text-xs text-slate-400 mb-1">
+                    <span>یادداشت شخصی برای این جلسه:</span>
+                    <span className="font-mono text-indigo-400 text-[11px]">زمان‌بندی هوشمند</span>
                   </div>
-                );
-              })}
-            </div>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={newNoteText}
+                      onChange={(e) => setNewNoteText(e.target.value)}
+                      placeholder="نکته مهم در دستور یا سرفصل..."
+                      className="flex-1 px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                    />
+                    <button
+                      type="submit"
+                      className="px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl transition-colors shrink-0 flex items-center gap-1 cursor-pointer"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>ثبت</span>
+                    </button>
+                  </div>
+                </form>
+
+                {/* Notes List */}
+                <div className="flex-1 overflow-y-auto space-y-2 pr-1">
+                  {videoNotes.length === 0 ? (
+                    <div className="text-center py-12 text-slate-500 text-xs">
+                      <Bookmark className="w-8 h-8 stroke-1 mx-auto mb-2 text-slate-600" />
+                      <p>هنوز یادداشتی برای این جلسه ثبت نکرده‌اید.</p>
+                      <p className="text-[11px] text-slate-600 mt-1">نکات کلیدی تدریس را بنویسید تا بعداً سریعاً مرور کنید.</p>
+                    </div>
+                  ) : (
+                    videoNotes.map((note) => (
+                      <div
+                        key={note.id}
+                        className="bg-slate-950/70 border border-slate-800/80 p-3 rounded-xl flex items-start justify-between gap-2.5 hover:border-slate-700 transition-colors"
+                      >
+                        <div className="flex-1 min-w-0">
+                          <button
+                            type="button"
+                            onClick={() => handleJumpToTimestamp(note.timestampSeconds)}
+                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-indigo-950 text-indigo-400 hover:bg-indigo-900 border border-indigo-800/60 font-mono text-[11px] mb-1.5 transition-colors cursor-pointer"
+                            title="پرش به زمان یادداشت در ویدیو"
+                          >
+                            <Clock className="w-3 h-3" />
+                            <span>{note.timestampFormatted}</span>
+                          </button>
+                          <p className="text-xs text-slate-300 leading-relaxed font-light">{note.noteText}</p>
+                          <span className="text-[10px] text-slate-500 mt-1 block">{note.createdAt}</span>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteNote(note.id)}
+                          className="p-1 text-slate-500 hover:text-red-400 rounded transition-colors cursor-pointer"
+                          title="حذف یادداشت"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

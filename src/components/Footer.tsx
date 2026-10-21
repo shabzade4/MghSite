@@ -5,10 +5,10 @@ import { NavigationTab } from '../types';
 
 interface FooterProps {
   onNavigate: (tab: NavigationTab) => void;
-  onOpenSupabaseGuide: () => void;
+  onOpenVerifyModal?: () => void;
 }
 
-export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenSupabaseGuide }) => {
+export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenVerifyModal }) => {
   const settings = store.settings;
 
   return (
@@ -62,15 +62,9 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenSupabaseGuide 
               آکادمی تخصصی پارس‌نت به عنوان مرجع یادگیری علوم کامپیوتر، سیسکو، میکروتیک، لینوکس و برنامه‌نویسی وب فرانت‌اند و بک‌اند با ارائه سورس‌کدهای آماده و پروژه‌های عملی به متخصصان کشور خدمت‌رسانی می‌کند.
             </p>
 
-            <div className="flex items-center gap-2 pt-2">
-              <button
-                onClick={onOpenSupabaseGuide}
-                className="text-xs text-emerald-400 hover:text-emerald-300 font-mono flex items-center gap-1.5"
-              >
-                <span>دیتابیس: Supabase PostgreSQL</span>
-                <span>·</span>
-                <span>استقرار: Vercel Ready</span>
-              </button>
+            <div className="flex items-center gap-2 pt-2 text-xs text-slate-400 font-mono">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>کلیه دوره‌ها دارای گواهینامه رسمی با استعلام آنلاین هستند</span>
             </div>
           </div>
 
@@ -91,6 +85,11 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenSupabaseGuide 
               <li>
                 <button onClick={() => onNavigate('files')} className="hover:text-white transition-colors">
                   پکیج سناریوهای پکت‌تریسر و اسکریپت‌ها
+                </button>
+              </li>
+              <li>
+                <button onClick={() => onNavigate('roadmaps')} className="hover:text-indigo-400 font-bold transition-colors">
+                  مسیرهای یادگیری و ورود به بازار کار IT
                 </button>
               </li>
               <li>
@@ -115,6 +114,13 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenSupabaseGuide 
           <div className="md:col-span-2 space-y-3">
             <h4 className="text-xs font-bold text-white uppercase tracking-wider">راهنما و مقررات</h4>
             <ul className="space-y-2 text-xs text-slate-400">
+              {onOpenVerifyModal && (
+                <li>
+                  <button onClick={onOpenVerifyModal} className="text-amber-400 hover:text-amber-300 font-bold transition-colors">
+                    استعلام اصالت گواهینامه
+                  </button>
+                </li>
+              )}
               <li>
                 <button onClick={() => onNavigate('about')} className="hover:text-white transition-colors">
                   درباره ما و اساتید
@@ -168,8 +174,8 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenSupabaseGuide 
           <div>
             تمامی حقوق مادی و معنوی برای <strong>آکادمی پارس‌نت</strong> محفوظ است.
           </div>
-          <div className="font-mono text-[11px] text-slate-400">
-            Powered by React 19, Supabase & Vercel
+          <div className="text-xs text-slate-400">
+            سامانه جامع آموزش‌های تخصصی شبکه، وب و مهندسی داده
           </div>
         </div>
       </div>

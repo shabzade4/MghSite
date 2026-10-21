@@ -1,8 +1,7 @@
 import {
   Course, DigitalFile, User, Order, Ticket, Article, SiteSettings,
-  CartItem, MediaItem, ContactMessage, Review, Coupon, CourseQuiz, Certificate, ToastMessage, VideoNote
+  CartItem, MediaItem, ContactMessage, Review, Coupon, CourseQuiz, Certificate, ToastMessage, VideoNote, ColorTheme, AdminTheme
 } from '../types';
-import { getSupabaseClient } from './supabase';
 
 // Generated asset image paths
 const HERO_IMAGE = '/src/assets/images/hero_tech_academy_1791894522996.jpg';
@@ -107,7 +106,7 @@ export const INITIAL_COURSES: Course[] = [
     title: 'دوره جامع آموزش طراحی سایت با React 19، Next.js و Tailwind CSS',
     slug: 'react-nextjs-web-development',
     shortDescription: 'آموزش صفر تا صد طراحی سایت مدرن، فرانت‌اند و اتصال به بک‌اند با ساخت پروژه‌های واقعی فروشگاهی و پنل ادمین',
-    description: 'اگر می‌خواهید به عنوان توسعه‌دهنده وب وارد بازار کار داخلی یا بین‌المللی شوید، این دوره کامل‌ترین پکیج یادگیری است. آموزش گام به گام جاوااسکریپت مدرن ES6+، تایپ‌اسکریپت، ری‌اکت ۱۹، فریمورک Next.js 15 با App Router، استایل‌دهی با Tailwind CSS، و اتصال به دیتابیس Supabase و REST API.',
+    description: 'اگر می‌خواهید به عنوان توسعه‌دهنده وب وارد بازار کار داخلی یا بین‌المللی شوید، این دوره کامل‌ترین پکیج یادگیری است. آموزش گام به گام جاوااسکریپت مدرن ES6+، تایپ‌اسکریپت، ری‌اکت ۱۹، فریمورک Next.js 15 با App Router، استایل‌دهی با Tailwind CSS، و اتصال به پایگاه داده و REST API.',
     category: 'web',
     level: 'جامع',
     price: 1950000,
@@ -131,8 +130,8 @@ export const INITIAL_COURSES: Course[] = [
       'ساخت وب‌سایت‌های مدرن ریسپانسیو با Tailwind CSS و React 19',
       'توسعه سیستم‌های احراز هویت، سبد خرید، درگاه پرداخت و پنل مدیریت',
       'تسلط بر Server Components و Server Actions در فریمورک Next.js 15',
-      'پیاده‌سازی پایگاه داده ریل‌تایم با Supabase و PostgreSQL',
-      'دیپلوی رایگان پروژه‌ها روی Vercel و تنظیم دامنه اختصاصی'
+      'پیاده‌سازی پایگاه داده ریل‌تایم و مدیریت داده‌های مقیاس‌پذیر',
+      'دیپلوی و استقرار استاندارد پروژه‌ها و تنظیم دامنه اختصاصی'
     ],
     seasons: [
       {
@@ -334,9 +333,9 @@ export const INITIAL_FILES: DigitalFile[] = [
   },
   {
     id: 'file-fullstack-web-template',
-    title: 'قالب اختصاصی آکادمی آموزشی و فروش فایل (Next.js 15 + Tailwind + Supabase)',
+    title: 'قالب اختصاصی آکادمی آموزشی و فروش فایل (Next.js 15 + Tailwind CSS)',
     slug: 'lms-digital-store-source-code-template',
-    description: 'سورس کد کامل یک پلتفرم فروش دوره‌های آموزشی و فایل‌های دیجیتال طراحی شده با React 19، Next.js 15، تیلویند CSS و اتصال کامل به Supabase. دارای پنل مدیریت، سبد خرید، کیف پول، اتصال به درگاه پرداخت زرین‌پال و طراحی کاملاً راست‌چین و ریسپانسیو.',
+    description: 'سورس کد کامل یک پلتفرم فروش دوره‌های آموزشی و فایل‌های دیجیتال طراحی شده با React 19، Next.js 15 و تیلویند CSS. دارای پنل مدیریت، سبد خرید، کیف پول، اتصال به درگاه پرداخت زرین‌پال و طراحی کاملاً راست‌چین و ریسپانسیو.',
     category: 'templates',
     price: 790000,
     originalPrice: 1200000,
@@ -349,8 +348,8 @@ export const INITIAL_FILES: DigitalFile[] = [
     features: [
       'طراحی کاملاً مدرن بر پایه Tailwind CSS با انیمیشن‌های نرم',
       'پنل اختصاصی کاربر و پنل مدیریت وردپرسی',
-      'اسکریپت ساخت دیتابیس Supabase به صورت آماده',
-      'آماده دیپلوی فوری روی Vercel بدون نیاز به تنظیمات پیچیده'
+      'اسکریپت ساخت جداول پایگاه داده و پیکربندی آماده',
+      'آماده استقرار فوری بدون نیاز به تنظیمات پیچیده'
     ],
     isFeatured: true,
     updatedAt: '۱۴۰۳/۰۷/۲۰'
@@ -385,6 +384,80 @@ export const INITIAL_USER: User = {
   walletBalance: 250000,
   createdAt: '۱۴۰۳/۰۱/۱۵'
 };
+
+export const INITIAL_USERS: User[] = [
+  INITIAL_USER,
+  {
+    id: 'usr-student-2',
+    name: 'سارا محمدی',
+    email: 'sara.mohammadi@example.com',
+    phone: '09198765432',
+    role: 'student',
+    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=250&q=80',
+    enrolledCourseIds: ['course-mikrotik-mtcna'],
+    purchasedFileIds: ['file-mikrotik-scripts'],
+    completedEpisodeIds: ['ep-1-1'],
+    certificates: [
+      {
+        id: 'cert-102',
+        certificateNumber: 'PN-CERT-2024-5120',
+        userId: 'usr-student-2',
+        userName: 'سارا محمدی',
+        userPhone: '09198765432',
+        courseId: 'course-mikrotik-mtcna',
+        courseTitle: 'دوره کاربردی مدیریت شبکه‌های میکروتیک (MTCNA)',
+        instructorName: 'مهندس محمدرضا قاسمی',
+        issueDate: '۱۴۰۳/۰۶/۱۵',
+        gradeScore: 92,
+        verificationCode: 'MTCNA-92-5120-VERIFIED'
+      }
+    ],
+    walletBalance: 120000,
+    createdAt: '۱۴۰۳/۰۲/۲۰'
+  },
+  {
+    id: 'usr-student-3',
+    name: 'امیررضا کاظمی',
+    email: 'a.kazemi@example.com',
+    phone: '09351234567',
+    role: 'student',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=250&q=80',
+    enrolledCourseIds: ['course-fullstack-react'],
+    purchasedFileIds: ['file-nextjs-starter-template'],
+    completedEpisodeIds: [],
+    certificates: [
+      {
+        id: 'cert-103',
+        certificateNumber: 'PN-CERT-2024-9403',
+        userId: 'usr-student-3',
+        userName: 'امیررضا کاظمی',
+        userPhone: '09351234567',
+        courseId: 'course-fullstack-react',
+        courseTitle: 'دوره پروژه محور طراحی وب با React 19 و Tailwind CSS',
+        instructorName: 'مهندس علی احمدی',
+        issueDate: '۱۴۰۳/۰۵/۲۲',
+        gradeScore: 88,
+        verificationCode: 'REACT-88-9403-VERIFIED'
+      }
+    ],
+    walletBalance: 450000,
+    createdAt: '۱۴۰۳/۰۳/۱۱'
+  },
+  {
+    id: 'usr-student-4',
+    name: 'ندا تهرانی',
+    email: 'neda.tehrani@example.com',
+    phone: '09129998877',
+    role: 'student',
+    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=250&q=80',
+    enrolledCourseIds: ['course-ccna-200-301', 'course-mikrotik-mtcna'],
+    purchasedFileIds: [],
+    completedEpisodeIds: [],
+    certificates: [],
+    walletBalance: 0,
+    createdAt: '۱۴۰۳/۰۴/۰۵'
+  }
+];
 
 export const INITIAL_ORDERS: Order[] = [
   {
@@ -673,7 +746,7 @@ export const INITIAL_REVIEWS: Review[] = [
     userName: 'امیررضا کریمی',
     userAvatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=150&q=80',
     rating: 5,
-    comment: 'پروژه‌محور بودن دوره و اتصال به دیتابیس Supabase و استقرار روی Vercel واقعاً نیاز بازار کار امروز است. دست مریزاد به مهندس سپهری.',
+    comment: 'پروژه‌محور بودن دوره و پیاده‌سازی پایگاه داده کاربردی و استقرار ابری واقعاً نیاز بازار کار امروز است. دست مریزاد به مهندس سپهری.',
     createdAt: '۱۴۰۳/۰۷/۱۵',
     isApproved: true
   }
@@ -792,15 +865,15 @@ export const INITIAL_QUIZZES: CourseQuiz[] = [
       },
       {
         id: 'rq-3',
-        question: 'مزیت استفاده از Supabase در برابر ساخت بک‌اند سنتی چیست؟',
+        question: 'مزیت استفاده از Backend-as-a-Service (BaaS) و پایگاه داده‌های ابری چیست؟',
         options: [
           'عدم نیاز به پایگاه داده',
-          'فراهم آوردن PostgreSQL ابری، سیستم احراز هویت، اشتراک ریل‌تایم و REST API آنی',
+          'فراهم آوردن پایگاه داده مقیاس‌پذیر، سیستم احراز هویت امن، اشتراک ریل‌تایم و APIهای آماده',
           'تنها برای ذخیره فایل کاربرد دارد',
-          'عدم سازگاری با React'
+          'عدم سازگاری با فریمورک‌های مدرن'
         ],
         correctOptionIndex: 1,
-        explanation: 'سوپابیس به عنوان جایگزین متن‌باز Firebase، پایگاه داده واقعی PostgreSQL را به همراه APIهای آماده و RLS امن در اختیار توسعه‌دهنده قرار می‌دهد.'
+        explanation: 'سرویس‌های BaaS ابری، پایگاه داده واقعی را به همراه APIهای آماده و مکانیزم‌های احراز هویت امن و سریع در اختیار توسعه‌دهنده قرار می‌دهند.'
       }
     ]
   }
@@ -815,8 +888,6 @@ export const INITIAL_SETTINGS: SiteSettings = {
   workHours: 'شنبه تا چهارشنبه ۹:۰۰ الی ۱۸:۰۰ - پنج‌شنبه‌ها ۹:۰۰ الی ۱۴:۰۰',
   zarinpalMerchantId: 'a1b2c3d4-e5f6-7890-abcd-1234567890ab',
   isGatewaySandbox: true,
-  supabaseUrl: import.meta.env.VITE_SUPABASE_URL || '',
-  supabaseAnonKey: import.meta.env.VITE_SUPABASE_ANON_KEY || '',
   telegramUsername: 'parsnet_academy',
   instagramUsername: 'parsnet.academy',
   adminUsername: 'admin',
@@ -836,6 +907,48 @@ export const INITIAL_SETTINGS: SiteSettings = {
 ۴. بازگشت وجه: در صورت وجود مغایرت در سرفصل‌های اعلامی با محتوای دوره تا ۴۸ ساعت پس از خرید امکان استرداد وجه طبق ضوابط مالی فراهم است.`
 };
 
+export const INITIAL_OFFICIAL_CERTS: Certificate[] = [
+  {
+    id: 'cert-sample-1',
+    certificateNumber: 'PN-CERT-2024-8841',
+    userId: 'usr-student-demo',
+    userName: 'علی حسینی',
+    userPhone: '09123456789',
+    courseId: 'course-ccna-200-301',
+    courseTitle: 'دوره جامع مهندسی شبکه سیسکو (Cisco CCNA 200-301)',
+    instructorName: 'مهندس محمدرضا قاسمی',
+    issueDate: '۱۴۰۳/۰۷/۱۰',
+    gradeScore: 96,
+    verificationCode: 'CCNA-96-8841-VERIFIED'
+  },
+  {
+    id: 'cert-sample-2',
+    certificateNumber: 'PN-CERT-2024-5120',
+    userId: 'usr-202',
+    userName: 'سارا محمدی',
+    userPhone: '09198765432',
+    courseId: 'course-mikrotik-mtcna',
+    courseTitle: 'دوره کاربردی مدیریت شبکه‌های میکروتیک (MTCNA)',
+    instructorName: 'مهندس محمدرضا قاسمی',
+    issueDate: '۱۴۰۳/۰۶/۱۵',
+    gradeScore: 92,
+    verificationCode: 'MTCNA-92-5120-VERIFIED'
+  },
+  {
+    id: 'cert-sample-3',
+    certificateNumber: 'PN-CERT-2024-9403',
+    userId: 'usr-303',
+    userName: 'امیررضا کاظمی',
+    userPhone: '09351234567',
+    courseId: 'course-fullstack-react',
+    courseTitle: 'دوره پروژه محور طراحی وب با React 19 و Tailwind CSS',
+    instructorName: 'مهندس علی احمدی',
+    issueDate: '۱۴۰۳/۰۵/۲۲',
+    gradeScore: 88,
+    verificationCode: 'REACT-88-9403-VERIFIED'
+  }
+];
+
 class Store {
   courses: Course[] = [];
   files: DigitalFile[] = [];
@@ -847,11 +960,15 @@ class Store {
   reviews: Review[] = [];
   coupons: Coupon[] = [];
   quizzes: CourseQuiz[] = INITIAL_QUIZZES;
+  officialCertificates: Certificate[] = INITIAL_OFFICIAL_CERTS;
   videoNotes: VideoNote[] = [];
   playbackTimes: Record<string, number> = {};
   theme: 'light' | 'dark' = 'light';
+  colorTheme: ColorTheme = 'indigo';
+  adminTheme: AdminTheme = 'classic-dark';
   toasts: ToastMessage[] = [];
   currentUser: User = INITIAL_USER;
+  users: User[] = INITIAL_USERS;
   settings: SiteSettings = INITIAL_SETTINGS;
   cart: CartItem[] = [];
   isAdminLoggedIn: boolean = false;
@@ -896,6 +1013,12 @@ class Store {
       const storedPlayback = localStorage.getItem('parsnet_playback_times');
       this.playbackTimes = storedPlayback ? JSON.parse(storedPlayback) : {};
 
+      const storedQuizzes = localStorage.getItem('parsnet_quizzes');
+      this.quizzes = storedQuizzes ? JSON.parse(storedQuizzes) : INITIAL_QUIZZES;
+
+      const storedOfficialCerts = localStorage.getItem('parsnet_official_certs');
+      this.officialCertificates = storedOfficialCerts ? JSON.parse(storedOfficialCerts) : INITIAL_OFFICIAL_CERTS;
+
       const storedTheme = localStorage.getItem('parsnet_theme') as 'light' | 'dark';
       this.theme = storedTheme || 'light';
       if (typeof document !== 'undefined') {
@@ -906,17 +1029,29 @@ class Store {
         }
       }
 
+      const storedColor = (localStorage.getItem('parsnet_color_theme') as ColorTheme) || 'indigo';
+      this.colorTheme = storedColor;
+
+      const storedAdminTheme = (localStorage.getItem('parsnet_admin_theme') as AdminTheme) || 'classic-dark';
+      this.adminTheme = storedAdminTheme;
+
+      if (typeof document !== 'undefined') {
+        document.documentElement.setAttribute('data-color-theme', storedColor);
+        document.documentElement.setAttribute('data-admin-theme', storedAdminTheme);
+      }
+
       const storedUser = localStorage.getItem('parsnet_user');
       this.currentUser = storedUser ? JSON.parse(storedUser) : INITIAL_USER;
+
+      const storedUsers = localStorage.getItem('parsnet_users');
+      this.users = storedUsers ? JSON.parse(storedUsers) : INITIAL_USERS;
 
       const storedSettings = localStorage.getItem('parsnet_settings');
       if (storedSettings) {
         const parsed = JSON.parse(storedSettings);
         this.settings = {
           ...INITIAL_SETTINGS,
-          ...parsed,
-          supabaseUrl: parsed.supabaseUrl || import.meta.env.VITE_SUPABASE_URL || '',
-          supabaseAnonKey: parsed.supabaseAnonKey || import.meta.env.VITE_SUPABASE_ANON_KEY || ''
+          ...parsed
         };
       } else {
         this.settings = INITIAL_SETTINGS;
@@ -937,8 +1072,13 @@ class Store {
       this.contactMessages = INITIAL_CONTACT_MESSAGES;
       this.reviews = INITIAL_REVIEWS;
       this.coupons = INITIAL_COUPONS;
+      this.quizzes = INITIAL_QUIZZES;
+      this.officialCertificates = INITIAL_OFFICIAL_CERTS;
       this.theme = 'light';
+      this.colorTheme = 'indigo';
+      this.adminTheme = 'classic-dark';
       this.currentUser = INITIAL_USER;
+      this.users = INITIAL_USERS;
       this.settings = INITIAL_SETTINGS;
       this.cart = [];
       this.isAdminLoggedIn = false;
@@ -956,10 +1096,15 @@ class Store {
       localStorage.setItem('parsnet_contact_messages', JSON.stringify(this.contactMessages));
       localStorage.setItem('parsnet_reviews', JSON.stringify(this.reviews));
       localStorage.setItem('parsnet_coupons', JSON.stringify(this.coupons));
+      localStorage.setItem('parsnet_quizzes', JSON.stringify(this.quizzes));
+      localStorage.setItem('parsnet_official_certs', JSON.stringify(this.officialCertificates));
       localStorage.setItem('parsnet_video_notes', JSON.stringify(this.videoNotes));
       localStorage.setItem('parsnet_playback_times', JSON.stringify(this.playbackTimes));
       localStorage.setItem('parsnet_theme', this.theme);
+      localStorage.setItem('parsnet_color_theme', this.colorTheme);
+      localStorage.setItem('parsnet_admin_theme', this.adminTheme);
       localStorage.setItem('parsnet_user', JSON.stringify(this.currentUser));
+      localStorage.setItem('parsnet_users', JSON.stringify(this.users));
       localStorage.setItem('parsnet_settings', JSON.stringify(this.settings));
       localStorage.setItem('parsnet_cart', JSON.stringify(this.cart));
       localStorage.setItem('parsnet_admin_auth', this.isAdminLoggedIn ? 'true' : 'false');
@@ -967,7 +1112,6 @@ class Store {
       console.error('Failed to save to localStorage', e);
     }
     this.notify();
-    this.syncToSupabaseQuietly();
   }
 
   subscribe(listener: () => void) {
@@ -1257,6 +1401,65 @@ class Store {
     this.saveToStorage();
   }
 
+  setColorTheme(theme: ColorTheme) {
+    this.colorTheme = theme;
+    this.settings = { ...this.settings, colorTheme: theme };
+    if (typeof document !== 'undefined') {
+      document.documentElement.setAttribute('data-color-theme', theme);
+    }
+    this.saveToStorage();
+    this.showToast('info', `تم رنگی سایت با موفقیت تغییر یافت.`);
+  }
+
+  setAdminTheme(theme: AdminTheme) {
+    this.adminTheme = theme;
+    this.settings = { ...this.settings, adminTheme: theme };
+    if (typeof document !== 'undefined') {
+      document.documentElement.setAttribute('data-admin-theme', theme);
+    }
+    this.saveToStorage();
+    this.showToast('info', 'قالب پیشخوان مدیریت با موفقیت تغییر کرد.');
+  }
+
+  // Multi-user & Student management
+  updateUser(userId: string, updates: Partial<User>) {
+    this.users = this.users.map(u => u.id === userId ? { ...u, ...updates } : u);
+    if (this.currentUser.id === userId) {
+      this.currentUser = { ...this.currentUser, ...updates };
+    }
+    this.saveToStorage();
+    this.showToast('success', 'اطلاعات کاربر با موفقیت به‌روزرسانی شد.');
+  }
+
+  addWalletCredit(userId: string, amount: number) {
+    this.users = this.users.map(u => {
+      if (u.id === userId) {
+        return { ...u, walletBalance: (u.walletBalance || 0) + amount };
+      }
+      return u;
+    });
+    if (this.currentUser.id === userId) {
+      this.currentUser = {
+        ...this.currentUser,
+        walletBalance: (this.currentUser.walletBalance || 0) + amount
+      };
+    }
+    this.saveToStorage();
+    this.showToast('success', `مبلغ ${amount.toLocaleString('fa-IR')} تومان به کیف پول کاربر اضافه گردید.`);
+  }
+
+  addUser(newUser: User) {
+    this.users = [newUser, ...this.users];
+    this.saveToStorage();
+    this.showToast('success', 'کاربر جدید به سامانه افزوده شد.');
+  }
+
+  deleteUser(userId: string) {
+    this.users = this.users.filter(u => u.id !== userId);
+    this.saveToStorage();
+    this.showToast('info', 'کاربر از لیست کاربران سامانه حذف شد.');
+  }
+
   // Coupon Management
   validateCoupon(code: string): { valid: boolean; discountPercent: number; message: string } {
     const trimmed = code.trim().toUpperCase();
@@ -1428,52 +1631,217 @@ class Store {
     return newCert;
   }
 
+  // Certificate Verification Service
+  verifyCertificate(query: string): Certificate | null {
+    if (!query || !query.trim()) return null;
+    const cleanQuery = query.trim().toUpperCase();
+
+    // Check current user certificates
+    const allCerts = this.getVerifiedCertificates();
+    const found = allCerts.find(c => 
+      c.certificateNumber.toUpperCase() === cleanQuery ||
+      c.verificationCode.toUpperCase() === cleanQuery ||
+      cleanQuery.includes(c.verificationCode.toUpperCase()) ||
+      c.certificateNumber.toUpperCase().includes(cleanQuery)
+    );
+
+    return found || null;
+  }
+
+  getVerifiedCertificates(): Certificate[] {
+    const userCerts = this.currentUser.certificates || [];
+    const sampleOfficialCerts: Certificate[] = [
+      {
+        id: 'cert-sample-1',
+        certificateNumber: 'PN-CERT-2024-8841',
+        userId: 'usr-student-demo',
+        userName: 'علی حسینی',
+        userPhone: '09123456789',
+        courseId: 'course-ccna-200-301',
+        courseTitle: 'دوره جامع مهندسی شبکه سیسکو (Cisco CCNA 200-301)',
+        instructorName: 'مهندس محمدرضا قاسمی',
+        issueDate: '۱۴۰۳/۰۷/۱۰',
+        gradeScore: 96,
+        verificationCode: 'CCNA-96-8841-VERIFIED'
+      },
+      {
+        id: 'cert-sample-2',
+        certificateNumber: 'PN-CERT-2024-5120',
+        userId: 'usr-202',
+        userName: 'سارا محمدی',
+        userPhone: '09198765432',
+        courseId: 'course-mikrotik-mtcna',
+        courseTitle: 'دوره کاربردی مدیریت شبکه‌های میکروتیک (MTCNA)',
+        instructorName: 'مهندس محمدرضا قاسمی',
+        issueDate: '۱۴۰۳/۰۶/۱۵',
+        gradeScore: 92,
+        verificationCode: 'MTCNA-92-5120-VERIFIED'
+      },
+      {
+        id: 'cert-sample-3',
+        certificateNumber: 'PN-CERT-2024-9403',
+        userId: 'usr-303',
+        userName: 'امیررضا کاظمی',
+        userPhone: '09351234567',
+        courseId: 'course-fullstack-react',
+        courseTitle: 'دوره پروژه محور طراحی وب با React 19 و Tailwind CSS',
+        instructorName: 'مهندس علی احمدی',
+        issueDate: '۱۴۰۳/۰۵/۲۲',
+        gradeScore: 88,
+        verificationCode: 'REACT-88-9403-VERIFIED'
+      }
+    ];
+
+    // Merge avoiding duplicates by certificateNumber
+    const combined = [...userCerts];
+    sampleOfficialCerts.forEach(sc => {
+      if (!combined.some(c => c.certificateNumber === sc.certificateNumber)) {
+        combined.push(sc);
+      }
+    });
+
+    return this.officialCertificates;
+  }
+
+  // Admin Official Certificate Management
+  addOfficialCertificate(cert: Certificate) {
+    this.officialCertificates = [cert, ...this.officialCertificates];
+    this.saveToStorage();
+    this.showToast('success', 'گواهینامه جدید با موفقیت در سامانه ثبت گردید.');
+  }
+
+  deleteOfficialCertificate(certId: string) {
+    this.officialCertificates = this.officialCertificates.filter(c => c.id !== certId);
+    this.saveToStorage();
+    this.showToast('info', 'گواهینامه مورد نظر با موفقیت حذف گردید.');
+  }
+
+  issueManualCertificate(data: {
+    userName: string;
+    userPhone: string;
+    courseTitle: string;
+    instructorName: string;
+    gradeScore: number;
+  }): Certificate {
+    const certNumber = `PN-CERT-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+    const newCert: Certificate = {
+      id: `cert-manual-${Date.now()}`,
+      certificateNumber: certNumber,
+      userId: `usr-${Date.now()}`,
+      userName: data.userName,
+      userPhone: data.userPhone,
+      courseId: 'course-manual',
+      courseTitle: data.courseTitle,
+      instructorName: data.instructorName || 'استاد رسمی آکادمی پارس‌نت',
+      issueDate: new Date().toLocaleDateString('fa-IR'),
+      gradeScore: data.gradeScore,
+      verificationCode: `PN-${data.gradeScore}-${Math.floor(100000 + Math.random() * 900000)}`
+    };
+
+    this.officialCertificates = [newCert, ...this.officialCertificates];
+    this.saveToStorage();
+    this.showToast('success', `گواهینامه معتبر با شماره ${certNumber} صادر شد.`);
+    return newCert;
+  }
+
+  // Admin Quiz / Exam Management
+  addQuiz(quiz: CourseQuiz) {
+    this.quizzes = [quiz, ...this.quizzes];
+    this.saveToStorage();
+    this.showToast('success', 'آزمون جدید دوره با موفقیت ثبت شد.');
+  }
+
+  updateQuiz(quizId: string, updates: Partial<CourseQuiz>) {
+    this.quizzes = this.quizzes.map(q => q.id === quizId ? { ...q, ...updates } : q);
+    this.saveToStorage();
+    this.showToast('success', 'تغییرات آزمون با موفقیت ذخیره گردید.');
+  }
+
+  deleteQuiz(quizId: string) {
+    this.quizzes = this.quizzes.filter(q => q.id !== quizId);
+    this.saveToStorage();
+    this.showToast('info', 'آزمون مورد نظر حذف گردید.');
+  }
+
+  // Backup & Restore Entire Site Data (No External Database Required)
+  exportAllData(): string {
+    const fullBackup = {
+      version: '1.0',
+      exportedAt: new Date().toISOString(),
+      courses: this.courses,
+      files: this.files,
+      orders: this.orders,
+      tickets: this.tickets,
+      articles: this.articles,
+      media: this.media,
+      contactMessages: this.contactMessages,
+      reviews: this.reviews,
+      coupons: this.coupons,
+      quizzes: this.quizzes,
+      officialCertificates: this.officialCertificates,
+      settings: this.settings,
+      users: this.users
+    };
+    return JSON.stringify(fullBackup, null, 2);
+  }
+
+  importAllData(jsonString: string): boolean {
+    try {
+      const data = JSON.parse(jsonString);
+      if (data.courses) this.courses = data.courses;
+      if (data.files) this.files = data.files;
+      if (data.orders) this.orders = data.orders;
+      if (data.tickets) this.tickets = data.tickets;
+      if (data.articles) this.articles = data.articles;
+      if (data.media) this.media = data.media;
+      if (data.contactMessages) this.contactMessages = data.contactMessages;
+      if (data.reviews) this.reviews = data.reviews;
+      if (data.coupons) this.coupons = data.coupons;
+      if (data.quizzes) this.quizzes = data.quizzes;
+      if (data.officialCertificates) this.officialCertificates = data.officialCertificates;
+      if (data.settings) this.settings = { ...INITIAL_SETTINGS, ...data.settings };
+      if (data.users) this.users = data.users;
+
+      this.saveToStorage();
+      this.showToast('success', 'اطلاعات کامل سایت با موفقیت بازیابی شد.');
+      return true;
+    } catch (err) {
+      console.error('Failed to import data', err);
+      this.showToast('error', 'فایل پشتیبان نامعتبر است.');
+      return false;
+    }
+  }
+
+  resetDataToDefault() {
+    this.courses = INITIAL_COURSES;
+    this.files = INITIAL_FILES;
+    this.orders = INITIAL_ORDERS;
+    this.tickets = INITIAL_TICKETS;
+    this.articles = INITIAL_ARTICLES;
+    this.media = INITIAL_MEDIA;
+    this.contactMessages = INITIAL_CONTACT_MESSAGES;
+    this.reviews = INITIAL_REVIEWS;
+    this.coupons = INITIAL_COUPONS;
+    this.quizzes = INITIAL_QUIZZES;
+    this.officialCertificates = INITIAL_OFFICIAL_CERTS;
+    this.settings = INITIAL_SETTINGS;
+    this.users = INITIAL_USERS;
+    this.saveToStorage();
+    this.showToast('info', 'تمامی داده‌ها به حالت پیش‌فرض اولیه بازگردانده شدند.');
+  }
+
   // Secure Expiring Download URLs
   generateSignedDownloadUrl(fileId: string): { url: string; token: string; expiresAt: string; expiresSeconds: number } {
     const file = this.files.find(f => f.id === fileId);
-    const token = `sig_${Date.now()}_${Math.random().toString(36).substr(2, 8)}`;
-    const expiryDate = new Date(Date.now() + 2 * 60 * 60 * 1000); // 2 hours
+    const token = btoa(`${fileId}-${Date.now()}`).substring(0, 16);
+    const expiryDate = new Date(Date.now() + 4 * 60 * 60 * 1000); // 4 hours
     const expiresAt = expiryDate.toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' });
-    const directUrl = file ? file.downloadUrl : 'https://parsnet-academy.com/downloads/secure.zip';
-    const signedUrl = `${directUrl}?token=${token}&expires=${Math.floor(expiryDate.getTime() / 1000)}`;
-
     return {
-      url: signedUrl,
+      url: file ? `${file.downloadUrl}?token=${token}&expires=${expiryDate.getTime()}` : '#',
       token,
       expiresAt,
-      expiresSeconds: 7200
+      expiresSeconds: 14400
     };
-  }
-
-  // Quiet sync to Supabase if configured
-  private async syncToSupabaseQuietly() {
-    const supabase = getSupabaseClient(this.settings.supabaseUrl, this.settings.supabaseAnonKey);
-    if (!supabase) return;
-
-    try {
-      // Sync settings or latest order
-      if (this.orders.length > 0) {
-        const latestOrder = this.orders[0];
-        await supabase.from('orders').upsert({
-          id: latestOrder.id,
-          order_number: latestOrder.orderNumber,
-          user_id: latestOrder.userId,
-          user_name: latestOrder.userName,
-          user_phone: latestOrder.userPhone,
-          user_email: latestOrder.userEmail,
-          items: latestOrder.items,
-          total_amount: latestOrder.totalAmount,
-          discount_amount: latestOrder.discountAmount,
-          payable_amount: latestOrder.payableAmount,
-          status: latestOrder.status,
-          gateway: latestOrder.gateway,
-          ref_id: latestOrder.refId,
-          card_number: latestOrder.cardNumber
-        });
-      }
-    } catch (e) {
-      // Supabase table might not exist yet before running the SQL script
-    }
   }
 }
 

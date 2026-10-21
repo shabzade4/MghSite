@@ -1,24 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingCart, User, LayoutDashboard, Terminal, Menu, X, Phone, Mail, BookOpen, Download, Radio, Info, Moon, Sun } from 'lucide-react';
+import { ShoppingCart, User, LayoutDashboard, Terminal, Menu, X, Phone, Mail, BookOpen, Download, Radio, Info, Moon, Sun, Palette, Check } from 'lucide-react';
 import { store } from '../services/store';
-import { NavigationTab } from '../types';
+import { NavigationTab, ColorTheme } from '../types';
 
 interface HeaderProps {
   currentTab: NavigationTab;
   onNavigate: (tab: NavigationTab) => void;
   onOpenCart: () => void;
-  onOpenSupabaseGuide: () => void;
+  onOpenVerifyModal?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   currentTab,
   onNavigate,
   onOpenCart,
-  onOpenSupabaseGuide
+  onOpenVerifyModal
 }) => {
   const [cartCount, setCartCount] = useState(store.cart.length);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>(store.theme);
+  const [colorTheme, setColorTheme] = useState<ColorTheme>(store.colorTheme);
+  const [isThemePickerOpen, setIsThemePickerOpen] = useState(false);
   const currentUser = store.currentUser;
   const settings = store.settings;
 
@@ -26,12 +28,14 @@ export const Header: React.FC<HeaderProps> = ({
     return store.subscribe(() => {
       setCartCount(store.cart.length);
       setTheme(store.theme);
+      setColorTheme(store.colorTheme);
     });
   }, []);
 
   const navItems: { id: NavigationTab; label: string }[] = [
     { id: 'home', label: 'صفحه اصلی' },
     { id: 'courses', label: 'دوره‌های آموزشی' },
+    { id: 'roadmaps', label: 'مسیرهای یادگیری' },
     { id: 'files', label: 'محصولات و سناریوها' },
     { id: 'blog', label: 'نوشته‌ها و رویدادها' },
     { id: 'about', label: 'درباره ما' },
@@ -41,23 +45,23 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 transition-all select-none">
       {/* Top micro announcement bar */}
-      <div className="bg-slate-900 text-slate-300 text-xs py-1.5 px-4">
+      <div className="bg-slate-900 text-slate-300 text-xs py-2 px-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <span className="text-amber-400 font-medium hidden sm:inline">تخفیف ویژه دوره‌های شبکه و وب:</span>
             <span>تا ۳۰٪ تخفیف روی دوره‌های سیسکو، میکروتیک و ری‌اکت ۱۹</span>
           </div>
           <div className="flex items-center gap-4">
-            <button
-              onClick={onOpenSupabaseGuide}
-              className="text-emerald-400 hover:text-emerald-300 transition-colors flex items-center gap-1 font-mono text-[11px]"
-            >
-              <Terminal className="w-3.5 h-3.5" />
-              <span className="hidden md:inline">اتصال دیتابیس Supabase و Vercel</span>
-              <span className="md:hidden">Supabase</span>
-            </button>
+            {onOpenVerifyModal && (
+              <button
+                onClick={onOpenVerifyModal}
+                className="text-amber-400 hover:text-amber-300 transition-colors flex items-center gap-1 font-mono text-[11px] cursor-pointer"
+              >
+                <span>استعلام اصالت گواهینامه</span>
+              </button>
+            )}
             <span className="text-slate-600 hidden sm:inline">|</span>
-            <span className="tabular-nums font-mono text-slate-400 hidden sm:inline">
+            <span className="tabular-nums font-mono text-slate-300">
               پشتیبانی: {settings.supportPhone}
             </span>
           </div>
@@ -122,6 +126,52 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Zone 3: Actions (Cart & Panels) */}
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            {/* Color Theme Selector Popover */}
+            <div className="relative">
+              <button
+                onClick={() => setIsThemePickerOpen(!isThemePickerOpen)}
+                className="p-2.5 text-slate-700 dark:text-slate-200 hover:text-indigo-600 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors border border-slate-200 dark:border-slate-800 cursor-pointer flex items-center gap-1"
+                title="تغییر تم رنگی سایت"
+              >
+                <Palette className="w-4 h-4 text-indigo-600" />
+              </button>
+
+              {isThemePickerOpen && (
+                <div className="absolute left-0 mt-2 w-48 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 p-2 z-50 space-y-1">
+                  <div className="text-[11px] font-bold text-slate-500 dark:text-slate-400 px-2 py-1 border-b border-slate-100 dark:border-slate-800">
+                    تم‌های رنگی سایت:
+                  </div>
+                  {[
+                    { id: 'indigo', name: 'نیلی سازمانی', hex: '#4f46e5' },
+                    { id: 'emerald', name: 'زمردی و نعنایی', hex: '#059669' },
+                    { id: 'cyan', name: 'فیروزه‌ای نئون', hex: '#0891b2' },
+                    { id: 'amber', name: 'طلایی کهربایی', hex: '#d97706' },
+                    { id: 'rose', name: 'یاقوتی و زرشکی', hex: '#e11d48' },
+                    { id: 'violet', name: 'بنفش رویال', hex: '#7c3aed' }
+                  ].map(t => (
+                    <button
+                      key={t.id}
+                      onClick={() => {
+                        store.setColorTheme(t.id as ColorTheme);
+                        setIsThemePickerOpen(false);
+                      }}
+                      className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs transition-colors cursor-pointer ${
+                        colorTheme === t.id
+                          ? 'bg-slate-100 dark:bg-slate-800 font-bold text-slate-900 dark:text-white'
+                          : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="w-3.5 h-3.5 rounded-full border border-black/10 shrink-0" style={{ backgroundColor: t.hex }} />
+                        <span>{t.name}</span>
+                      </div>
+                      {colorTheme === t.id && <Check className="w-3.5 h-3.5 text-indigo-600" />}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
             {/* Dark / Light Theme Toggle */}
             <button
               onClick={() => store.toggleTheme()}

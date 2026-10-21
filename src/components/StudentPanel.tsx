@@ -1,20 +1,26 @@
 import React, { useState } from 'react';
-import { BookOpen, Download, ShoppingBag, MessageSquare, User, Play, Clock, CheckCircle2, AlertCircle, Send, Plus, ArrowRight, ShieldCheck, Wallet } from 'lucide-react';
-import { Course, DigitalFile, Order, Ticket } from '../types';
+import { BookOpen, Download, ShoppingBag, MessageSquare, User, Play, Clock, CheckCircle2, AlertCircle, Send, Plus, ArrowRight, ShieldCheck, Wallet, Award, Check, Lock, Sparkles, Printer } from 'lucide-react';
+import { Course, DigitalFile, Order, Ticket, Certificate } from '../types';
 import { store } from '../services/store';
 
 interface StudentPanelProps {
   onOpenPlayer: (course: Course) => void;
   onOpenInvoice: (order: Order) => void;
   onBackToHome: () => void;
+  onOpenCertificate?: (cert: Certificate) => void;
+  onOpenQuiz?: (course: Course) => void;
+  onOpenVerifyModal?: (code?: string) => void;
 }
 
 export const StudentPanel: React.FC<StudentPanelProps> = ({
   onOpenPlayer,
   onOpenInvoice,
-  onBackToHome
+  onBackToHome,
+  onOpenCertificate,
+  onOpenQuiz,
+  onOpenVerifyModal
 }) => {
-  const [activeTab, setActiveTab] = useState<'courses' | 'files' | 'orders' | 'tickets' | 'profile'>('courses');
+  const [activeTab, setActiveTab] = useState<'courses' | 'files' | 'certificates' | 'orders' | 'tickets' | 'profile'>('courses');
   const [currentUser, setCurrentUser] = useState(store.currentUser);
   const [courses, setCourses] = useState<Course[]>(store.courses);
   const [files, setFiles] = useState<DigitalFile[]>(store.files);
@@ -179,6 +185,17 @@ export const StudentPanel: React.FC<StudentPanelProps> = ({
           </button>
 
           <button
+            onClick={() => { setActiveTab('certificates'); setSelectedTicket(null); }}
+            className={`w-full px-4 py-3 text-right text-xs font-semibold rounded-xl flex items-center gap-3 transition-colors ${
+              activeTab === 'certificates' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-700 hover:bg-slate-50'
+            }`}
+          >
+            <Award className="w-4 h-4 shrink-0 text-amber-500" />
+            <span className="flex-1">گواهینامه‌های رسمی</span>
+            <span className="font-mono text-[11px] tabular-nums">({(currentUser.certificates || []).length})</span>
+          </button>
+
+          <button
             onClick={() => { setActiveTab('orders'); setSelectedTicket(null); }}
             className={`w-full px-4 py-3 text-right text-xs font-semibold rounded-xl flex items-center gap-3 transition-colors ${
               activeTab === 'orders' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-700 hover:bg-slate-50'
@@ -219,7 +236,7 @@ export const StudentPanel: React.FC<StudentPanelProps> = ({
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h2 className="text-base font-bold text-slate-900">دوره‌های آموزشی ثبت‌نام شده</h2>
-                  <p className="text-xs text-slate-500 mt-0.5">برای مشاهده ویدیوها و دانلود فایل‌ها روی هر دوره کلیک کنید.</p>
+                  <p className="text-xs text-slate-500 mt-0.5">برای مشاهده ویدیوها و شرکت در آزمون دریافت گواهینامه، دوره مورد نظر را انتخاب کنید.</p>
                 </div>
               </div>
 
@@ -230,39 +247,79 @@ export const StudentPanel: React.FC<StudentPanelProps> = ({
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {enrolledCourses.map((course) => (
-                    <div
-                      key={course.id}
-                      className="border border-slate-200 rounded-2xl p-4 hover:border-indigo-300 hover:shadow-sm transition-all flex flex-col justify-between"
-                    >
-                      <div className="flex items-start gap-3 mb-3">
-                        <img
-                          src={course.image}
-                          alt={course.title}
-                          referrerPolicy="no-referrer"
-                          className="w-20 h-16 rounded-xl object-cover shrink-0"
-                        />
+                  {enrolledCourses.map((course) => {
+                    const prog = store.getCourseProgress(course.id);
+                    const hasCert = (currentUser.certificates || []).some(c => c.courseId === course.id);
+
+                    return (
+                      <div
+                        key={course.id}
+                        className="border border-slate-200 rounded-2xl p-4 hover:border-indigo-300 hover:shadow-sm transition-all flex flex-col justify-between"
+                      >
                         <div>
-                          <h4 className="text-xs font-bold text-slate-900 line-clamp-2 leading-snug">
-                            {course.title}
-                          </h4>
-                          <div className="text-[11px] text-slate-500 mt-1 flex items-center gap-2">
-                            <span>مدرس: {course.instructor.name}</span>
-                            <span>·</span>
-                            <span className="font-mono tabular-nums">{course.episodesCount} جلسه</span>
+                          <div className="flex items-start gap-3 mb-3">
+                            <img
+                              src={course.image}
+                              alt={course.title}
+                              referrerPolicy="no-referrer"
+                              className="w-20 h-16 rounded-xl object-cover shrink-0"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <h4 className="text-xs font-bold text-slate-900 line-clamp-2 leading-snug">
+                                {course.title}
+                              </h4>
+                              <div className="text-[11px] text-slate-500 mt-1 flex items-center gap-2">
+                                <span>مدرس: {course.instructor.name}</span>
+                                <span>·</span>
+                                <span className="font-mono tabular-nums">{course.episodesCount} جلسه</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Progress bar */}
+                          <div className="mb-4 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                            <div className="flex items-center justify-between text-[11px] mb-1">
+                              <span className="text-slate-500">میزان پیشرفت مشاهده:</span>
+                              <span className="font-mono font-bold text-emerald-600 tabular-nums">
+                                {prog.percent}٪ ({prog.completedCount} از {prog.totalCount} جلسه)
+                              </span>
+                            </div>
+                            <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
+                              <div
+                                className="bg-emerald-500 h-full rounded-full transition-all duration-500"
+                                style={{ width: `${prog.percent}%` }}
+                              />
+                            </div>
                           </div>
                         </div>
-                      </div>
 
-                      <button
-                        onClick={() => onOpenPlayer(course)}
-                        className="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 transition-colors"
-                      >
-                        <Play className="w-3.5 h-3.5 fill-current" />
-                        <span>پخش جلسات و دانلود تمرین‌ها</span>
-                      </button>
-                    </div>
-                  ))}
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => onOpenPlayer(course)}
+                            className="flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                          >
+                            <Play className="w-3.5 h-3.5 fill-current" />
+                            <span>پخش جلسات</span>
+                          </button>
+
+                          {onOpenQuiz && (
+                            <button
+                              onClick={() => onOpenQuiz(course)}
+                              className={`px-3 py-2 text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 transition-colors cursor-pointer border ${
+                                hasCert
+                                  ? 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100'
+                                  : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200'
+                              }`}
+                              title={hasCert ? 'مشاهده و شرکت مجدد در آزمون' : 'شرکت در آزمون آنلاین پایان دوره'}
+                            >
+                              <Award className="w-3.5 h-3.5 text-amber-600" />
+                              <span className="hidden sm:inline">{hasCert ? 'آزمون مجدد' : 'آزمون گواهی'}</span>
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -274,7 +331,7 @@ export const StudentPanel: React.FC<StudentPanelProps> = ({
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h2 className="text-base font-bold text-slate-900">فایل‌ها و سناریوهای خریداری‌شده</h2>
-                  <p className="text-xs text-slate-500 mt-0.5">لینک‌های دانلود مستقیم با پهنای باند اختصاصی و آخرین آپدیت‌ها.</p>
+                  <p className="text-xs text-slate-500 mt-0.5">لینک‌های دانلود اختصاصی با گواهی امضای دیجیتال و توکن امن دو ساعته.</p>
                 </div>
               </div>
 
@@ -285,34 +342,136 @@ export const StudentPanel: React.FC<StudentPanelProps> = ({
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {purchasedFiles.map((file) => (
+                  {purchasedFiles.map((file) => {
+                    const signedData = store.generateSignedDownloadUrl(file.id);
+
+                    return (
+                      <div
+                        key={file.id}
+                        className="border border-slate-200 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50/50 hover:bg-slate-50 transition-all"
+                      >
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h4 className="text-xs font-bold text-slate-900">{file.title}</h4>
+                            <span className="text-[10px] bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded font-medium flex items-center gap-1">
+                              <ShieldCheck className="w-3 h-3 text-emerald-600" />
+                              <span>لینک اختصاصی امن</span>
+                            </span>
+                          </div>
+                          <div className="text-[11px] text-slate-500 mt-1.5 flex items-center gap-2 flex-wrap">
+                            <span className="font-mono">حجم: {file.fileSize}</span>
+                            <span>·</span>
+                            <span className="font-mono">فرمت: {file.fileFormat}</span>
+                            <span>·</span>
+                            <span className="font-mono">نسخه: {file.version}</span>
+                            <span>·</span>
+                            <span className="text-indigo-600 font-mono text-[10px]">اعتبار توکن: {signedData.expiresAt}</span>
+                          </div>
+                        </div>
+
+                        <a
+                          href={signedData.url}
+                          download
+                          onClick={(e) => {
+                            e.preventDefault();
+                            store.showToast('success', `دانلود فایل «${file.title}» آغاز شد.`);
+                          }}
+                          className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 transition-colors whitespace-nowrap shadow-xs cursor-pointer"
+                        >
+                          <Download className="w-3.5 h-3.5" />
+                          <span>دانلود فایل ({file.fileSize})</span>
+                        </a>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* TAB: Official Certificates */}
+          {activeTab === 'certificates' && (
+            <div>
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="text-base font-bold text-slate-900">گواهینامه‌های رسمی پایان دوره</h2>
+                  <p className="text-xs text-slate-500 mt-0.5">مدارک تاییدشده پایان دوره‌ها با کد رهگیری اختصاصی، آماده چاپ و استعلام آنلاین.</p>
+                </div>
+              </div>
+
+              {(!currentUser.certificates || currentUser.certificates.length === 0) ? (
+                <div className="text-center py-12 text-slate-400 bg-slate-50/50 rounded-2xl border border-dashed border-slate-200 p-8">
+                  <Award className="w-12 h-12 stroke-1 mx-auto mb-3 text-amber-400" />
+                  <h3 className="text-sm font-bold text-slate-800 mb-1">هنوز گواهینامه‌ای صادر نشده است</h3>
+                  <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed mb-6">
+                    برای دریافت گواهینامه معتبر آکادمی پارس‌نت، دوره‌های آموزشی خود را مشاهده نموده و در آزمون آنلاین تستی (با حداقل نمره ۷۰٪) شرکت کنید.
+                  </p>
+
+                  {enrolledCourses.length > 0 && onOpenQuiz && (
+                    <div className="flex flex-wrap justify-center gap-2">
+                      {enrolledCourses.map(c => (
+                        <button
+                          key={c.id}
+                          onClick={() => onOpenQuiz(c)}
+                          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
+                        >
+                          <Award className="w-3.5 h-3.5 text-amber-300" />
+                          <span>شرکت در آزمون: {c.title}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {currentUser.certificates.map((cert) => (
                     <div
-                      key={file.id}
-                      className="border border-slate-200 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                      key={cert.id}
+                      className="border border-amber-200/80 bg-gradient-to-r from-amber-50/40 via-white to-slate-50 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs"
                     >
-                      <div>
-                        <h4 className="text-xs font-bold text-slate-900">{file.title}</h4>
-                        <div className="text-[11px] text-slate-500 mt-1 flex items-center gap-2">
-                          <span className="font-mono">حجم: {file.fileSize}</span>
-                          <span>·</span>
-                          <span className="font-mono">فرمت: {file.fileFormat}</span>
-                          <span>·</span>
-                          <span className="font-mono">نسخه: {file.version}</span>
+                      <div className="flex items-start gap-4">
+                        <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-600 shrink-0">
+                          <Award className="w-6 h-6" />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h4 className="text-sm font-bold text-slate-900">{cert.courseTitle}</h4>
+                            <span className="text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded font-mono font-bold">
+                              نمره: {cert.gradeScore}٪
+                            </span>
+                          </div>
+                          <div className="text-xs text-slate-500 mt-1 flex items-center gap-3 font-mono flex-wrap">
+                            <span>شماره مدرک: <strong className="text-slate-700">{cert.certificateNumber}</strong></span>
+                            <span>·</span>
+                            <span>کد رهگیری: <strong className="text-slate-700">{cert.verificationCode}</strong></span>
+                            <span>·</span>
+                            <span>تاریخ صدور: {cert.issueDate}</span>
+                          </div>
                         </div>
                       </div>
 
-                      <a
-                        href={file.downloadUrl}
-                        download
-                        onClick={(e) => {
-                          e.preventDefault();
-                          alert(`دانلود فایل «${file.title}» آغاز شد.`);
-                        }}
-                        className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 transition-colors whitespace-nowrap shadow-xs"
-                      >
-                        <Download className="w-3.5 h-3.5" />
-                        <span>دانلود مستقیم فایل ({file.fileSize})</span>
-                      </a>
+                      <div className="flex items-center gap-2 self-start sm:self-auto flex-wrap">
+                        {onOpenVerifyModal && (
+                          <button
+                            onClick={() => onOpenVerifyModal(cert.verificationCode)}
+                            className="px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 transition-colors whitespace-nowrap shadow-xs cursor-pointer"
+                            title="استعلام آنلاین وضعیت این مدرک"
+                          >
+                            <ShieldCheck className="w-3.5 h-3.5 text-indigo-600" />
+                            <span>استعلام آنلاین</span>
+                          </button>
+                        )}
+
+                        {onOpenCertificate && (
+                          <button
+                            onClick={() => onOpenCertificate(cert)}
+                            className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 transition-colors whitespace-nowrap shadow-xs cursor-pointer"
+                          >
+                            <Printer className="w-3.5 h-3.5 text-amber-400" />
+                            <span>مشاهده و چاپ مدرک (PDF)</span>
+                          </button>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>

@@ -34,12 +34,129 @@ import {
   Phone,
   MapPin,
   Clock,
-  HardDrive
+  HardDrive,
+  Star,
+  Percent,
+  CheckCircle,
+  XCircle,
+  GitFork,
+  Sun,
+  Moon,
+  Palette,
+  Wallet,
+  Bell,
+  ChevronDown,
+  ChevronUp,
+  Layers,
+  Award,
+  HelpCircle,
+  FileJson,
+  UploadCloud,
+  RotateCcw,
+  Sliders,
+  Sparkles,
+  Share2,
+  Menu,
+  Server,
+  Terminal,
+  Code2,
+  X
 } from 'lucide-react';
-import { Course, DigitalFile, Order, Ticket, User, SiteSettings, Article, MediaItem, ContactMessage } from '../types';
+import { Course, DigitalFile, Order, Ticket, User, SiteSettings, Article, MediaItem, ContactMessage, Coupon, Review, ColorTheme, AdminTheme, Season, Episode, CourseQuiz, Certificate } from '../types';
 import { store } from '../services/store';
-import { SUPABASE_SQL_SCHEMA, testSupabaseConnection } from '../services/supabase';
 import { MediaPickerModal } from './MediaPickerModal';
+
+export const ADMIN_THEMES: Record<AdminTheme, {
+  name: string;
+  topbar: string;
+  sidebar: string;
+  sidebarActive: string;
+  sidebarHover: string;
+  canvas: string;
+  card: string;
+  cardBorder: string;
+  text: string;
+  subText: string;
+  badge: string;
+  accent: string;
+  tableHeader: string;
+}> = {
+  'classic-dark': {
+    name: 'کلاسیک وردپرس (تیره کربنی)',
+    topbar: 'bg-slate-950 border-slate-800 text-slate-200',
+    sidebar: 'bg-slate-900 border-slate-800 text-slate-300',
+    sidebarActive: 'bg-indigo-600 text-white font-bold',
+    sidebarHover: 'hover:bg-slate-800/80 hover:text-white',
+    canvas: 'bg-slate-100/90 text-slate-900',
+    card: 'bg-white',
+    cardBorder: 'border-slate-200/90 shadow-xs',
+    text: 'text-slate-900',
+    subText: 'text-slate-500',
+    badge: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+    accent: 'text-indigo-600',
+    tableHeader: 'bg-slate-50 text-slate-600'
+  },
+  'modern-light': {
+    name: 'مدرن و مینیمال (روشن و نقره‌ای)',
+    topbar: 'bg-white border-slate-200/90 text-slate-800 shadow-xs',
+    sidebar: 'bg-slate-50 border-slate-200 text-slate-700',
+    sidebarActive: 'bg-white text-indigo-700 font-bold shadow-xs border-r-4 border-indigo-600',
+    sidebarHover: 'hover:bg-slate-200/60 hover:text-slate-900',
+    canvas: 'bg-slate-100 text-slate-900',
+    card: 'bg-white',
+    cardBorder: 'border-slate-200 shadow-xs',
+    text: 'text-slate-900',
+    subText: 'text-slate-500',
+    badge: 'bg-slate-100 text-slate-700 border-slate-200',
+    accent: 'text-indigo-600',
+    tableHeader: 'bg-slate-100 text-slate-700'
+  },
+  'slate-midnight': {
+    name: 'آبسیدین و نایت‌مود (تیره خالص)',
+    topbar: 'bg-neutral-950 border-neutral-800 text-neutral-200',
+    sidebar: 'bg-neutral-900 border-neutral-800 text-neutral-300',
+    sidebarActive: 'bg-neutral-800 text-cyan-400 font-bold border-r-4 border-cyan-400',
+    sidebarHover: 'hover:bg-neutral-800/60 hover:text-white',
+    canvas: 'bg-neutral-950 text-neutral-100',
+    card: 'bg-neutral-900',
+    cardBorder: 'border-neutral-800 shadow-xs',
+    text: 'text-neutral-100',
+    subText: 'text-neutral-400',
+    badge: 'bg-neutral-800 text-cyan-400 border-neutral-700',
+    accent: 'text-cyan-400',
+    tableHeader: 'bg-neutral-800 text-neutral-300'
+  },
+  'royal-indigo': {
+    name: 'سرمه‌ای رویال و بنفش لوکس (SaaS)',
+    topbar: 'bg-slate-950 border-indigo-950/80 text-indigo-100',
+    sidebar: 'bg-gradient-to-b from-indigo-950 via-slate-950 to-slate-900 border-indigo-900/40 text-indigo-200',
+    sidebarActive: 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-bold shadow-md shadow-indigo-900/50',
+    sidebarHover: 'hover:bg-indigo-900/40 hover:text-white',
+    canvas: 'bg-slate-100 text-slate-900',
+    card: 'bg-white',
+    cardBorder: 'border-indigo-100 shadow-xs',
+    text: 'text-slate-900',
+    subText: 'text-slate-500',
+    badge: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+    accent: 'text-indigo-600',
+    tableHeader: 'bg-indigo-50/70 text-indigo-900'
+  },
+  'emerald-terminal': {
+    name: 'ترمینال تکنو و سایبر (DevOps)',
+    topbar: 'bg-zinc-950 border-zinc-800 text-emerald-400',
+    sidebar: 'bg-zinc-900 border-zinc-800 text-zinc-300 font-mono',
+    sidebarActive: 'bg-emerald-950/80 text-emerald-400 font-bold border-r-4 border-emerald-500',
+    sidebarHover: 'hover:bg-zinc-800 hover:text-emerald-300',
+    canvas: 'bg-zinc-950 text-zinc-100 font-mono',
+    card: 'bg-zinc-900',
+    cardBorder: 'border-zinc-800 shadow-xs',
+    text: 'text-zinc-100',
+    subText: 'text-zinc-400',
+    badge: 'bg-zinc-800 text-emerald-400 border-zinc-700',
+    accent: 'text-emerald-400',
+    tableHeader: 'bg-zinc-800 text-zinc-300'
+  }
+};
 
 interface WordPressAdminProps {
   onBackToSite: () => void;
@@ -51,7 +168,7 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
   onOpenInvoice
 }) => {
   const [activeMenu, setActiveMenu] = useState<
-    'dashboard' | 'courses' | 'files' | 'media' | 'orders' | 'users' | 'tickets' | 'contact-messages' | 'articles' | 'settings'
+    'dashboard' | 'courses' | 'files' | 'roadmaps' | 'quizzes' | 'certificates' | 'media' | 'articles' | 'coupons' | 'reviews' | 'orders' | 'users' | 'tickets' | 'contact-messages' | 'settings'
   >('dashboard');
 
   const [courses, setCourses] = useState<Course[]>(store.courses);
@@ -62,6 +179,38 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
   const [mediaList, setMediaList] = useState<MediaItem[]>(store.media);
   const [contactMessages, setContactMessages] = useState<ContactMessage[]>(store.contactMessages);
   const [settings, setSettings] = useState<SiteSettings>(store.settings);
+  const [coupons, setCoupons] = useState<Coupon[]>(store.coupons);
+  const [reviews, setReviews] = useState<Review[]>(store.reviews);
+  const [users, setUsers] = useState<User[]>(store.users);
+
+  // User Management State
+  const [userSearch, setUserSearch] = useState('');
+  const [userRoleFilter, setUserRoleFilter] = useState<'all' | 'student' | 'instructor' | 'admin'>('all');
+  const [isAddingUser, setIsAddingUser] = useState(false);
+  const [newUserName, setNewUserName] = useState('');
+  const [newUserEmail, setNewUserEmail] = useState('');
+  const [newUserPhone, setNewUserPhone] = useState('');
+  const [newUserRole, setNewUserRole] = useState<'student' | 'instructor' | 'admin'>('student');
+  const [newUserWallet, setNewUserWallet] = useState<number>(0);
+  const [selectedUserForWallet, setSelectedUserForWallet] = useState<User | null>(null);
+  const [walletChargeInput, setWalletChargeInput] = useState<number>(100000);
+
+  // Roadmaps & Theme State
+  const [activeRoadmapView, setActiveRoadmapView] = useState<string>('network-engineer');
+  const [currentTime, setCurrentTime] = useState(() => new Date().toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' }));
+  const [colorTheme, setColorTheme] = useState<ColorTheme>(store.colorTheme);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+
+  // Coupon state
+  const [isAddingCoupon, setIsAddingCoupon] = useState(false);
+  const [newCouponCode, setNewCouponCode] = useState('');
+  const [newCouponDiscount, setNewCouponDiscount] = useState<number>(20);
+  const [newCouponMaxUses, setNewCouponMaxUses] = useState<number>(100);
+  const [newCouponExpires, setNewCouponExpires] = useState('۱۴۰۳/۰۹/۳۰');
+  const [newCouponDescription, setNewCouponDescription] = useState('');
+
+  // Review filter
+  const [reviewFilter, setReviewFilter] = useState<'all' | 'pending' | 'approved'>('all');
 
   // Search filter
   const [searchFilter, setSearchFilter] = useState('');
@@ -146,15 +295,52 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
   // Ticket reply in admin
   const [adminTicketReply, setAdminTicketReply] = useState<Record<string, string>>({});
 
-  // Supabase Testing & Copy State
-  const [supabaseTestStatus, setSupabaseTestStatus] = useState<{ loading: boolean; message: string; success?: boolean }>({
-    loading: false,
-    message: ''
-  });
-  const [isSqlCopied, setIsSqlCopied] = useState(false);
+  // Theme, Quiz & Certificate Management States
+  const [adminTheme, setAdminTheme] = useState<AdminTheme>(store.adminTheme);
+  const [quizzes, setQuizzes] = useState<CourseQuiz[]>(store.quizzes);
+  const [certificates, setCertificates] = useState<Certificate[]>(store.officialCertificates);
+
+  // Certificate Issuance State
+  const [isIssuingCert, setIsIssuingCert] = useState(false);
+  const [certStudentName, setCertStudentName] = useState('');
+  const [certStudentPhone, setCertStudentPhone] = useState('');
+  const [certCourseTitle, setCertCourseTitle] = useState('دوره جامع مهندسی شبکه سیسکو (Cisco CCNA 200-301)');
+  const [certInstructor, setCertInstructor] = useState('مهندس محمدرضا قاسمی');
+  const [certScore, setCertScore] = useState<number>(95);
+  const [certSearch, setCertSearch] = useState('');
+
+  // Quiz Management State
+  const [isAddingQuiz, setIsAddingQuiz] = useState(false);
+  const [quizSearch, setQuizSearch] = useState('');
+  const [newQuizCourse, setNewQuizCourse] = useState('دوره جامع مهندسی شبکه سیسکو (Cisco CCNA 200-301)');
+  const [newQuizTitle, setNewQuizTitle] = useState('آزمون آنلاین پایان دوره و سنجش مهارت');
+  const [newQuizTimeLimit, setNewQuizTimeLimit] = useState<number>(25);
+  const [newQuizPassScore, setNewQuizPassScore] = useState<number>(75);
+  const [newQuizQuestions, setNewQuizQuestions] = useState<Array<{ question: string; options: string[]; correctOptionIndex: number; explanation: string }>>([
+    {
+      question: 'کدام پروتکل برای ترجمه آدرس‌های محلی شبکه (Private IP) به آدرس عمومی اینترنت به کار می‌رود؟',
+      options: ['NAT / PAT', 'RIPv2', 'SNMPv3', 'LLDP'],
+      correctOptionIndex: 0,
+      explanation: 'مکانیزم NAT/PAT نگاشت آدرس‌های خصوصی به عمومی را انجام می‌دهد.'
+    },
+    {
+      question: 'پروتکل OSPF برای برقراری همسایگی و محاسبه کوتاه‌ترین مسیر از کدام الگوریتم استفاده می‌کند؟',
+      options: ['الگوریتم دکسترا (SPF / Dijkstra)', 'الگوریتم بلمن-فورد (Bellman-Ford)', 'الگوریتم DUAL', 'الگوریتم هشینگ MD5'],
+      correctOptionIndex: 0,
+      explanation: 'پروتکل OSPF از الگوریتم کوتاه‌ترین مسیر اول (Shortest Path First) دکسترا بهره می‌برد.'
+    }
+  ]);
+
+  // Backup & Import State
+  const [importBackupText, setImportBackupText] = useState('');
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
   useEffect(() => {
-    return store.subscribe(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date().toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' }));
+    }, 15000);
+
+    const unsub = store.subscribe(() => {
       setCourses([...store.courses]);
       setFiles([...store.files]);
       setOrders([...store.orders]);
@@ -163,8 +349,63 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
       setMediaList([...store.media]);
       setContactMessages([...store.contactMessages]);
       setSettings({ ...store.settings });
+      setCoupons([...store.coupons]);
+      setReviews([...store.reviews]);
+      setUsers([...store.users]);
+      setQuizzes([...store.quizzes]);
+      setCertificates([...store.officialCertificates]);
+      setColorTheme(store.colorTheme);
+      setAdminTheme(store.adminTheme);
     });
+
+    return () => {
+      clearInterval(timer);
+      unsub();
+    };
   }, []);
+
+  // Coupon handlers
+  const handleSaveCoupon = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newCouponCode.trim()) return;
+
+    const newCp: Coupon = {
+      id: `cp-${Date.now()}`,
+      code: newCouponCode.trim().toUpperCase(),
+      discountPercent: Number(newCouponDiscount) || 10,
+      maxUses: Number(newCouponMaxUses) || 50,
+      usedCount: 0,
+      expiresAt: newCouponExpires.trim() || '۱۴۰۳/۱۲/۲۹',
+      isActive: true,
+      description: newCouponDescription.trim() || 'تخفیف ویژه جشنواره'
+    };
+
+    store.addCoupon(newCp);
+    setIsAddingCoupon(false);
+    setNewCouponCode('');
+    setNewCouponDescription('');
+  };
+
+  const handleToggleCoupon = (id: string) => {
+    store.toggleCouponStatus(id);
+  };
+
+  const handleDeleteCoupon = (id: string) => {
+    if (confirm('آیا از حذف این کد تخفیف اطمینان دارید؟')) {
+      store.deleteCoupon(id);
+    }
+  };
+
+  // Review handlers
+  const handleApproveReview = (id: string) => {
+    store.approveReview(id, true);
+  };
+
+  const handleDeleteReview = (id: string) => {
+    if (confirm('آیا از حذف این دیدگاه اطمینان دارید؟')) {
+      store.deleteReview(id);
+    }
+  };
 
   const totalRevenue = orders
     .filter(o => o.status === 'completed')
@@ -209,21 +450,23 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
         prerequisites: ['آشنایی مقدماتی با کامپیوتر'],
         whatYouWillLearn: courseFormData.whatYouWillLearn || ['آشنایی و پیکربندی عملی'],
         updatedAt: new Date().toLocaleDateString('fa-IR'),
-        seasons: [
-          {
-            id: 's-new-1',
-            title: 'فصل اول: مقدمات و راه‌اندازی',
-            episodes: [
+        seasons: (courseFormData.seasons && courseFormData.seasons.length > 0)
+          ? courseFormData.seasons
+          : [
               {
-                id: `ep-${Date.now()}`,
-                title: 'جلسه ۱: معرفی سرفصل‌ها و اهداف دوره',
-                duration: '۲۰:۰۰',
-                videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-                isFreePreview: true
+                id: 's-new-1',
+                title: 'فصل اول: مقدمات و راه‌اندازی',
+                episodes: [
+                  {
+                    id: `ep-${Date.now()}`,
+                    title: 'جلسه ۱: معرفی سرفصل‌ها و اهداف دوره',
+                    duration: '۲۰:۰۰',
+                    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+                    isFreePreview: true
+                  }
+                ]
               }
             ]
-          }
-        ]
       };
       store.addCourse(newCourse);
     }
@@ -235,6 +478,120 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
     if (confirm('آیا از حذف این دوره اطمینان دارید؟')) {
       store.deleteCourse(id);
     }
+  };
+
+  // Curriculum & Seasons Builder
+  const handleAddSeason = () => {
+    const currentSeasons = courseFormData.seasons || [];
+    const newSeason: Season = {
+      id: `s-${Date.now()}`,
+      title: `فصل جدید شماره ${currentSeasons.length + 1}`,
+      episodes: []
+    };
+    setCourseFormData({
+      ...courseFormData,
+      seasons: [...currentSeasons, newSeason]
+    });
+  };
+
+  const handleAddEpisodeToSeason = (seasonId: string) => {
+    const currentSeasons = courseFormData.seasons || [];
+    const updated = currentSeasons.map(s => {
+      if (s.id === seasonId) {
+        const epIndex = s.episodes.length + 1;
+        const newEp: Episode = {
+          id: `ep-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+          title: `جلسه ${epIndex}: عنوان جلسه جدید`,
+          duration: '۲۰:۰۰',
+          videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+          isFreePreview: epIndex === 1
+        };
+        return { ...s, episodes: [...s.episodes, newEp] };
+      }
+      return s;
+    });
+    setCourseFormData({ ...courseFormData, seasons: updated });
+  };
+
+  const handleUpdateEpisode = (seasonId: string, episodeId: string, updates: Partial<Episode>) => {
+    const currentSeasons = courseFormData.seasons || [];
+    const updated = currentSeasons.map(s => {
+      if (s.id === seasonId) {
+        return {
+          ...s,
+          episodes: s.episodes.map(ep => ep.id === episodeId ? { ...ep, ...updates } : ep)
+        };
+      }
+      return s;
+    });
+    setCourseFormData({ ...courseFormData, seasons: updated });
+  };
+
+  const handleDeleteEpisode = (seasonId: string, episodeId: string) => {
+    const currentSeasons = courseFormData.seasons || [];
+    const updated = currentSeasons.map(s => {
+      if (s.id === seasonId) {
+        return { ...s, episodes: s.episodes.filter(ep => ep.id !== episodeId) };
+      }
+      return s;
+    });
+    setCourseFormData({ ...courseFormData, seasons: updated });
+  };
+
+  const handleDeleteSeason = (seasonId: string) => {
+    const currentSeasons = courseFormData.seasons || [];
+    setCourseFormData({
+      ...courseFormData,
+      seasons: currentSeasons.filter(s => s.id !== seasonId)
+    });
+  };
+
+  // User Management Handlers
+  const handleCreateUser = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newUserName.trim() || !newUserEmail.trim()) return;
+
+    const newUser: User = {
+      id: `usr-${Date.now()}`,
+      name: newUserName.trim(),
+      email: newUserEmail.trim(),
+      phone: newUserPhone.trim() || '09120000000',
+      role: newUserRole,
+      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=250&q=80',
+      enrolledCourseIds: [],
+      purchasedFileIds: [],
+      completedEpisodeIds: [],
+      certificates: [],
+      walletBalance: Number(newUserWallet) || 0,
+      createdAt: new Date().toLocaleDateString('fa-IR')
+    };
+
+    store.addUser(newUser);
+    setIsAddingUser(false);
+    setNewUserName('');
+    setNewUserEmail('');
+    setNewUserPhone('');
+    setNewUserWallet(0);
+  };
+
+  const handleRechargeWallet = (userId: string, amount: number) => {
+    store.addWalletCredit(userId, amount);
+    setSelectedUserForWallet(null);
+  };
+
+  const handleUserRoleChange = (userId: string, role: User['role']) => {
+    store.updateUser(userId, { role });
+  };
+
+  const handleDeleteUser = (userId: string) => {
+    if (confirm('آیا از حذف این کاربر از سیستم اطمینان دارید؟')) {
+      store.deleteUser(userId);
+    }
+  };
+
+  // Order status update
+  const handleOrderStatusChange = (orderId: string, status: Order['status']) => {
+    store.updateOrderStatus(orderId, status);
   };
 
   // File handlers
@@ -477,22 +834,95 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
     onBackToSite();
   };
 
-  // Test Supabase connection
-  const handleTestSupabase = async () => {
-    setSupabaseTestStatus({ loading: true, message: 'در حال بررسی اتصال به دیتابیس Supabase...' });
-    const result = await testSupabaseConnection(settings.supabaseUrl, settings.supabaseAnonKey);
-    setSupabaseTestStatus({
-      loading: false,
-      message: result.message,
-      success: result.success
+  // Manual Certificate Issuance Handler
+  const handleIssueCertificate = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!certStudentName.trim() || !certCourseTitle.trim()) {
+      alert('لطفاً نام دانشجو و عنوان دوره را وارد نمایید.');
+      return;
+    }
+    store.issueManualCertificate({
+      userName: certStudentName.trim(),
+      userPhone: certStudentPhone.trim() || '۰۹۱۲۰۰۰۰۰۰۰',
+      courseTitle: certCourseTitle.trim(),
+      instructorName: certInstructor.trim() || 'استاد رسمی آکادمی پارس‌نت',
+      gradeScore: Number(certScore) || 90
     });
+    setCertStudentName('');
+    setCertStudentPhone('');
+    setIsIssuingCert(false);
   };
 
-  // Copy SQL Schema
-  const handleCopySql = () => {
-    navigator.clipboard.writeText(SUPABASE_SQL_SCHEMA);
-    setIsSqlCopied(true);
-    setTimeout(() => setIsSqlCopied(false), 3000);
+  // Delete Certificate Handler
+  const handleDeleteCertificate = (id: string) => {
+    if (confirm('آیا از ابطال و حذف این گواهینامه اطمینان دارید؟')) {
+      store.deleteOfficialCertificate(id);
+    }
+  };
+
+  // Quiz Handlers
+  const handleSaveQuiz = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newQuizTitle.trim()) return;
+
+    const newQuiz: CourseQuiz = {
+      id: `quiz-${Date.now()}`,
+      courseId: `course-${Date.now()}`,
+      courseTitle: newQuizCourse,
+      title: newQuizTitle.trim(),
+      timeLimitMinutes: Number(newQuizTimeLimit) || 20,
+      passScorePercent: Number(newQuizPassScore) || 70,
+      questions: newQuizQuestions.map((q, idx) => ({
+        id: `q-${Date.now()}-${idx}`,
+        question: q.question,
+        options: q.options,
+        correctOptionIndex: q.correctOptionIndex,
+        explanation: q.explanation
+      }))
+    };
+
+    store.addQuiz(newQuiz);
+    setIsAddingQuiz(false);
+    setNewQuizTitle('');
+  };
+
+  const handleDeleteQuiz = (id: string) => {
+    if (confirm('آیا از حذف این آزمون دوره اطمینان دارید؟')) {
+      store.deleteQuiz(id);
+    }
+  };
+
+  // Backup & Export / Import Handlers
+  const handleExportBackup = () => {
+    const dataStr = store.exportAllData();
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `parsnet-backup-${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    store.showToast('success', 'فایل پشتیبان کامل سایت با موفقیت دانلود شد.');
+  };
+
+  const handleImportBackup = () => {
+    if (!importBackupText.trim()) {
+      alert('لطفاً محتوای فایل پشتیبان JSON را در کادر وارد فرمایید.');
+      return;
+    }
+    const success = store.importAllData(importBackupText.trim());
+    if (success) {
+      setIsImportModalOpen(false);
+      setImportBackupText('');
+    }
+  };
+
+  const handleResetFactoryDefaults = () => {
+    if (confirm('هشدار: آیا مطمئن هستید که می‌خواهید تمامی داده‌ها را به مقادیر پیش‌فرض اولیه بازگردانید؟ تمامی تغییرات فعلی جایگزین خواهند شد.')) {
+      store.resetDataToDefault();
+    }
   };
 
   // Filtered media list
@@ -506,217 +936,408 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
     return matchesSearch && matchesType;
   });
 
+  const currentThemeStyle = ADMIN_THEMES[adminTheme] || ADMIN_THEMES['classic-dark'];
+
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col font-sans" dir="rtl">
-      {/* WordPress Top Admin Bar (Black Header #1d2327) */}
-      <header className="h-10 bg-slate-950 border-b border-slate-800 flex items-center justify-between px-4 text-xs select-none z-30 shrink-0">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1.5 font-black text-white">
-            <div className="w-5 h-5 rounded bg-indigo-600 flex items-center justify-center text-white text-[11px] font-mono">
+    <div className={`min-h-screen ${currentThemeStyle.canvas} flex flex-col font-sans transition-colors duration-200 select-none`} dir="rtl">
+      {/* WordPress Top Admin Bar */}
+      <header className={`h-11 ${currentThemeStyle.topbar} border-b flex items-center justify-between px-3 sm:px-4 text-xs z-30 shrink-0 transition-colors`}>
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* Sidebar collapse button */}
+          <button
+            onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+            className="p-1.5 rounded-lg hover:bg-white/10 transition-colors cursor-pointer text-slate-300"
+            title={isSidebarCollapsed ? 'گسترش منوی سایدبار' : 'جمع کردن منوی سایدبار'}
+          >
+            <Menu className="w-4 h-4" />
+          </button>
+
+          <div className="flex items-center gap-1.5 font-black">
+            <div className="w-6 h-6 rounded-md bg-gradient-to-tr from-indigo-600 to-cyan-500 flex items-center justify-center text-white text-[11px] font-mono shadow-xs">
               W
             </div>
-            <span>پیشخوان مدیریت وردپرس</span>
+            <span className="hidden sm:inline font-bold">پیشخوان مدیریت آکادمی</span>
           </div>
 
           <button
             onClick={onBackToSite}
-            className="flex items-center gap-1 text-slate-300 hover:text-white hover:bg-slate-800 px-2 py-1 rounded transition-colors"
+            className="flex items-center gap-1 text-slate-300 hover:text-white hover:bg-white/10 px-2 py-1 rounded-lg transition-colors cursor-pointer"
           >
-            <Globe className="w-3.5 h-3.5 text-slate-400" />
-            <span>مشاهده وب‌سایت اصلی</span>
+            <Globe className="w-3.5 h-3.5 text-indigo-400" />
+            <span className="hidden md:inline">مشاهده سایت اصلی</span>
           </button>
 
-          <div className="hidden md:flex items-center gap-2 text-slate-400">
+          <div className="hidden lg:flex items-center gap-2 text-slate-400">
             <span>·</span>
-            <span className="text-emerald-400 font-mono text-[11px]">Supabase & Vercel Ready</span>
+            <span className="flex items-center gap-1.5 text-emerald-400 font-mono text-[11px]">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse inline-block" />
+              سامانه پایدار
+            </span>
             <span>·</span>
-            <span className="text-amber-400 font-mono text-[11px]">مدیر فعال: {settings.adminUsername || 'admin'}</span>
+            <span className="text-amber-400 font-mono text-[11px]">مدیر: {settings.adminUsername || 'admin'}</span>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        {/* Topbar Actions: Quick Theme Switcher & Admin Controls */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* Fast Admin Theme Switcher */}
+          <div className="hidden sm:flex items-center gap-1 bg-black/20 p-0.5 rounded-xl border border-white/10 text-[11px]">
+            <span className="px-1.5 text-slate-400 hidden xl:inline">قالب:</span>
+            <button
+              onClick={() => store.setAdminTheme('classic-dark')}
+              className={`px-2 py-0.5 rounded-lg transition-all ${
+                adminTheme === 'classic-dark' ? 'bg-indigo-600 text-white font-bold' : 'text-slate-300 hover:text-white'
+              }`}
+              title="کلاسیک وردپرس (تیره)"
+            >
+              کلاسیک
+            </button>
+            <button
+              onClick={() => store.setAdminTheme('modern-light')}
+              className={`px-2 py-0.5 rounded-lg transition-all ${
+                adminTheme === 'modern-light' ? 'bg-indigo-600 text-white font-bold' : 'text-slate-300 hover:text-white'
+              }`}
+              title="مدرن و مینیمال (روشن)"
+            >
+              روشن
+            </button>
+            <button
+              onClick={() => store.setAdminTheme('slate-midnight')}
+              className={`px-2 py-0.5 rounded-lg transition-all ${
+                adminTheme === 'slate-midnight' ? 'bg-cyan-500 text-slate-950 font-bold' : 'text-slate-300 hover:text-white'
+              }`}
+              title="آبسیدین نایت‌مود (مشکی)"
+            >
+              آبسیدین
+            </button>
+            <button
+              onClick={() => store.setAdminTheme('royal-indigo')}
+              className={`px-2 py-0.5 rounded-lg transition-all ${
+                adminTheme === 'royal-indigo' ? 'bg-violet-600 text-white font-bold' : 'text-slate-300 hover:text-white'
+              }`}
+              title="سرمه‌ای رویال لوکس (SaaS)"
+            >
+              رویال
+            </button>
+            <button
+              onClick={() => store.setAdminTheme('emerald-terminal')}
+              className={`px-2 py-0.5 rounded-lg transition-all ${
+                adminTheme === 'emerald-terminal' ? 'bg-emerald-500 text-slate-950 font-bold font-mono' : 'text-slate-300 hover:text-white'
+              }`}
+              title="ترمینال تکنو سایبر (DevOps)"
+            >
+              سایبر
+            </button>
+          </div>
+
           <button
             onClick={() => setActiveMenu('settings')}
-            className="text-slate-300 hover:text-indigo-300 flex items-center gap-1 text-[11px]"
-            title="تغییر نام کاربری و کلمه عبور مدیر"
+            className="text-slate-300 hover:text-white hover:bg-white/10 px-2 py-1 rounded-lg transition-colors flex items-center gap-1 text-[11px] cursor-pointer"
+            title="تنظیمات، تغییر رمز مدیر و قالب‌ها"
           >
             <Key className="w-3.5 h-3.5 text-indigo-400" />
-            <span className="hidden sm:inline">تغییر رمز مدیر</span>
+            <span className="hidden md:inline">امنیت و تنظیمات</span>
           </button>
 
           <button
             onClick={handleAdminLogout}
-            className="text-red-300 hover:text-red-200 hover:bg-red-950/40 px-2 py-1 rounded transition-colors flex items-center gap-1 text-[11px]"
+            className="text-rose-300 hover:text-white hover:bg-rose-900/40 px-2 py-1 rounded-lg transition-colors flex items-center gap-1 text-[11px] cursor-pointer"
             title="خروج از مدیریت"
           >
-            <LogOut className="w-3.5 h-3.5 text-red-400" />
+            <LogOut className="w-3.5 h-3.5" />
             <span>خروج</span>
           </button>
         </div>
       </header>
 
-      {/* WordPress Main Layout: Dark Sidebar + Workspace */}
+      {/* WordPress Main Layout: Dark / Themed Sidebar + Workspace */}
       <div className="flex-1 flex overflow-hidden">
-        {/* WordPress Classic Dark Sidebar (Width: 230px) */}
-        <aside className="w-56 bg-slate-900 text-slate-300 flex flex-col shrink-0 border-l border-slate-800 wp-scrollbar overflow-y-auto">
+        {/* Themed Sidebar */}
+        <aside className={`${isSidebarCollapsed ? 'w-16' : 'w-60'} ${currentThemeStyle.sidebar} flex flex-col shrink-0 border-l wp-scrollbar overflow-y-auto transition-all duration-200`}>
           <div className="py-2 text-xs space-y-0.5">
             {/* 1. Dashboard */}
             <button
               onClick={() => setActiveMenu('dashboard')}
-              className={`w-full px-4 py-2.5 text-right flex items-center gap-2.5 transition-colors ${
-                activeMenu === 'dashboard'
-                  ? 'bg-indigo-600 text-white font-bold'
-                  : 'hover:bg-slate-800/80 hover:text-white'
+              className={`w-full ${isSidebarCollapsed ? 'px-0 justify-center' : 'px-3.5'} py-2.5 text-right flex items-center gap-2.5 transition-colors cursor-pointer ${
+                activeMenu === 'dashboard' ? currentThemeStyle.sidebarActive : currentThemeStyle.sidebarHover
               }`}
+              title="پیشخوان"
             >
-              <LayoutDashboard className="w-4 h-4 text-slate-400" />
-              <span>پیشخوان</span>
+              <LayoutDashboard className="w-4 h-4 shrink-0" />
+              {!isSidebarCollapsed && <span>پیشخوان</span>}
             </button>
 
             {/* 2. Courses */}
             <button
               onClick={() => { setActiveMenu('courses'); setIsEditingCourse(false); }}
-              className={`w-full px-4 py-2.5 text-right flex items-center gap-2.5 transition-colors ${
-                activeMenu === 'courses'
-                  ? 'bg-indigo-600 text-white font-bold'
-                  : 'hover:bg-slate-800/80 hover:text-white'
+              className={`w-full ${isSidebarCollapsed ? 'px-0 justify-center' : 'px-3.5'} py-2.5 text-right flex items-center gap-2.5 transition-colors cursor-pointer ${
+                activeMenu === 'courses' ? currentThemeStyle.sidebarActive : currentThemeStyle.sidebarHover
               }`}
+              title="دوره‌های آموزشی"
             >
-              <BookOpen className="w-4 h-4 text-slate-400" />
-              <span className="flex-1">دوره‌های آموزشی</span>
-              <span className="bg-slate-800 px-1.5 py-0.2 text-[10px] rounded font-mono">
-                {courses.length}
-              </span>
+              <BookOpen className="w-4 h-4 shrink-0" />
+              {!isSidebarCollapsed && (
+                <>
+                  <span className="flex-1">دوره‌های آموزشی</span>
+                  <span className="bg-black/20 px-1.5 py-0.2 text-[10px] rounded font-mono">
+                    {courses.length}
+                  </span>
+                </>
+              )}
             </button>
 
             {/* 3. Files */}
             <button
               onClick={() => { setActiveMenu('files'); setIsEditingFile(false); }}
-              className={`w-full px-4 py-2.5 text-right flex items-center gap-2.5 transition-colors ${
-                activeMenu === 'files'
-                  ? 'bg-indigo-600 text-white font-bold'
-                  : 'hover:bg-slate-800/80 hover:text-white'
+              className={`w-full ${isSidebarCollapsed ? 'px-0 justify-center' : 'px-3.5'} py-2.5 text-right flex items-center gap-2.5 transition-colors cursor-pointer ${
+                activeMenu === 'files' ? currentThemeStyle.sidebarActive : currentThemeStyle.sidebarHover
               }`}
+              title="فایل‌ها و سناریوها"
             >
-              <Download className="w-4 h-4 text-slate-400" />
-              <span className="flex-1">فایل‌ها و سناریوها</span>
-              <span className="bg-slate-800 px-1.5 py-0.2 text-[10px] rounded font-mono">
-                {files.length}
-              </span>
-            </button>
-
-            {/* 4. Media Library (NEW) */}
-            <button
-              onClick={() => setActiveMenu('media')}
-              className={`w-full px-4 py-2.5 text-right flex items-center gap-2.5 transition-colors ${
-                activeMenu === 'media'
-                  ? 'bg-indigo-600 text-white font-bold'
-                  : 'hover:bg-slate-800/80 hover:text-white'
-              }`}
-            >
-              <ImageIcon className="w-4 h-4 text-slate-400" />
-              <span className="flex-1">کتابخانه رسانه‌ها</span>
-              <span className="bg-indigo-500/20 text-indigo-300 px-1.5 py-0.2 text-[10px] rounded font-mono">
-                {mediaList.length}
-              </span>
-            </button>
-
-            {/* 5. Articles & News */}
-            <button
-              onClick={() => { setActiveMenu('articles'); setIsEditingArticle(false); }}
-              className={`w-full px-4 py-2.5 text-right flex items-center gap-2.5 transition-colors ${
-                activeMenu === 'articles'
-                  ? 'bg-indigo-600 text-white font-bold'
-                  : 'hover:bg-slate-800/80 hover:text-white'
-              }`}
-            >
-              <FileText className="w-4 h-4 text-slate-400" />
-              <span className="flex-1">نوشته‌ها و رویدادها</span>
-              <span className="bg-slate-800 px-1.5 py-0.2 text-[10px] rounded font-mono">
-                {articles.length}
-              </span>
-            </button>
-
-            {/* 6. Orders */}
-            <button
-              onClick={() => setActiveMenu('orders')}
-              className={`w-full px-4 py-2.5 text-right flex items-center gap-2.5 transition-colors ${
-                activeMenu === 'orders'
-                  ? 'bg-indigo-600 text-white font-bold'
-                  : 'hover:bg-slate-800/80 hover:text-white'
-              }`}
-            >
-              <ShoppingBag className="w-4 h-4 text-slate-400" />
-              <span className="flex-1">سفارشات و مالی</span>
-              <span className="bg-amber-500/20 text-amber-300 px-1.5 py-0.2 text-[10px] rounded font-mono">
-                {orders.length}
-              </span>
-            </button>
-
-            {/* 7. Users */}
-            <button
-              onClick={() => setActiveMenu('users')}
-              className={`w-full px-4 py-2.5 text-right flex items-center gap-2.5 transition-colors ${
-                activeMenu === 'users'
-                  ? 'bg-indigo-600 text-white font-bold'
-                  : 'hover:bg-slate-800/80 hover:text-white'
-              }`}
-            >
-              <Users className="w-4 h-4 text-slate-400" />
-              <span>کاربران و دانشجویان</span>
-            </button>
-
-            {/* 8. Tickets */}
-            <button
-              onClick={() => setActiveMenu('tickets')}
-              className={`w-full px-4 py-2.5 text-right flex items-center gap-2.5 transition-colors ${
-                activeMenu === 'tickets'
-                  ? 'bg-indigo-600 text-white font-bold'
-                  : 'hover:bg-slate-800/80 hover:text-white'
-              }`}
-            >
-              <MessageSquare className="w-4 h-4 text-slate-400" />
-              <span className="flex-1">تیکت‌های پشتیبانی</span>
-              <span className="bg-red-500/20 text-red-300 px-1.5 py-0.2 text-[10px] rounded font-mono">
-                {tickets.filter(t => t.status === 'open').length}
-              </span>
-            </button>
-
-            {/* 9. Contact Messages (NEW) */}
-            <button
-              onClick={() => setActiveMenu('contact-messages')}
-              className={`w-full px-4 py-2.5 text-right flex items-center gap-2.5 transition-colors ${
-                activeMenu === 'contact-messages'
-                  ? 'bg-indigo-600 text-white font-bold'
-                  : 'hover:bg-slate-800/80 hover:text-white'
-              }`}
-            >
-              <Mail className="w-4 h-4 text-slate-400" />
-              <span className="flex-1">پیام‌های تماس</span>
-              {contactMessages.filter(m => !m.isRead).length > 0 && (
-                <span className="bg-emerald-500 text-white px-1.5 py-0.2 text-[10px] rounded-full font-mono font-bold">
-                  {contactMessages.filter(m => !m.isRead).length}
-                </span>
+              <Download className="w-4 h-4 shrink-0" />
+              {!isSidebarCollapsed && (
+                <>
+                  <span className="flex-1">فایل‌ها و سناریوها</span>
+                  <span className="bg-black/20 px-1.5 py-0.2 text-[10px] rounded font-mono">
+                    {files.length}
+                  </span>
+                </>
               )}
             </button>
 
-            {/* 10. Settings & Security */}
+            {/* 4. Roadmaps (NEW) */}
+            <button
+              onClick={() => setActiveMenu('roadmaps')}
+              className={`w-full ${isSidebarCollapsed ? 'px-0 justify-center' : 'px-3.5'} py-2.5 text-right flex items-center gap-2.5 transition-colors cursor-pointer ${
+                activeMenu === 'roadmaps' ? currentThemeStyle.sidebarActive : currentThemeStyle.sidebarHover
+              }`}
+              title="مسیرهای یادگیری IT"
+            >
+              <GitFork className="w-4 h-4 shrink-0" />
+              {!isSidebarCollapsed && (
+                <>
+                  <span className="flex-1">مسیرهای یادگیری IT</span>
+                  <span className="bg-cyan-500/20 text-cyan-300 px-1.5 py-0.2 text-[10px] rounded font-mono">
+                    ۴
+                  </span>
+                </>
+              )}
+            </button>
+
+            {/* 5. Quizzes & Exams (NEW) */}
+            <button
+              onClick={() => setActiveMenu('quizzes')}
+              className={`w-full ${isSidebarCollapsed ? 'px-0 justify-center' : 'px-3.5'} py-2.5 text-right flex items-center gap-2.5 transition-colors cursor-pointer ${
+                activeMenu === 'quizzes' ? currentThemeStyle.sidebarActive : currentThemeStyle.sidebarHover
+              }`}
+              title="آزمون‌ها و کوئیزها"
+            >
+              <HelpCircle className="w-4 h-4 shrink-0" />
+              {!isSidebarCollapsed && (
+                <>
+                  <span className="flex-1">آزمون‌ها و کوئیزها</span>
+                  <span className="bg-indigo-500/20 text-indigo-300 px-1.5 py-0.2 text-[10px] rounded font-mono">
+                    {quizzes.length}
+                  </span>
+                </>
+              )}
+            </button>
+
+            {/* 6. Official Certificates (NEW) */}
+            <button
+              onClick={() => setActiveMenu('certificates')}
+              className={`w-full ${isSidebarCollapsed ? 'px-0 justify-center' : 'px-3.5'} py-2.5 text-right flex items-center gap-2.5 transition-colors cursor-pointer ${
+                activeMenu === 'certificates' ? currentThemeStyle.sidebarActive : currentThemeStyle.sidebarHover
+              }`}
+              title="گواهینامه‌های رسمی"
+            >
+              <Award className="w-4 h-4 shrink-0" />
+              {!isSidebarCollapsed && (
+                <>
+                  <span className="flex-1">مدارک و گواهینامه‌ها</span>
+                  <span className="bg-amber-500/20 text-amber-300 px-1.5 py-0.2 text-[10px] rounded font-mono">
+                    {certificates.length}
+                  </span>
+                </>
+              )}
+            </button>
+
+            {/* 7. Media Library */}
+            <button
+              onClick={() => setActiveMenu('media')}
+              className={`w-full ${isSidebarCollapsed ? 'px-0 justify-center' : 'px-3.5'} py-2.5 text-right flex items-center gap-2.5 transition-colors cursor-pointer ${
+                activeMenu === 'media' ? currentThemeStyle.sidebarActive : currentThemeStyle.sidebarHover
+              }`}
+              title="کتابخانه رسانه‌ها"
+            >
+              <ImageIcon className="w-4 h-4 shrink-0" />
+              {!isSidebarCollapsed && (
+                <>
+                  <span className="flex-1">کتابخانه رسانه‌ها</span>
+                  <span className="bg-black/20 px-1.5 py-0.2 text-[10px] rounded font-mono">
+                    {mediaList.length}
+                  </span>
+                </>
+              )}
+            </button>
+
+            {/* 8. Articles & News */}
+            <button
+              onClick={() => { setActiveMenu('articles'); setIsEditingArticle(false); }}
+              className={`w-full ${isSidebarCollapsed ? 'px-0 justify-center' : 'px-3.5'} py-2.5 text-right flex items-center gap-2.5 transition-colors cursor-pointer ${
+                activeMenu === 'articles' ? currentThemeStyle.sidebarActive : currentThemeStyle.sidebarHover
+              }`}
+              title="نوشته‌ها و رویدادها"
+            >
+              <FileText className="w-4 h-4 shrink-0" />
+              {!isSidebarCollapsed && (
+                <>
+                  <span className="flex-1">نوشته‌ها و رویدادها</span>
+                  <span className="bg-black/20 px-1.5 py-0.2 text-[10px] rounded font-mono">
+                    {articles.length}
+                  </span>
+                </>
+              )}
+            </button>
+
+            {/* 9. Coupons */}
+            <button
+              onClick={() => setActiveMenu('coupons')}
+              className={`w-full ${isSidebarCollapsed ? 'px-0 justify-center' : 'px-3.5'} py-2.5 text-right flex items-center gap-2.5 transition-colors cursor-pointer ${
+                activeMenu === 'coupons' ? currentThemeStyle.sidebarActive : currentThemeStyle.sidebarHover
+              }`}
+              title="کدهای تخفیف"
+            >
+              <Tag className="w-4 h-4 shrink-0" />
+              {!isSidebarCollapsed && (
+                <>
+                  <span className="flex-1">کدهای تخفیف</span>
+                  <span className="bg-emerald-500/20 text-emerald-300 px-1.5 py-0.2 text-[10px] rounded font-mono">
+                    {coupons.length}
+                  </span>
+                </>
+              )}
+            </button>
+
+            {/* 10. Reviews */}
+            <button
+              onClick={() => setActiveMenu('reviews')}
+              className={`w-full ${isSidebarCollapsed ? 'px-0 justify-center' : 'px-3.5'} py-2.5 text-right flex items-center gap-2.5 transition-colors cursor-pointer ${
+                activeMenu === 'reviews' ? currentThemeStyle.sidebarActive : currentThemeStyle.sidebarHover
+              }`}
+              title="دیدگاه‌های دانشجویان"
+            >
+              <Star className="w-4 h-4 shrink-0" />
+              {!isSidebarCollapsed && (
+                <>
+                  <span className="flex-1">دیدگاه‌های دانشجویان</span>
+                  {reviews.filter(r => !r.isApproved).length > 0 ? (
+                    <span className="bg-amber-500 text-slate-900 font-bold px-1.5 py-0.2 text-[10px] rounded-full font-mono">
+                      {reviews.filter(r => !r.isApproved).length}
+                    </span>
+                  ) : (
+                    <span className="bg-black/20 px-1.5 py-0.2 text-[10px] rounded font-mono">
+                      {reviews.length}
+                    </span>
+                  )}
+                </>
+              )}
+            </button>
+
+            {/* 11. Orders */}
+            <button
+              onClick={() => setActiveMenu('orders')}
+              className={`w-full ${isSidebarCollapsed ? 'px-0 justify-center' : 'px-3.5'} py-2.5 text-right flex items-center gap-2.5 transition-colors cursor-pointer ${
+                activeMenu === 'orders' ? currentThemeStyle.sidebarActive : currentThemeStyle.sidebarHover
+              }`}
+              title="سفارشات و مالی"
+            >
+              <ShoppingBag className="w-4 h-4 shrink-0" />
+              {!isSidebarCollapsed && (
+                <>
+                  <span className="flex-1">سفارشات و مالی</span>
+                  <span className="bg-amber-500/20 text-amber-300 px-1.5 py-0.2 text-[10px] rounded font-mono">
+                    {orders.length}
+                  </span>
+                </>
+              )}
+            </button>
+
+            {/* 12. Users */}
+            <button
+              onClick={() => setActiveMenu('users')}
+              className={`w-full ${isSidebarCollapsed ? 'px-0 justify-center' : 'px-3.5'} py-2.5 text-right flex items-center gap-2.5 transition-colors cursor-pointer ${
+                activeMenu === 'users' ? currentThemeStyle.sidebarActive : currentThemeStyle.sidebarHover
+              }`}
+              title="کاربران و دانشجویان"
+            >
+              <Users className="w-4 h-4 shrink-0" />
+              {!isSidebarCollapsed && (
+                <>
+                  <span className="flex-1">کاربران و دانشجویان</span>
+                  <span className="bg-black/20 px-1.5 py-0.2 text-[10px] rounded font-mono">
+                    {users.length}
+                  </span>
+                </>
+              )}
+            </button>
+
+            {/* 13. Tickets */}
+            <button
+              onClick={() => setActiveMenu('tickets')}
+              className={`w-full ${isSidebarCollapsed ? 'px-0 justify-center' : 'px-3.5'} py-2.5 text-right flex items-center gap-2.5 transition-colors cursor-pointer ${
+                activeMenu === 'tickets' ? currentThemeStyle.sidebarActive : currentThemeStyle.sidebarHover
+              }`}
+              title="تیکت‌های پشتیبانی"
+            >
+              <MessageSquare className="w-4 h-4 shrink-0" />
+              {!isSidebarCollapsed && (
+                <>
+                  <span className="flex-1">تیکت‌های پشتیبانی</span>
+                  <span className="bg-red-500/20 text-red-300 px-1.5 py-0.2 text-[10px] rounded font-mono">
+                    {tickets.filter(t => t.status === 'open').length}
+                  </span>
+                </>
+              )}
+            </button>
+
+            {/* 14. Contact Messages */}
+            <button
+              onClick={() => setActiveMenu('contact-messages')}
+              className={`w-full ${isSidebarCollapsed ? 'px-0 justify-center' : 'px-3.5'} py-2.5 text-right flex items-center gap-2.5 transition-colors cursor-pointer ${
+                activeMenu === 'contact-messages' ? currentThemeStyle.sidebarActive : currentThemeStyle.sidebarHover
+              }`}
+              title="پیام‌های تماس"
+            >
+              <Mail className="w-4 h-4 shrink-0" />
+              {!isSidebarCollapsed && (
+                <>
+                  <span className="flex-1">پیام‌های تماس</span>
+                  {contactMessages.filter(m => !m.isRead).length > 0 && (
+                    <span className="bg-emerald-500 text-white px-1.5 py-0.2 text-[10px] rounded-full font-mono font-bold">
+                      {contactMessages.filter(m => !m.isRead).length}
+                    </span>
+                  )}
+                </>
+              )}
+            </button>
+
+            {/* 15. Settings & Appearance */}
             <button
               onClick={() => setActiveMenu('settings')}
-              className={`w-full px-4 py-2.5 text-right flex items-center gap-2.5 transition-colors ${
-                activeMenu === 'settings'
-                  ? 'bg-indigo-600 text-white font-bold'
-                  : 'hover:bg-slate-800/80 hover:text-white'
+              className={`w-full ${isSidebarCollapsed ? 'px-0 justify-center' : 'px-3.5'} py-2.5 text-right flex items-center gap-2.5 transition-colors cursor-pointer ${
+                activeMenu === 'settings' ? currentThemeStyle.sidebarActive : currentThemeStyle.sidebarHover
               }`}
+              title="تنظیمات، تم‌ها و پشتیبان"
             >
-              <Settings className="w-4 h-4 text-slate-400" />
-              <span>تنظیمات و صفحات سایت</span>
+              <Settings className="w-4 h-4 shrink-0" />
+              {!isSidebarCollapsed && <span>تنظیمات و قالب‌ها</span>}
             </button>
           </div>
         </aside>
 
         {/* Admin Content Canvas */}
-        <main className="flex-1 p-6 md:p-8 overflow-y-auto bg-slate-50 text-slate-900">
+        <main className={`flex-1 p-4 sm:p-6 md:p-8 overflow-y-auto ${currentThemeStyle.canvas} transition-colors`}>
           {/* ===================== VIEW 1: DASHBOARD ===================== */}
           {activeMenu === 'dashboard' && (
             <div className="space-y-6 max-w-6xl">
@@ -1402,6 +2023,488 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
             </div>
           )}
 
+          {/* ===================== VIEW: ROADMAPS MANAGEMENT ===================== */}
+          {activeMenu === 'roadmaps' && (
+            <div className="space-y-6 max-w-6xl">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h1 className="text-xl font-black text-slate-900">مسیرهای شغلی و نقشه راه IT</h1>
+                  <p className="text-xs text-slate-500 mt-1">
+                    مدیریت و پایش ۴ مسیر شغلی استاندارد مهندسی شبکه، دواپس، طراحی وب و امنیت سایبری
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="px-3 py-1 bg-cyan-50 border border-cyan-200 text-cyan-800 text-xs font-bold rounded-xl flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
+                    ۴ نقشه راه فعال در سایت
+                  </span>
+                </div>
+              </div>
+
+              {/* Roadmaps Switcher Tabs */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {[
+                  { id: 'network-engineer', title: 'مهندسی شبکه سیسکو', sub: 'CCNA -> CCNP Enterprise', icon: Server, color: 'text-indigo-600' },
+                  { id: 'devops-architect', title: 'دواپس و لینوکس', sub: 'Linux -> Docker -> K8s', icon: Terminal, color: 'text-cyan-600' },
+                  { id: 'frontend-developer', title: 'فرانت‌اند مدرن', sub: 'React 19 -> Next.js 15', icon: Code2, color: 'text-emerald-600' },
+                  { id: 'cybersecurity', title: 'امنیت سایبری', sub: 'Network+ -> CEH -> SOC', icon: Shield, color: 'text-rose-600' }
+                ].map(track => {
+                  const Icon = track.icon;
+                  const isActive = activeRoadmapView === track.id;
+                  return (
+                    <button
+                      key={track.id}
+                      onClick={() => setActiveRoadmapView(track.id)}
+                      className={`p-4 rounded-2xl border text-right transition-all cursor-pointer ${
+                        isActive
+                          ? 'bg-white border-indigo-600 ring-2 ring-indigo-500/20 shadow-sm'
+                          : 'bg-white/80 border-slate-200 hover:border-slate-300'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <Icon className={`w-5 h-5 ${track.color}`} />
+                        <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-bold">
+                          فعال
+                        </span>
+                      </div>
+                      <div className="text-xs font-black text-slate-900">{track.title}</div>
+                      <div className="text-[11px] text-slate-500 font-mono mt-0.5">{track.sub}</div>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Roadmap Detail View for Admin */}
+              <div className="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-xs space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-200 gap-3">
+                  <div>
+                    <h3 className="text-base font-bold text-slate-900">
+                      {activeRoadmapView === 'network-engineer' && 'مسیر شغلی مهندس ارشد شبکه سیسکو و زیرساخت ارتباطی'}
+                      {activeRoadmapView === 'devops-architect' && 'مسیر شغلی مهندس دواپس، اتوماسیون ابری و سرورهای لینوکسی'}
+                      {activeRoadmapView === 'frontend-developer' && 'مسیر شغلی برنامه‌نویس وب مدرن و فول‌استک با React و Next.js'}
+                      {activeRoadmapView === 'cybersecurity' && 'مسیر شغلی کارشناس امنیت اطلاعات و تست نفوذ سامانه‌ها'}
+                    </h3>
+                    <p className="text-xs text-slate-500 mt-1">شامل ۵ گام مهارتی گام‌به‌گام از سطح مقدماتی تا اشتغال در دیتاسنترها و پروژه‌های بین‌المللی</p>
+                  </div>
+                  <div className="flex items-center gap-3 text-xs">
+                    <div className="bg-emerald-50 text-emerald-800 border border-emerald-200 px-3 py-1 rounded-xl font-bold">
+                      میانگین درآمد: ۲۵ تا ۵۵ میلیون تومان
+                    </div>
+                  </div>
+                </div>
+
+                {/* Pipeline Steps in Admin */}
+                <div className="space-y-4">
+                  <span className="text-xs font-bold text-slate-800 block">مراحل و مهارت‌های تدوین‌شده در این مسیر:</span>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/70 space-y-2">
+                      <div className="flex items-center gap-2">
+                        <span className="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs font-bold font-mono">۱</span>
+                        <h4 className="text-xs font-bold text-slate-900">مبانی و زیرساخت اولیه (Foundations)</h4>
+                      </div>
+                      <p className="text-[11px] text-slate-600 leading-relaxed">
+                        یادگیری مدل‌های مرجع OSI، کابل‌کشی ساخت‌یافته، تنظیمات مقدماتی سیستم‌عامل و آشنایی با سخت‌افزارهای ارتباطی
+                      </p>
+                      <div className="text-[10px] text-indigo-700 font-bold bg-indigo-50 p-2 rounded-lg">
+                        دوره مرتبط: دوره جامع Network+ و مبانی شبکه
+                      </div>
+                    </div>
+
+                    <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/70 space-y-2">
+                      <div className="flex items-center gap-2">
+                        <span className="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs font-bold font-mono">۲</span>
+                        <h4 className="text-xs font-bold text-slate-900">تسلط بر پیکربندی و سناریوهای کاربردی</h4>
+                      </div>
+                      <p className="text-[11px] text-slate-600 leading-relaxed">
+                        اجرای سناریوهای واقعی در شبیه‌سازهای EVE-NG و Packet Tracer با تجهیزات استاندارد صنعتی
+                      </p>
+                      <div className="text-[10px] text-indigo-700 font-bold bg-indigo-50 p-2 rounded-lg">
+                        دوره مرتبط: دوره جامع سیسکو CCNA 200-301 و میکروتیک MTCNA
+                      </div>
+                    </div>
+
+                    <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/70 space-y-2">
+                      <div className="flex items-center gap-2">
+                        <span className="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs font-bold font-mono">۳</span>
+                        <h4 className="text-xs font-bold text-slate-900">امنیت، مانیتورینگ و خطایابی پیشرفته</h4>
+                      </div>
+                      <p className="text-[11px] text-slate-600 leading-relaxed">
+                        پیاده‌سازی Access Control Lists، فایروال‌های لبه شبکه، پروتکل‌های احراز هویت و مانیتورینگ Zabbix
+                      </p>
+                      <div className="text-[10px] text-indigo-700 font-bold bg-indigo-50 p-2 rounded-lg">
+                        دوره مرتبط: پکیج سناریوهای امنیت و روتینگ سازمانی
+                      </div>
+                    </div>
+
+                    <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/70 space-y-2">
+                      <div className="flex items-center gap-2">
+                        <span className="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs font-bold font-mono">۴</span>
+                        <h4 className="text-xs font-bold text-slate-900">اتوماسیون، برنامه‌نویسی و آزمون پایانی</h4>
+                      </div>
+                      <p className="text-[11px] text-slate-600 leading-relaxed">
+                        توسعه اسکریپت‌های پایتون و ابزارهای Ansible جهت خودکارسازی وظایف روزمره و شرکت در آزمون پایانی برای دریافت مدرک رسمی
+                      </p>
+                      <div className="text-[10px] text-indigo-700 font-bold bg-indigo-50 p-2 rounded-lg">
+                        آزمون پایانی: آزمون آنلاین مهارت‌سنجی دوره با حد نصاب ۷۵٪
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ===================== VIEW: QUIZZES & EXAMS MANAGEMENT ===================== */}
+          {activeMenu === 'quizzes' && (
+            <div className="space-y-6 max-w-6xl">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h1 className="text-xl font-black text-slate-900">آزمون‌ها و کوئیزهای سنجش مهارت دوره‌ها</h1>
+                  <p className="text-xs text-slate-500 mt-1">
+                    تعریف سوالات چهارگزینه‌ای، تنظیم زمان پاسخ‌گویی، تعیین حد نصاب قبولی و صدور مدرک خودکار
+                  </p>
+                </div>
+                <button
+                  onClick={() => setIsAddingQuiz(true)}
+                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>افزودن آزمون جدید دوره</span>
+                </button>
+              </div>
+
+              {/* Add Quiz Form / Modal */}
+              {isAddingQuiz ? (
+                <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-6 max-w-4xl">
+                  <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+                    <h3 className="text-sm font-bold text-slate-900">تعریف آزمون تستی جدید برای دوره‌ها</h3>
+                    <button
+                      onClick={() => setIsAddingQuiz(false)}
+                      className="text-slate-400 hover:text-slate-600 text-xs font-bold cursor-pointer"
+                    >
+                      انصراف
+                    </button>
+                  </div>
+
+                  <form onSubmit={handleSaveQuiz} className="space-y-4 text-xs">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block font-bold text-slate-700 mb-1">دوره آموزشی مربوطه</label>
+                        <select
+                          value={newQuizCourse}
+                          onChange={(e) => setNewQuizCourse(e.target.value)}
+                          className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl"
+                        >
+                          {courses.map(c => (
+                            <option key={c.id} value={c.title}>{c.title}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block font-bold text-slate-700 mb-1">عنوان آزمون</label>
+                        <input
+                          type="text"
+                          value={newQuizTitle}
+                          onChange={(e) => setNewQuizTitle(e.target.value)}
+                          placeholder="آزمون آنلاین پایان دوره و سنجش مهارت"
+                          className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block font-bold text-slate-700 mb-1">مدت زمان آزمون (دقیقه)</label>
+                        <input
+                          type="number"
+                          min={5}
+                          max={120}
+                          value={newQuizTimeLimit}
+                          onChange={(e) => setNewQuizTimeLimit(Number(e.target.value))}
+                          className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl font-mono"
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block font-bold text-slate-700 mb-1">حد نصاب قبولی برای صدور مدرک (درصد)</label>
+                        <input
+                          type="number"
+                          min={50}
+                          max={100}
+                          value={newQuizPassScore}
+                          onChange={(e) => setNewQuizPassScore(Number(e.target.value))}
+                          className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl font-mono"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    {/* Question Builder */}
+                    <div className="space-y-3 pt-3 border-t border-slate-100">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-slate-800">سوالات آزمون ({newQuizQuestions.length} سوال):</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setNewQuizQuestions([
+                              ...newQuizQuestions,
+                              {
+                                question: `سوال تستی شماره ${newQuizQuestions.length + 1}`,
+                                options: ['گزینه الف', 'گزینه ب', 'گزینه ج', 'گزینه د'],
+                                correctOptionIndex: 0,
+                                explanation: 'توضیحات تکمیلی و پاسخ تشریحی سوال'
+                              }
+                            ]);
+                          }}
+                          className="text-xs text-indigo-600 font-bold hover:underline flex items-center gap-1 cursor-pointer"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                          <span>افزودن سوال جدید</span>
+                        </button>
+                      </div>
+
+                      <div className="space-y-3">
+                        {newQuizQuestions.map((q, qIndex) => (
+                          <div key={qIndex} className="p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-3">
+                            <div className="flex items-center justify-between">
+                              <span className="font-bold text-slate-900">سوال شماره {qIndex + 1}</span>
+                              {newQuizQuestions.length > 1 && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setNewQuizQuestions(newQuizQuestions.filter((_, idx) => idx !== qIndex));
+                                  }}
+                                  className="text-red-500 hover:text-red-700 text-[11px]"
+                                >
+                                  حذف سوال
+                                </button>
+                              )}
+                            </div>
+
+                            <input
+                              type="text"
+                              value={q.question}
+                              onChange={(e) => {
+                                const copy = [...newQuizQuestions];
+                                copy[qIndex].question = e.target.value;
+                                setNewQuizQuestions(copy);
+                              }}
+                              placeholder="متن سوال را وارد نمایید..."
+                              className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs"
+                              required
+                            />
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                              {q.options.map((opt, optIdx) => (
+                                <div key={optIdx} className="flex items-center gap-2 bg-white p-2 rounded-lg border border-slate-200">
+                                  <input
+                                    type="radio"
+                                    name={`correct-${qIndex}`}
+                                    checked={q.correctOptionIndex === optIdx}
+                                    onChange={() => {
+                                      const copy = [...newQuizQuestions];
+                                      copy[qIndex].correctOptionIndex = optIdx;
+                                      setNewQuizQuestions(copy);
+                                    }}
+                                    className="cursor-pointer"
+                                  />
+                                  <input
+                                    type="text"
+                                    value={opt}
+                                    onChange={(e) => {
+                                      const copy = [...newQuizQuestions];
+                                      copy[qIndex].options[optIdx] = e.target.value;
+                                      setNewQuizQuestions(copy);
+                                    }}
+                                    className="flex-1 bg-transparent text-xs focus:outline-none"
+                                    placeholder={`گزینه ${optIdx + 1}`}
+                                  />
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 pt-3">
+                      <button
+                        type="submit"
+                        className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-colors cursor-pointer"
+                      >
+                        ذخیره و فعال‌سازی آزمون در سامانه
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setIsAddingQuiz(false)}
+                        className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition-colors cursor-pointer"
+                      >
+                        انصراف
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              ) : (
+                /* Quizzes Table */
+                <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden">
+                  <table className="w-full text-right text-xs">
+                    <thead className="bg-slate-50 text-slate-600 border-b border-slate-200 font-bold">
+                      <tr>
+                        <th className="p-3">دوره آموزشی و عنوان آزمون</th>
+                        <th className="p-3">مدت زمان</th>
+                        <th className="p-3">حد نصاب قبولی</th>
+                        <th className="p-3">تعداد سوالات</th>
+                        <th className="p-3">وضعیت مدرک</th>
+                        <th className="p-3">عملیات</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {quizzes.map(quiz => (
+                        <tr key={quiz.id} className="hover:bg-slate-50">
+                          <td className="p-3">
+                            <div className="font-bold text-slate-900">{quiz.title}</div>
+                            <div className="text-[11px] text-slate-500 mt-0.5">{quiz.courseTitle}</div>
+                          </td>
+                          <td className="p-3 font-mono tabular-nums text-slate-700">
+                            {quiz.timeLimitMinutes} دقیقه
+                          </td>
+                          <td className="p-3">
+                            <span className="bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded font-mono font-bold text-[11px]">
+                              {quiz.passScorePercent}٪
+                            </span>
+                          </td>
+                          <td className="p-3 font-mono text-slate-700">
+                            {quiz.questions.length} سوال تستی
+                          </td>
+                          <td className="p-3">
+                            <span className="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded font-bold text-[11px]">
+                              صدور آنی گواهینامه
+                            </span>
+                          </td>
+                          <td className="p-3">
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => handleDeleteQuiz(quiz.id)}
+                                className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg cursor-pointer"
+                                title="حذف آزمون"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ===================== VIEW: OFFICIAL CERTIFICATES MANAGEMENT ===================== */}
+          {activeMenu === 'certificates' && (
+            <div className="space-y-6 max-w-6xl">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h1 className="text-xl font-black text-slate-900">بانک گواهینامه‌های رسمی و استعلام اصالت</h1>
+                  <p className="text-xs text-slate-500 mt-1">
+                    فهرست کلیه مدارک تایید شده، صدور مدرک دستی برای دانشجویان، ابطال و تایید اصالت کد رهگیری
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setIsIssuingCert(true)}
+                    className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>صدور گواهینامه دستی برای دانشجو</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Search Bar */}
+              <div className="flex items-center gap-3 bg-white p-3 rounded-2xl border border-slate-200/90 shadow-xs">
+                <Search className="w-4 h-4 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="جستجو بر اساس نام دانشجو، شماره مدرک یا کد رهگیری..."
+                  value={certSearch}
+                  onChange={(e) => setCertSearch(e.target.value)}
+                  className="flex-1 bg-transparent text-xs focus:outline-none"
+                />
+              </div>
+
+              {/* Certificates Table */}
+              <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden">
+                <table className="w-full text-right text-xs">
+                  <thead className="bg-slate-50 text-slate-600 border-b border-slate-200 font-bold">
+                    <tr>
+                      <th className="p-3">شماره رسمی گواهینامه</th>
+                      <th className="p-3">نام و تلفن دانشجو</th>
+                      <th className="p-3">عنوان دوره آموزشی</th>
+                      <th className="p-3">تاریخ صدور</th>
+                      <th className="p-3">نمره آزمون</th>
+                      <th className="p-3">کد رهگیری آنلاین</th>
+                      <th className="p-3">عملیات</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {certificates
+                      .filter(c =>
+                        !certSearch ||
+                        c.userName.toLowerCase().includes(certSearch.toLowerCase()) ||
+                        c.certificateNumber.toLowerCase().includes(certSearch.toLowerCase()) ||
+                        c.verificationCode.toLowerCase().includes(certSearch.toLowerCase()) ||
+                        c.courseTitle.toLowerCase().includes(certSearch.toLowerCase())
+                      )
+                      .map(cert => (
+                        <tr key={cert.id} className="hover:bg-slate-50">
+                          <td className="p-3">
+                            <span className="font-mono font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded text-[11px] border border-indigo-200">
+                              {cert.certificateNumber}
+                            </span>
+                          </td>
+                          <td className="p-3">
+                            <div className="font-bold text-slate-900">{cert.userName}</div>
+                            <div className="text-[11px] text-slate-500 font-mono mt-0.5">{cert.userPhone}</div>
+                          </td>
+                          <td className="p-3">
+                            <div className="font-medium text-slate-900 line-clamp-1">{cert.courseTitle}</div>
+                            <div className="text-[11px] text-slate-500 mt-0.5">مدرس: {cert.instructorName}</div>
+                          </td>
+                          <td className="p-3 font-mono text-slate-600">{cert.issueDate}</td>
+                          <td className="p-3">
+                            <span className="bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded font-mono font-bold text-[11px]">
+                              {cert.gradeScore} از ۱۰۰
+                            </span>
+                          </td>
+                          <td className="p-3">
+                            <span className="font-mono text-[11px] text-slate-600 bg-slate-100 px-2 py-0.5 rounded select-all">
+                              {cert.verificationCode}
+                            </span>
+                          </td>
+                          <td className="p-3">
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => handleDeleteCertificate(cert.id)}
+                                className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg cursor-pointer"
+                                title="ابطال و حذف گواهینامه"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
           {/* ===================== VIEW 4: MEDIA LIBRARY (NEW & COMPREHENSIVE) ===================== */}
           {activeMenu === 'media' && (
             <div className="space-y-6 max-w-6xl">
@@ -1903,6 +3006,322 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
             </div>
           )}
 
+          {/* ===================== VIEW: COUPONS & DISCOUNTS ===================== */}
+          {activeMenu === 'coupons' && (
+            <div className="space-y-6 max-w-6xl">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h1 className="text-xl font-black text-slate-900">مدیریت کدهای تخفیف و جشنواره‌ها</h1>
+                  <p className="text-xs text-slate-500 mt-1">تعریف کدهای تخفیف درصدی، مدیریت انقضا و اعمال مستقیم روی سبد خرید</p>
+                </div>
+                <button
+                  onClick={() => setIsAddingCoupon(!isAddingCoupon)}
+                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 cursor-pointer self-start sm:self-auto"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>{isAddingCoupon ? 'بستن فرم' : 'ایجاد کد تخفیف جدید'}</span>
+                </button>
+              </div>
+
+              {/* Add Coupon Form */}
+              {isAddingCoupon && (
+                <form onSubmit={handleSaveCoupon} className="bg-white p-6 rounded-2xl border border-indigo-200 shadow-sm space-y-4 animate-fadeIn">
+                  <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                    <Tag className="w-4 h-4 text-indigo-600" />
+                    <span>مشخصات کد تخفیف جدید</span>
+                  </h3>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">کد تخفیف (لاتین)</label>
+                      <input
+                        type="text"
+                        required
+                        dir="ltr"
+                        value={newCouponCode}
+                        onChange={(e) => setNewCouponCode(e.target.value.toUpperCase())}
+                        placeholder="مثال: NOWRUZ40"
+                        className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono uppercase focus:outline-none focus:border-indigo-600"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">درصد تخفیف (۱ تا ۱۰۰)</label>
+                      <input
+                        type="number"
+                        required
+                        min="1"
+                        max="100"
+                        value={newCouponDiscount}
+                        onChange={(e) => setNewCouponDiscount(Number(e.target.value))}
+                        className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono focus:outline-none focus:border-indigo-600"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">حداکثر دفعات استفاده</label>
+                      <input
+                        type="number"
+                        required
+                        min="1"
+                        value={newCouponMaxUses}
+                        onChange={(e) => setNewCouponMaxUses(Number(e.target.value))}
+                        className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono focus:outline-none focus:border-indigo-600"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">تاریخ انقضا</label>
+                      <input
+                        type="text"
+                        value={newCouponExpires}
+                        onChange={(e) => setNewCouponExpires(e.target.value)}
+                        placeholder="۱۴۰۳/۱۲/۲۹"
+                        className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono focus:outline-none focus:border-indigo-600"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1 text-xs">توضیحات و مناسبت تخفیف</label>
+                    <input
+                      type="text"
+                      value={newCouponDescription}
+                      onChange={(e) => setNewCouponDescription(e.target.value)}
+                      placeholder="مثال: تخفیف ویژه دوره جامع شبکه به مناسبت آغاز پاییز"
+                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-indigo-600"
+                    />
+                  </div>
+
+                  <div className="flex justify-end gap-2 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setIsAddingCoupon(false)}
+                      className="px-4 py-2 border border-slate-200 rounded-xl text-xs text-slate-600 hover:bg-slate-50 cursor-pointer"
+                    >
+                      انصراف
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer"
+                    >
+                      ثبت و فعال‌سازی کد
+                    </button>
+                  </div>
+                </form>
+              )}
+
+              {/* Coupons List Table */}
+              <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden">
+                <table className="w-full text-right text-xs">
+                  <thead className="bg-slate-50 text-slate-600 border-b border-slate-200 font-bold">
+                    <tr>
+                      <th className="p-3">کد تخفیف</th>
+                      <th className="p-3">درصد تخفیف</th>
+                      <th className="p-3">میزان استفاده</th>
+                      <th className="p-3">تاریخ انقضا</th>
+                      <th className="p-3">توضیحات</th>
+                      <th className="p-3">وضعیت</th>
+                      <th className="p-3">عملیات</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {coupons.map((cp) => (
+                      <tr key={cp.id} className="hover:bg-slate-50">
+                        <td className="p-3">
+                          <div className="flex items-center gap-2">
+                            <span className="font-mono font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded text-xs">
+                              {cp.code}
+                            </span>
+                            <button
+                              onClick={() => {
+                                navigator.clipboard.writeText(cp.code);
+                                store.showToast('success', `کد ${cp.code} در کلیپ‌بورد کپی شد.`);
+                              }}
+                              className="text-slate-400 hover:text-slate-600 p-0.5"
+                              title="کپی کد"
+                            >
+                              <Copy className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </td>
+                        <td className="p-3 font-mono font-bold text-emerald-600 text-sm">
+                          {cp.discountPercent}٪
+                        </td>
+                        <td className="p-3 font-mono text-slate-600">
+                          {cp.usedCount} از {cp.maxUses}
+                        </td>
+                        <td className="p-3 font-mono text-slate-500">{cp.expiresAt}</td>
+                        <td className="p-3 text-slate-600">{cp.description || '-'}</td>
+                        <td className="p-3">
+                          <button
+                            onClick={() => handleToggleCoupon(cp.id)}
+                            className={`px-2 py-0.5 rounded text-[11px] font-bold cursor-pointer transition-colors ${
+                              cp.isActive
+                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                : 'bg-slate-100 text-slate-500 border border-slate-200'
+                            }`}
+                          >
+                            {cp.isActive ? 'فعال' : 'غیرفعال'}
+                          </button>
+                        </td>
+                        <td className="p-3">
+                          <button
+                            onClick={() => handleDeleteCoupon(cp.id)}
+                            className="p-1 text-slate-400 hover:text-red-600 rounded transition-colors cursor-pointer"
+                            title="حذف کد تخفیف"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* ===================== VIEW: REVIEWS & MODERATION ===================== */}
+          {activeMenu === 'reviews' && (
+            <div className="space-y-6 max-w-6xl">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h1 className="text-xl font-black text-slate-900">مدیریت و تایید دیدگاه‌های دانشجویان</h1>
+                  <p className="text-xs text-slate-500 mt-1">بررسی دیدگاه‌های ثبت شده برای دوره‌ها، تایید انتشار عمومی در سایت یا حذف</p>
+                </div>
+
+                <div className="flex items-center gap-1 bg-white p-1 rounded-xl border border-slate-200 text-xs">
+                  <button
+                    onClick={() => setReviewFilter('all')}
+                    className={`px-3 py-1.5 rounded-lg font-medium transition-colors cursor-pointer ${
+                      reviewFilter === 'all' ? 'bg-indigo-600 text-white' : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    همه ({reviews.length})
+                  </button>
+                  <button
+                    onClick={() => setReviewFilter('pending')}
+                    className={`px-3 py-1.5 rounded-lg font-medium transition-colors cursor-pointer ${
+                      reviewFilter === 'pending' ? 'bg-indigo-600 text-white' : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    در انتظار بررسی ({reviews.filter(r => !r.isApproved).length})
+                  </button>
+                  <button
+                    onClick={() => setReviewFilter('approved')}
+                    className={`px-3 py-1.5 rounded-lg font-medium transition-colors cursor-pointer ${
+                      reviewFilter === 'approved' ? 'bg-indigo-600 text-white' : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    منتشر شده ({reviews.filter(r => r.isApproved).length})
+                  </button>
+                </div>
+              </div>
+
+              {/* Reviews List */}
+              {reviews.filter(r =>
+                reviewFilter === 'all'
+                  ? true
+                  : reviewFilter === 'pending'
+                  ? !r.isApproved
+                  : r.isApproved
+              ).length === 0 ? (
+                <div className="text-center py-16 bg-white rounded-3xl border border-slate-200 text-slate-400">
+                  <Star className="w-12 h-12 mx-auto mb-2 text-slate-300" />
+                  <p className="text-sm font-medium">دیدگاهی در این بخش یافت نشد.</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {reviews
+                    .filter(r =>
+                      reviewFilter === 'all'
+                        ? true
+                        : reviewFilter === 'pending'
+                        ? !r.isApproved
+                        : r.isApproved
+                    )
+                    .map((rev) => (
+                      <div
+                        key={rev.id}
+                        className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-xs flex flex-col sm:flex-row sm:items-start justify-between gap-4"
+                      >
+                        <div className="flex-1 space-y-2">
+                          <div className="flex items-center gap-3">
+                            <img
+                              src={rev.userAvatar}
+                              alt={rev.userName}
+                              className="w-9 h-9 rounded-full object-cover ring-2 ring-indigo-50"
+                            />
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs font-bold text-slate-900">{rev.userName}</span>
+                                <span className="text-[10px] text-slate-400 font-mono">· {rev.createdAt}</span>
+                              </div>
+                              <div className="text-[11px] text-indigo-600 font-medium">
+                                دوره: {rev.courseTitle}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-1 pt-1">
+                            {[1, 2, 3, 4, 5].map((s) => (
+                              <Star
+                                key={s}
+                                className={`w-3.5 h-3.5 ${s <= rev.rating ? 'text-amber-500 fill-current' : 'text-slate-300'}`}
+                              />
+                            ))}
+                            <span className="text-xs font-mono font-bold text-slate-700 mr-1">{rev.rating} از ۵</span>
+                          </div>
+
+                          <p className="text-xs text-slate-700 leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-100">
+                            {rev.comment}
+                          </p>
+                        </div>
+
+                        <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-3 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100">
+                          <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                            rev.isApproved
+                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                              : 'bg-amber-50 text-amber-700 border border-amber-200'
+                          }`}>
+                            {rev.isApproved ? 'منتشر شده در سایت' : 'در انتظار بررسی'}
+                          </span>
+
+                          <div className="flex items-center gap-1.5">
+                            {!rev.isApproved ? (
+                              <button
+                                onClick={() => handleApproveReview(rev.id)}
+                                className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center gap-1 transition-all shadow-xs cursor-pointer"
+                              >
+                                <Check className="w-3.5 h-3.5" />
+                                <span>تایید و انتشار</span>
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => store.approveReview(rev.id, false)}
+                                className="px-2.5 py-1 text-slate-500 hover:text-slate-700 border border-slate-200 rounded-xl text-xs cursor-pointer"
+                              >
+                                لغو تایید
+                              </button>
+                            )}
+
+                            <button
+                              onClick={() => handleDeleteReview(rev.id)}
+                              className="p-1.5 text-slate-400 hover:text-red-600 rounded-lg transition-colors cursor-pointer"
+                              title="حذف دیدگاه"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              )}
+            </div>
+          )}
+
           {/* ===================== VIEW 6: ORDERS & WOOCOMMERCE ===================== */}
           {activeMenu === 'orders' && (
             <div className="space-y-6 max-w-6xl">
@@ -2236,7 +3655,7 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
               <div>
                 <h1 className="text-xl font-black text-slate-900">تنظیمات، امنیت مدیریت و ویرایش صفحات سایت</h1>
                 <p className="text-xs text-slate-500 mt-1">
-                  تغییر رمز عبور مدیر، ویرایش متون درباره ما و قوانین، اتصال Supabase و درگاه پرداخت
+                  تغییر رمز عبور مدیر، ویرایش متون درباره ما و قوانین، تم‌ها و درگاه پرداخت
                 </p>
               </div>
 
@@ -2417,136 +3836,134 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
                 </div>
               </div>
 
-              {/* 3. SUPABASE CLOUD DATABASE BOX */}
-              <div className="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-xs space-y-4">
+              {/* 3. SITE THEMES & ADMIN TEMPLATES STUDIO */}
+              <div className="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-xs space-y-6">
                 <div className="flex items-center gap-3 pb-3 border-b border-slate-200">
-                  <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
-                    <Database className="w-5 h-5" />
+                  <div className="w-9 h-9 rounded-xl bg-violet-100 text-violet-700 flex items-center justify-center">
+                    <Palette className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-bold text-slate-900">تنظیمات اتصال به Supabase (پایگاه داده ابری)</h3>
-                    <p className="text-xs text-slate-500">برای ذخیره ریل‌تایم دوره‌ها، فایل‌ها، سفارشات و کاربران در دیتابیس PostgreSQL سوپابیس</p>
+                    <h3 className="text-sm font-bold text-slate-900">شخصی‌سازی تم‌های وب‌سایت و قالب پیشخوان مدیریت</h3>
+                    <p className="text-xs text-slate-500">انتخاب رنگ‌بندی اختصاصی سایت و استایل بصری محیط پیشخوان بدون نیاز به کدنویسی</p>
                   </div>
                 </div>
 
-                <div className="space-y-4 text-xs">
-                  <div>
-                    <label className="block font-bold text-slate-700 mb-1">
-                      آدرس پروژه Supabase (Project URL)
-                    </label>
-                    <input
-                      type="url"
-                      dir="ltr"
-                      value={settings.supabaseUrl}
-                      onChange={(e) => setSettings({ ...settings, supabaseUrl: e.target.value })}
-                      placeholder="https://xyzcompany.supabase.co"
-                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl font-mono"
-                    />
-                    <span className="text-[11px] text-slate-400 mt-1 block">
-                      قابل دریافت از پنل Supabase بخش Project Settings -&gt; API
-                    </span>
+                {/* Site Color Themes */}
+                <div className="space-y-3">
+                  <span className="text-xs font-bold text-slate-800 block">
+                    ۱. تم رنگی صفحات عمومی وب‌سایت (Site Color Theme)
+                  </span>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {[
+                      { id: 'indigo', name: 'نیلی سازمانی', hex: '#4f46e5', desc: 'شیک و استاندارد بین‌المللی' },
+                      { id: 'emerald', name: 'زمردی و نعنایی', hex: '#059669', desc: 'نماد رشد و فناوری سبز' },
+                      { id: 'cyan', name: 'فیروزه‌ای نئونی', hex: '#0891b2', desc: 'مدرن و های‌تک' },
+                      { id: 'amber', name: 'طلایی کهربایی', hex: '#d97706', desc: 'گرم، پرانرژی و جذاب' },
+                      { id: 'rose', name: 'یاقوتی و زرشکی', hex: '#e11d48', desc: 'خلاقانه و چشم‌نواز' },
+                      { id: 'violet', name: 'بنفش رویال', hex: '#7c3aed', desc: 'لوکس و دیجیتال آرت' }
+                    ].map(ct => (
+                      <button
+                        key={ct.id}
+                        type="button"
+                        onClick={() => store.setColorTheme(ct.id as ColorTheme)}
+                        className={`p-3 rounded-xl border text-right transition-all flex flex-col gap-1.5 cursor-pointer ${
+                          colorTheme === ct.id
+                            ? 'border-indigo-600 bg-indigo-50/60 ring-2 ring-indigo-500/20 shadow-xs'
+                            : 'border-slate-200 hover:border-slate-300 bg-white'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-slate-900">{ct.name}</span>
+                          <span className="w-4 h-4 rounded-full border border-black/10 shrink-0" style={{ backgroundColor: ct.hex }} />
+                        </div>
+                        <span className="text-[11px] text-slate-500">{ct.desc}</span>
+                      </button>
+                    ))}
                   </div>
-
-                  <div>
-                    <label className="block font-bold text-slate-700 mb-1">
-                      کلید عمومی Supabase (Anon Key)
-                    </label>
-                    <input
-                      type="password"
-                      dir="ltr"
-                      value={settings.supabaseAnonKey}
-                      onChange={(e) => setSettings({ ...settings, supabaseAnonKey: e.target.value })}
-                      placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl font-mono"
-                    />
-                  </div>
-
-                  <div className="flex items-center gap-3 pt-2">
-                    <button
-                      onClick={() => store.updateSettings({
-                        supabaseUrl: settings.supabaseUrl,
-                        supabaseAnonKey: settings.supabaseAnonKey
-                      })}
-                      className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl"
-                    >
-                      ذخیره تنظیمات دیتابیس
-                    </button>
-
-                    <button
-                      onClick={handleTestSupabase}
-                      disabled={supabaseTestStatus.loading}
-                      className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl flex items-center gap-1.5 disabled:opacity-50"
-                    >
-                      {supabaseTestStatus.loading && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
-                      <span>تست زنده اتصال به Supabase</span>
-                    </button>
-                  </div>
-
-                  {supabaseTestStatus.message && (
-                    <div className={`p-3 rounded-xl border flex items-center gap-2 ${
-                      supabaseTestStatus.success
-                        ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
-                        : 'bg-amber-50 border-amber-200 text-amber-800'
-                    }`}>
-                      {supabaseTestStatus.success ? <CheckCircle2 className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
-                      <span>{supabaseTestStatus.message}</span>
-                    </div>
-                  )}
                 </div>
 
-                {/* 1-Click SQL Script Copy */}
-                <div className="pt-4 border-t border-slate-200">
-                  <div className="flex items-center justify-between mb-2">
-                    <div>
-                      <span className="text-xs font-bold text-slate-800 block">
-                        اسکریپت کامل ساخت جداول در Supabase (SQL Schema Migration)
-                      </span>
-                      <span className="text-[11px] text-slate-500">
-                        کافی است این کد را کپی کرده و در بخش SQL Editor در پنل Supabase اجرا (Run) کنید تا تمام جداول ساخته شوند.
-                      </span>
-                    </div>
-
-                    <button
-                      onClick={handleCopySql}
-                      className="px-3.5 py-1.5 bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 border border-slate-200 text-slate-700 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors"
-                    >
-                      {isSqlCopied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                      <span>{isSqlCopied ? 'کپی شد!' : 'کپی اسکریپت SQL'}</span>
-                    </button>
-                  </div>
-
-                  <div className="bg-slate-900 text-emerald-400 p-3 rounded-xl font-mono text-[11px] max-h-36 overflow-y-auto" dir="ltr">
-                    <pre>{SUPABASE_SQL_SCHEMA.slice(0, 480)}...</pre>
+                {/* Admin Panel Themes */}
+                <div className="space-y-3 pt-3 border-t border-slate-100">
+                  <span className="text-xs font-bold text-slate-800 block">
+                    ۲. قالب و پوسته پیشخوان مدیریت (Admin Panel Template)
+                  </span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {(Object.keys(ADMIN_THEMES) as AdminTheme[]).map(atKey => {
+                      const at = ADMIN_THEMES[atKey];
+                      return (
+                        <button
+                          key={atKey}
+                          type="button"
+                          onClick={() => store.setAdminTheme(atKey)}
+                          className={`p-3.5 rounded-xl border text-right transition-all flex flex-col gap-2 cursor-pointer ${
+                            adminTheme === atKey
+                              ? 'border-indigo-600 bg-indigo-50/70 ring-2 ring-indigo-500/20 shadow-xs'
+                              : 'border-slate-200 hover:border-slate-300 bg-white'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-bold text-slate-900">{at.name}</span>
+                            {adminTheme === atKey && (
+                              <CheckCircle className="w-4 h-4 text-indigo-600 shrink-0" />
+                            )}
+                          </div>
+                          <div className="flex items-center gap-1.5 text-[10px] text-slate-500 font-mono">
+                            <span className="w-3 h-3 rounded-sm bg-slate-900 inline-block border border-slate-700" />
+                            <span className="w-3 h-3 rounded-sm bg-indigo-600 inline-block" />
+                            <span className="w-3 h-3 rounded-sm bg-slate-100 inline-block border border-slate-300" />
+                          </div>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
 
-              {/* 4. VERCEL DEPLOYMENT GUIDE */}
-              <div className="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-xs space-y-3">
+              {/* 4. FULL SITE BACKUP & RESTORE (NO DATABASE CONFIG REQUIRED) */}
+              <div className="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-xs space-y-4">
                 <div className="flex items-center gap-3 pb-3 border-b border-slate-200">
-                  <div className="w-9 h-9 rounded-xl bg-slate-900 text-white flex items-center justify-center font-black">
-                    ▲
+                  <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                    <FileJson className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-bold text-slate-900">راهنمای استقرار در Vercel (Vercel Deployment)</h3>
-                    <p className="text-xs text-slate-500">پروژه کاملاً بر پایه Vite + React و سازگار با Vercel آماده شده است.</p>
+                    <h3 className="text-sm font-bold text-slate-900">پشتیبان‌گیری کامل و بازیابی اطلاعات سامانه</h3>
+                    <p className="text-xs text-slate-500">تمامی داده‌های دوره‌ها، سفارشات، کاربران، آزمون‌ها و مدارک بدون نیاز به دیتابیس خارجی در سیستم محفوظ است</p>
                   </div>
                 </div>
 
-                <div className="text-xs text-slate-600 space-y-2 leading-relaxed">
-                  <p>
-                    ۱. این مخزن را در اکانت گیت‌هاب خود پوش کنید یا سورس را در Vercel بارگذاری نمایید.
+                <div className="text-xs text-slate-600 space-y-3">
+                  <p className="leading-relaxed">
+                    سیستم آکادمی پارس‌نت با معماری مستقل طراحی شده است؛ به این معنی که برای ذخیره تغییرات و کارکرد کامل هیچ نیازی به راه‌اندازی یا اتصال به دیتابیس‌های پیچیده خارجی ندارید. همچنین می‌توانید در هر لحظه یک نسخه پشتیبان کامل JSON دریافت کنید یا داده‌های قبلی را بازیابی نمایید.
                   </p>
-                  <p>
-                    ۲. در پنل Vercel هنگام ایجاد پروژه، در بخش <strong>Environment Variables</strong> دو متغیر زیر را اضافه فرمایید:
-                  </p>
-                  <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 font-mono text-[11px] space-y-1" dir="ltr">
-                    <div>VITE_SUPABASE_URL = {settings.supabaseUrl || 'https://your-project.supabase.co'}</div>
-                    <div>VITE_SUPABASE_ANON_KEY = {settings.supabaseAnonKey || 'your-supabase-anon-key'}</div>
+
+                  <div className="flex flex-wrap items-center gap-3 pt-2">
+                    <button
+                      type="button"
+                      onClick={handleExportBackup}
+                      className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl flex items-center gap-2 transition-colors cursor-pointer shadow-xs"
+                    >
+                      <Download className="w-4 h-4" />
+                      <span>دانلود فایل کامل پشتیبان (JSON Backup)</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setIsImportModalOpen(true)}
+                      className="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl flex items-center gap-2 transition-colors cursor-pointer"
+                    >
+                      <UploadCloud className="w-4 h-4" />
+                      <span>بازیابی اطلاعات از فایل پشتیبان</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleResetFactoryDefaults}
+                      className="px-4 py-2.5 bg-slate-100 hover:bg-red-50 hover:text-red-700 text-slate-600 font-bold rounded-xl flex items-center gap-2 transition-colors cursor-pointer border border-slate-200"
+                    >
+                      <RotateCcw className="w-4 h-4" />
+                      <span>بازنشانی به داده‌های اولیه</span>
+                    </button>
                   </div>
-                  <p>
-                    ۳. دکمه Deploy را بزنید؛ سایت با عملکرد بالا روی CDN جهانی ورسل در دسترس خواهد بود.
-                  </p>
                 </div>
               </div>
 
@@ -2620,6 +4037,165 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
             : 'انتخاب تصویر شاخص برای نوشته یا رویداد'
         }
       />
+
+      {/* MANUAL CERTIFICATE ISSUANCE MODAL */}
+      {isIssuingCert && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 space-y-4 shadow-2xl border border-slate-200">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+              <div className="flex items-center gap-2 text-slate-900 font-bold">
+                <Award className="w-5 h-5 text-amber-500" />
+                <span>صدور رسمی مدرک و گواهینامه برای دانشجو</span>
+              </div>
+              <button
+                onClick={() => setIsIssuingCert(false)}
+                className="text-slate-400 hover:text-slate-600 p-1 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleIssueCertificate} className="space-y-4 text-xs">
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">نام و نام خانوادگی دانشجو</label>
+                <input
+                  type="text"
+                  value={certStudentName}
+                  onChange={(e) => setCertStudentName(e.target.value)}
+                  placeholder="مثال: سهراب سپهری"
+                  className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">شماره همراه دانشجو</label>
+                <input
+                  type="tel"
+                  dir="ltr"
+                  value={certStudentPhone}
+                  onChange={(e) => setCertStudentPhone(e.target.value)}
+                  placeholder="۰۹۱۲۳۴۵۶۷۸۹"
+                  className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl font-mono"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">عنوان دوره آموزشی</label>
+                <select
+                  value={certCourseTitle}
+                  onChange={(e) => setCertCourseTitle(e.target.value)}
+                  className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl"
+                >
+                  {courses.map(c => (
+                    <option key={c.id} value={c.title}>{c.title}</option>
+                  ))}
+                  <option value="دوره تخصصی مهندسی شبکه و لینوکس سازمانی">دوره تخصصی مهندسی شبکه و لینوکس سازمانی</option>
+                  <option value="دوره جامع طراحی و پیاده‌سازی زیرساخت دیتاسنتر">دوره جامع طراحی و پیاده‌سازی زیرساخت دیتاسنتر</option>
+                </select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">نام استاد صادرکننده</label>
+                  <input
+                    type="text"
+                    value={certInstructor}
+                    onChange={(e) => setCertInstructor(e.target.value)}
+                    placeholder="مهندس محمدرضا قاسمی"
+                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">نمره کسب‌شده (از ۱۰۰)</label>
+                  <input
+                    type="number"
+                    min={60}
+                    max={100}
+                    value={certScore}
+                    onChange={(e) => setCertScore(Number(e.target.value))}
+                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl font-mono"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-amber-900 text-[11px] leading-relaxed">
+                گواهینامه پس از ثبت رسمی دارای کد رهگیری یکتا و قابلیت استعلام فوری آنلاین در سامانه خواهد بود.
+              </div>
+
+              <div className="flex items-center gap-3 pt-2">
+                <button
+                  type="submit"
+                  className="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-colors cursor-pointer shadow-xs"
+                >
+                  ثبت و صدور رسمی مدرک
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsIssuingCert(false)}
+                  className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl cursor-pointer"
+                >
+                  انصراف
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* IMPORT BACKUP MODAL */}
+      {isImportModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 space-y-4 shadow-2xl border border-slate-200">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+              <div className="flex items-center gap-2 text-slate-900 font-bold">
+                <UploadCloud className="w-5 h-5 text-indigo-600" />
+                <span>بازیابی اطلاعات از فایل پشتیبان JSON</span>
+              </div>
+              <button
+                onClick={() => setIsImportModalOpen(false)}
+                className="text-slate-400 hover:text-slate-600 p-1 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-3 text-xs">
+              <p className="text-slate-600 leading-relaxed">
+                محتوای متنی فایل پشتیبان قبلی (JSON) را در کادر زیر قرار دهید و دکمه بازیابی را بزنید. تمامی داده‌ها، دوره‌ها و تنظیمات بازنشانی خواهند شد:
+              </p>
+
+              <textarea
+                rows={7}
+                dir="ltr"
+                value={importBackupText}
+                onChange={(e) => setImportBackupText(e.target.value)}
+                placeholder='{ "version": "1.0", "courses": [...], "settings": {...} }'
+                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl font-mono text-[11px] focus:outline-none focus:border-indigo-500"
+              />
+
+              <div className="flex items-center gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={handleImportBackup}
+                  className="flex-1 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl transition-colors cursor-pointer"
+                >
+                  بازیابی و بارگذاری داده‌ها
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsImportModalOpen(false)}
+                  className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl cursor-pointer"
+                >
+                  انصراف
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

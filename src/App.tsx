@@ -12,15 +12,19 @@ import { InvoiceModal } from './components/InvoiceModal';
 import { StudentPanel } from './components/StudentPanel';
 import { WordPressAdmin } from './components/WordPressAdmin';
 import { AdminLogin } from './components/AdminLogin';
-import { SupabaseGuideModal } from './components/SupabaseGuideModal';
 import { BlogView } from './components/BlogView';
 import { ArticleDetailModal } from './components/ArticleDetailModal';
 import { AboutUsView } from './components/AboutUsView';
 import { ContactUsView } from './components/ContactUsView';
 import { TermsAndSitemapView } from './components/TermsAndSitemapView';
 import { Footer } from './components/Footer';
+import { CourseQuizModal } from './components/CourseQuizModal';
+import { CertificateModal } from './components/CertificateModal';
+import { CertificateVerifyModal } from './components/CertificateVerifyModal';
+import { RoadmapsView } from './components/RoadmapsView';
+import { ToastContainer } from './components/ToastContainer';
 
-import { Course, DigitalFile, Order, OrderItem, Article, NavigationTab } from './types';
+import { Course, DigitalFile, Order, OrderItem, Article, NavigationTab, Certificate } from './types';
 import { store } from './services/store';
 import { BookOpen, Download, Terminal, ArrowLeft, Radio } from 'lucide-react';
 
@@ -28,6 +32,8 @@ export default function App() {
   const [currentTab, setCurrentTab] = useState<NavigationTab>('home');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedLevel, setSelectedLevel] = useState<string>('all');
+  const [sortBy, setSortBy] = useState<'featured' | 'rating' | 'popular' | 'price-asc' | 'price-desc'>('featured');
 
   // Store data
   const [courses, setCourses] = useState<Course[]>(store.courses);
@@ -38,10 +44,13 @@ export default function App() {
   // Modals & Drawers state
   const [selectedCourseForDetails, setSelectedCourseForDetails] = useState<Course | null>(null);
   const [selectedCourseForPlayer, setSelectedCourseForPlayer] = useState<Course | null>(null);
+  const [selectedCourseForQuiz, setSelectedCourseForQuiz] = useState<Course | null>(null);
+  const [selectedCertificate, setSelectedCertificate] = useState<Certificate | null>(null);
+  const [isVerifyModalOpen, setIsVerifyModalOpen] = useState(false);
+  const [verifyModalInitialCode, setVerifyModalInitialCode] = useState('');
   const [selectedFileForDetails, setSelectedFileForDetails] = useState<DigitalFile | null>(null);
   const [selectedArticleForDetails, setSelectedArticleForDetails] = useState<Article | null>(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [isSupabaseGuideOpen, setIsSupabaseGuideOpen] = useState(false);
 
   // Checkout & Payment State
   const [isPaymentGatewayOpen, setIsPaymentGatewayOpen] = useState(false);
@@ -60,7 +69,7 @@ export default function App() {
     });
   }, []);
 
-  // Filtered courses
+  // Filtered and sorted courses
   const filteredCourses = courses.filter(c => {
     const matchesSearch = !searchQuery || 
       c.title.includes(searchQuery) || 
@@ -73,10 +82,18 @@ export default function App() {
        selectedCategory === 'web' ? c.category === 'web' : 
        selectedCategory === 'devops' ? (c.category === 'devops' || c.category === 'security') : true);
 
-    return matchesSearch && matchesCat;
+    const matchesLevel = selectedLevel === 'all' || c.level === selectedLevel;
+
+    return matchesSearch && matchesCat && matchesLevel;
+  }).sort((a, b) => {
+    if (sortBy === 'rating') return b.rating - a.rating;
+    if (sortBy === 'popular') return b.studentsCount - a.studentsCount;
+    if (sortBy === 'price-asc') return a.price - b.price;
+    if (sortBy === 'price-desc') return b.price - a.price;
+    return (b.isFeatured ? 1 : 0) - (a.isFeatured ? 1 : 0);
   });
 
-  // Filtered files
+  // Filtered and sorted files
   const filteredFiles = files.filter(f => {
     const matchesSearch = !searchQuery || 
       f.title.includes(searchQuery) || 
@@ -85,6 +102,11 @@ export default function App() {
 
     const matchesCat = selectedCategory === 'all' || selectedCategory === 'files';
     return matchesSearch && matchesCat;
+  }).sort((a, b) => {
+    if (sortBy === 'popular') return b.downloadsCount - a.downloadsCount;
+    if (sortBy === 'price-asc') return a.price - b.price;
+    if (sortBy === 'price-desc') return b.price - a.price;
+    return 0;
   });
 
   // Handle Cart Proceed to Checkout
@@ -148,6 +170,12 @@ export default function App() {
     setActiveInvoiceOrder(order);
   };
 
+  // Certificate Verification Modal Trigger
+  const handleOpenVerifyModal = (code?: string) => {
+    setVerifyModalInitialCode(code || '');
+    setIsVerifyModalOpen(true);
+  };
+
   // IF ADMIN PANEL MODE: Check Login status
   if (currentTab === 'admin-panel') {
     if (!isAdminLoggedIn) {
@@ -179,7 +207,7 @@ export default function App() {
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
         onOpenCart={() => setIsCartOpen(true)}
-        onOpenSupabaseGuide={() => setIsSupabaseGuideOpen(true)}
+        onOpenVerifyModal={() => handleOpenVerifyModal()}
       />
 
       {/* Main Views Container */}
@@ -190,6 +218,9 @@ export default function App() {
             onOpenPlayer={(course) => setSelectedCourseForPlayer(course)}
             onOpenInvoice={(order) => setActiveInvoiceOrder(order)}
             onBackToHome={() => setCurrentTab('home')}
+            onOpenQuiz={(course) => setSelectedCourseForQuiz(course)}
+            onOpenCertificate={(cert) => setSelectedCertificate(cert)}
+            onOpenVerifyModal={(code) => handleOpenVerifyModal(code)}
           />
         )}
 
@@ -258,6 +289,15 @@ export default function App() {
           </div>
         )}
 
+        {/* VIEW: CAREER ROADMAPS */}
+        {currentTab === 'roadmaps' && (
+          <RoadmapsView
+            courses={courses}
+            onOpenCourse={(c) => setSelectedCourseForDetails(c)}
+            onOpenVerifyModal={() => handleOpenVerifyModal()}
+          />
+        )}
+
         {/* VIEW: HOME, COURSES, FILES */}
         {(currentTab === 'home' || currentTab === 'courses' || currentTab === 'files') && (
           <>
@@ -307,15 +347,50 @@ export default function App() {
                       </h2>
                     </div>
 
-                    {currentTab === 'home' && (
-                      <button
-                        onClick={() => setCurrentTab('courses')}
-                        className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 self-start sm:self-auto cursor-pointer"
-                      >
-                        <span>مشاهده همه دوره‌ها ({courses.length})</span>
-                        <ArrowLeft className="w-3.5 h-3.5" />
-                      </button>
-                    )}
+                    <div className="flex items-center gap-2 self-start sm:self-auto flex-wrap">
+                      {currentTab === 'courses' && (
+                        <>
+                          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl text-xs">
+                            {['all', 'مقدماتی', 'متوسط', 'جامع'].map((lvl) => (
+                              <button
+                                key={lvl}
+                                onClick={() => setSelectedLevel(lvl)}
+                                className={`px-2.5 py-1 rounded-lg transition-colors cursor-pointer text-[11px] ${
+                                  selectedLevel === lvl
+                                    ? 'bg-white text-indigo-700 font-bold shadow-xs'
+                                    : 'text-slate-600 hover:text-slate-900'
+                                }`}
+                              >
+                                {lvl === 'all' ? 'همه سطوح' : lvl}
+                              </button>
+                            ))}
+                          </div>
+
+                          <select
+                            value={sortBy}
+                            onChange={(e) => setSortBy(e.target.value as any)}
+                            aria-label="مرتب‌سازی دوره‌ها"
+                            className="bg-white border border-slate-200 text-slate-700 text-xs rounded-xl px-3 py-1.5 focus:outline-none focus:border-indigo-500 cursor-pointer font-medium"
+                          >
+                            <option value="featured">مرتب‌سازی: پیشنهادی</option>
+                            <option value="rating">بالاترین امتیاز</option>
+                            <option value="popular">بیشترین دانشجو</option>
+                            <option value="price-asc">ارزان‌ترین</option>
+                            <option value="price-desc">گران‌ترین</option>
+                          </select>
+                        </>
+                      )}
+
+                      {currentTab === 'home' && (
+                        <button
+                          onClick={() => setCurrentTab('courses')}
+                          className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 self-start sm:self-auto cursor-pointer"
+                        >
+                          <span>مشاهده همه دوره‌ها ({courses.length})</span>
+                          <ArrowLeft className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
                   </div>
 
                   {filteredCourses.length === 0 ? (
@@ -467,7 +542,7 @@ export default function App() {
           setCurrentTab(tab);
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
-        onOpenSupabaseGuide={() => setIsSupabaseGuideOpen(true)}
+        onOpenVerifyModal={() => handleOpenVerifyModal()}
       />
 
       {/* ALL MODALS & DRAWERS */}
@@ -490,6 +565,7 @@ export default function App() {
           course={selectedCourseForPlayer}
           onClose={() => setSelectedCourseForPlayer(null)}
           onEnrollCourse={handleDirectCourseCheckout}
+          onOpenQuiz={(course) => setSelectedCourseForQuiz(course)}
         />
       )}
 
@@ -534,17 +610,6 @@ export default function App() {
         />
       )}
 
-      {/* 7. Supabase & Vercel Guide Modal */}
-      {isSupabaseGuideOpen && (
-        <SupabaseGuideModal
-          onClose={() => setIsSupabaseGuideOpen(false)}
-          onOpenAdminSettings={() => {
-            setIsSupabaseGuideOpen(false);
-            setCurrentTab('admin-panel');
-          }}
-        />
-      )}
-
       {/* 8. Article & Event Detail Modal */}
       {selectedArticleForDetails && (
         <ArticleDetailModal
@@ -552,6 +617,45 @@ export default function App() {
           onClose={() => setSelectedArticleForDetails(null)}
         />
       )}
+
+      {/* 9. Course Exam & Quiz Modal */}
+      {selectedCourseForQuiz && (
+        <CourseQuizModal
+          course={selectedCourseForQuiz}
+          onClose={() => setSelectedCourseForQuiz(null)}
+          onViewCertificate={(cert) => {
+            setSelectedCourseForQuiz(null);
+            setSelectedCertificate(cert);
+          }}
+        />
+      )}
+
+      {/* 10. Official Verified Certificate Modal */}
+      {selectedCertificate && (
+        <CertificateModal
+          certificate={selectedCertificate}
+          onClose={() => setSelectedCertificate(null)}
+          onVerifyCertificate={(code) => handleOpenVerifyModal(code)}
+        />
+      )}
+
+      {/* 11. Certificate Verification Modal */}
+      {isVerifyModalOpen && (
+        <CertificateVerifyModal
+          initialCode={verifyModalInitialCode}
+          onClose={() => {
+            setIsVerifyModalOpen(false);
+            setVerifyModalInitialCode('');
+          }}
+          onViewCertificate={(cert) => {
+            setIsVerifyModalOpen(false);
+            setSelectedCertificate(cert);
+          }}
+        />
+      )}
+
+      {/* Global Interactive Toast Feedback */}
+      <ToastContainer />
     </div>
   );
 }

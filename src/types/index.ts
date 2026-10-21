@@ -202,6 +202,9 @@ export interface ContactMessage {
   isRead: boolean;
 }
 
+export type ColorTheme = 'indigo' | 'emerald' | 'cyan' | 'amber' | 'rose' | 'violet';
+export type AdminTheme = 'classic-dark' | 'modern-light' | 'slate-midnight' | 'royal-indigo' | 'emerald-terminal';
+
 export interface SiteSettings {
   siteTitle: string;
   tagline: string;
@@ -211,14 +214,14 @@ export interface SiteSettings {
   workHours: string;
   zarinpalMerchantId: string;
   isGatewaySandbox: boolean;
-  supabaseUrl: string;
-  supabaseAnonKey: string;
   telegramUsername: string;
   instagramUsername: string;
   adminUsername: string;
   adminPassword: string;
   aboutText: string;
   termsText: string;
+  colorTheme?: ColorTheme;
+  adminTheme?: AdminTheme;
 }
 
 export interface Review {
