@@ -140,9 +140,10 @@ ${articles.map(a => `  <url>
 
           <h1 className="text-2xl sm:text-3xl font-black text-white">
             {activeTab === 'terms'
-              ? 'قوانین و دستورالعمل‌های استفاده از آکادمی پارس‌نت'
+              ? 'قوانین و دستورالعمل‌های استفاده از مجموعه مهرادینت'
               : 'نقشه درختی وب‌سایت و ساختار صفحات و محتوا'}
           </h1>
+
           <p className="text-xs sm:text-sm text-slate-400 max-w-2xl mx-auto font-light">
             {activeTab === 'terms'
               ? 'مقررات آموزشی، حفظ مالکیت معنوی، ضوابط استرداد وجه و حقوق متقابل دانشجو و آکادمی'

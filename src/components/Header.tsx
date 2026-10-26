@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingCart, User, LayoutDashboard, Terminal, Menu, X, Phone, Mail, BookOpen, Download, Radio, Info, Moon, Sun, Palette, Check } from 'lucide-react';
+import { ShoppingCart, User, LayoutDashboard, Terminal, Menu, X, Phone, Mail, BookOpen, Download, Radio, Info, Moon, Sun, Palette, Check, Leaf } from 'lucide-react';
 import { store } from '../services/store';
 import { NavigationTab, ColorTheme } from '../types';
 
@@ -7,6 +7,7 @@ interface HeaderProps {
   currentTab: NavigationTab;
   onNavigate: (tab: NavigationTab) => void;
   onOpenCart: () => void;
+  onOpenOrganicCart?: () => void;
   onOpenVerifyModal?: () => void;
 }
 
@@ -14,9 +15,11 @@ export const Header: React.FC<HeaderProps> = ({
   currentTab,
   onNavigate,
   onOpenCart,
+  onOpenOrganicCart,
   onOpenVerifyModal
 }) => {
   const [cartCount, setCartCount] = useState(store.cart.length);
+  const [organicCartCount, setOrganicCartCount] = useState(store.organicCart.length);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>(store.theme);
   const [colorTheme, setColorTheme] = useState<ColorTheme>(store.colorTheme);
@@ -27,6 +30,7 @@ export const Header: React.FC<HeaderProps> = ({
   useEffect(() => {
     return store.subscribe(() => {
       setCartCount(store.cart.length);
+      setOrganicCartCount(store.organicCart.length);
       setTheme(store.theme);
       setColorTheme(store.colorTheme);
     });
@@ -34,10 +38,11 @@ export const Header: React.FC<HeaderProps> = ({
 
   const navItems: { id: NavigationTab; label: string }[] = [
     { id: 'home', label: 'صفحه اصلی' },
+    { id: 'projects-services', label: 'خدمات و انجام پروژه' },
     { id: 'courses', label: 'دوره‌های آموزشی' },
     { id: 'roadmaps', label: 'مسیرهای یادگیری' },
     { id: 'files', label: 'محصولات و سناریوها' },
-    { id: 'blog', label: 'نوشته‌ها و رویدادها' },
+    { id: 'blog', label: 'نوشته‌ها و مقالات' },
     { id: 'about', label: 'درباره ما' },
     { id: 'contact', label: 'تماس با ما' }
   ];
@@ -48,8 +53,8 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="bg-slate-900 text-slate-300 text-xs py-2 px-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="text-amber-400 font-medium hidden sm:inline">تخفیف ویژه دوره‌های شبکه و وب:</span>
-            <span>تا ۳۰٪ تخفیف روی دوره‌های سیسکو، میکروتیک و ری‌اکت ۱۹</span>
+            <span className="text-amber-400 font-medium hidden sm:inline">پذیرش تخصصی پروژه‌ها:</span>
+            <span>نصب نرم‌افزار، سیستم‌عامل سرور، مجازی‌سازی، پسیو/اکتیو شبکه، وب‌سایت و برنامه‌نویسی</span>
           </div>
           <div className="flex items-center gap-4">
             {onOpenVerifyModal && (
@@ -62,7 +67,7 @@ export const Header: React.FC<HeaderProps> = ({
             )}
             <span className="text-slate-600 hidden sm:inline">|</span>
             <span className="tabular-nums font-mono text-slate-300">
-              پشتیبانی: {settings.supportPhone}
+              مشاوره و پشتیبانی: {settings.supportPhone}
             </span>
           </div>
         </div>
@@ -94,35 +99,54 @@ export const Header: React.FC<HeaderProps> = ({
               </div>
               <div>
                 <div className="text-lg sm:text-xl font-black text-slate-900 tracking-tight flex items-center gap-1.5">
-                  <span>پارس‌نت</span>
+                  <span>مهرادینت</span>
                   <span className="text-[10px] sm:text-xs font-mono font-medium text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded">
-                    ACADEMY
+                    MEHRADINET
                   </span>
                 </div>
                 <div className="text-[10px] text-slate-500 font-normal hidden sm:block">
-                  آموزش تخصصی شبکه، وب و فایل‌های IT
+                  آموزش تخصصی شبکه، وب، برنامه‌نویسی و انجام پروژه‌های کامپیوتری
                 </div>
               </div>
             </button>
           </div>
 
           {/* Zone 2: Navigation Links (Desktop) */}
-          <nav className="hidden lg:flex items-center gap-6 text-xs font-medium text-slate-600">
+          <nav className="hidden lg:flex items-center gap-4 text-xs font-medium text-slate-600">
             {navItems.map(item => (
               <button
                 key={item.id}
                 onClick={() => onNavigate(item.id)}
                 className={`hover:text-indigo-600 transition-colors whitespace-nowrap py-1 relative ${
                   currentTab === item.id ? 'text-indigo-600 font-bold' : ''
-                }`}
+                } ${item.id === 'projects-services' ? 'font-bold text-slate-900' : ''}`}
               >
                 {item.label}
+                {item.id === 'projects-services' && (
+                  <span className="mr-1 bg-indigo-100 text-indigo-700 text-[9px] px-1.5 py-0.2 rounded-md font-bold">
+                    پروژه IT
+                  </span>
+                )}
                 {currentTab === item.id && (
                   <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-600 rounded-full" />
                 )}
               </button>
             ))}
+
+            {/* Dedicated Distinct Organic Store Button (Special Shape & Color) */}
+            <button
+              onClick={() => onNavigate('organic-shop')}
+              className={`group px-3 py-1.5 rounded-full text-xs font-black transition-all flex items-center gap-1.5 border shadow-sm cursor-pointer ${
+                currentTab === 'organic-shop'
+                  ? 'bg-gradient-to-r from-emerald-600 via-emerald-700 to-teal-700 text-white border-emerald-400 ring-2 ring-emerald-500/40 shadow-emerald-600/30 shadow-md scale-105'
+                  : 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-600 hover:text-white hover:border-emerald-500 hover:shadow-md'
+              }`}
+            >
+              <Leaf className="w-3.5 h-3.5 text-emerald-600 group-hover:text-white transition-colors animate-pulse" />
+              <span>فروشگاه ارگانیک</span>
+            </button>
           </nav>
+
 
           {/* Zone 3: Actions (Cart & Panels) */}
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
@@ -181,11 +205,26 @@ export const Header: React.FC<HeaderProps> = ({
               {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />}
             </button>
 
-            {/* Shopping Cart button */}
+            {/* Organic Store Cart Trigger Button */}
+            <button
+              onClick={onOpenOrganicCart || onOpenCart}
+              className="relative p-2 text-emerald-700 bg-emerald-50/90 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-300 dark:hover:bg-emerald-900/60 rounded-xl transition-all border border-emerald-200 dark:border-emerald-800/60 cursor-pointer flex items-center gap-1.5"
+              title="سبد خرید محصولات ارگانیک"
+            >
+              <Leaf className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <span className="hidden xl:inline text-xs font-bold text-emerald-800 dark:text-emerald-200">سبد ارگانیک</span>
+              {organicCartCount > 0 && (
+                <span className="bg-emerald-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-sm">
+                  {organicCartCount}
+                </span>
+              )}
+            </button>
+
+            {/* Courses Cart Button */}
             <button
               onClick={onOpenCart}
               className="relative p-2.5 text-slate-700 dark:text-slate-200 hover:text-indigo-600 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors border border-slate-200 dark:border-slate-800 cursor-pointer"
-              title="سبد خرید"
+              title="سبد خرید دوره‌ها و فایل‌ها"
             >
               <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" />
               {cartCount > 0 && (
@@ -226,7 +265,26 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Mobile Navigation Drawer */}
         {isMobileMenuOpen && (
-          <div className="lg:hidden border-t border-slate-200 py-3 px-2 space-y-1 bg-white">
+          <div className="lg:hidden border-t border-slate-200 py-3 px-2 space-y-1.5 bg-white">
+            {/* Mobile Organic Link */}
+            <button
+              onClick={() => {
+                onNavigate('organic-shop');
+                setIsMobileMenuOpen(false);
+              }}
+              className={`w-full text-right px-4 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-between ${
+                currentTab === 'organic-shop'
+                  ? 'bg-emerald-600 text-white'
+                  : 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <Leaf className="w-4 h-4 text-emerald-500" />
+                <span>فروشگاه محصولات ارگانیک (خشکبار و گردو)</span>
+              </div>
+              <span className="bg-amber-400 text-stone-900 text-[10px] px-1.5 py-0.5 rounded-full font-bold">ویژه</span>
+            </button>
+
             {navItems.map(item => (
               <button
                 key={item.id}

@@ -60,11 +60,27 @@ import {
   Server,
   Terminal,
   Code2,
-  X
+  Layout,
+  X,
+  Leaf,
+  Package,
+  Scale,
+  Truck,
+  Printer
 } from 'lucide-react';
-import { Course, DigitalFile, Order, Ticket, User, SiteSettings, Article, MediaItem, ContactMessage, Coupon, Review, ColorTheme, AdminTheme, Season, Episode, CourseQuiz, Certificate } from '../types';
+import { 
+  Course, DigitalFile, Order, Ticket, User, SiteSettings, Article, MediaItem, 
+  ContactMessage, Coupon, Review, ColorTheme, AdminTheme, Season, Episode, 
+  CourseQuiz, Certificate, SidebarCustomLink,
+  OrganicProduct, OrganicOrder, OrganicSettlement, OrganicPackageOption, OrganicCategory, OrganicGrade,
+  ProjectRequest, ProjectStatus, ProjectServiceCategory
+} from '../types';
+
 import { store } from '../services/store';
 import { MediaPickerModal } from './MediaPickerModal';
+import { RichTextEditor } from './RichTextEditor';
+import { UploadReviewModal, PendingUploadFile } from './UploadReviewModal';
+import { OrganicAdminSection } from './OrganicAdminSection';
 
 export const ADMIN_THEMES: Record<AdminTheme, {
   name: string;
@@ -168,7 +184,7 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
   onOpenInvoice
 }) => {
   const [activeMenu, setActiveMenu] = useState<
-    'dashboard' | 'courses' | 'files' | 'roadmaps' | 'quizzes' | 'certificates' | 'media' | 'articles' | 'coupons' | 'reviews' | 'orders' | 'users' | 'tickets' | 'contact-messages' | 'settings'
+    'dashboard' | 'courses' | 'files' | 'roadmaps' | 'quizzes' | 'certificates' | 'media' | 'articles' | 'coupons' | 'reviews' | 'orders' | 'users' | 'tickets' | 'contact-messages' | 'settings' | 'organic-products' | 'organic-finance' | 'project-requests'
   >('dashboard');
 
   const [courses, setCourses] = useState<Course[]>(store.courses);
@@ -182,6 +198,13 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
   const [coupons, setCoupons] = useState<Coupon[]>(store.coupons);
   const [reviews, setReviews] = useState<Review[]>(store.reviews);
   const [users, setUsers] = useState<User[]>(store.users);
+  const [projectRequests, setProjectRequests] = useState<ProjectRequest[]>(store.projectRequests);
+
+  // Dedicated Organic Store States
+  const [organicProducts, setOrganicProducts] = useState<OrganicProduct[]>(store.organicProducts);
+  const [organicOrders, setOrganicOrders] = useState<OrganicOrder[]>(store.organicOrders);
+  const [organicSettlements, setOrganicSettlements] = useState<OrganicSettlement[]>(store.organicSettlements);
+
 
   // User Management State
   const [userSearch, setUserSearch] = useState('');
@@ -280,7 +303,22 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
 
   // Media Picker Modal for Forms
   const [isMediaPickerOpen, setIsMediaPickerOpen] = useState(false);
-  const [mediaPickerTarget, setMediaPickerTarget] = useState<'course' | 'file' | 'article' | null>(null);
+  const [mediaPickerTarget, setMediaPickerTarget] = useState<'course' | 'file' | 'article' | 'course-gallery' | 'file-gallery' | 'article-gallery' | 'rich-editor' | null>(null);
+  const [richEditorCallback, setRichEditorCallback] = useState<((url: string) => void) | null>(null);
+
+  // Staged Upload Review State (prevents immediate auto-uploading upon file selection)
+  const [pendingUpload, setPendingUpload] = useState<PendingUploadFile | null>(null);
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [uploadTarget, setUploadTarget] = useState<'media-library' | 'course-image' | 'file-image' | 'article-image' | 'course-gallery' | 'file-gallery' | 'article-gallery'>('media-library');
+
+  // Tag inputs for forms
+  const [courseTagInput, setCourseTagInput] = useState('');
+  const [fileTagInput, setFileTagInput] = useState('');
+  const [articleTagInput, setArticleTagInput] = useState('');
+
+  // Sidebar link form state in Settings
+  const [newSidebarLinkTitle, setNewSidebarLinkTitle] = useState('');
+  const [newSidebarLinkUrl, setNewSidebarLinkUrl] = useState('');
 
   // Contact Messages state
   const [selectedContactMessage, setSelectedContactMessage] = useState<ContactMessage | null>(null);
@@ -354,9 +392,14 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
       setUsers([...store.users]);
       setQuizzes([...store.quizzes]);
       setCertificates([...store.officialCertificates]);
+      setOrganicProducts([...store.organicProducts]);
+      setOrganicOrders([...store.organicOrders]);
+      setOrganicSettlements([...store.organicSettlements]);
+      setProjectRequests([...store.projectRequests]);
       setColorTheme(store.colorTheme);
       setAdminTheme(store.adminTheme);
     });
+
 
     return () => {
       clearInterval(timer);
@@ -421,14 +464,17 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
       const existing = courses.find(c => c.id === courseFormData.id)!;
       store.updateCourse({
         ...existing,
-        ...courseFormData
+        ...courseFormData,
+        slug: courseFormData.slug?.trim() ? generateSlug(courseFormData.slug) : existing.slug,
+        tags: courseFormData.tags || existing.tags || [],
+        galleryImages: courseFormData.galleryImages || existing.galleryImages || []
       } as Course);
     } else {
       // Add
       const newCourse: Course = {
         id: `course-${Date.now()}`,
         title: courseFormData.title || 'دوره آموزشی جدید',
-        slug: (courseFormData.title || 'new-course').toLowerCase().replace(/\s+/g, '-'),
+        slug: courseFormData.slug?.trim() ? generateSlug(courseFormData.slug) : generateSlug(courseFormData.title || 'new-course'),
         description: courseFormData.description || 'توضیحات دوره',
         shortDescription: courseFormData.shortDescription || 'توضیح کوتاه دوره',
         category: (courseFormData.category as any) || 'network',
@@ -436,6 +482,8 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
         price: Number(courseFormData.price) || 0,
         originalPrice: Number(courseFormData.originalPrice) || 0,
         image: courseFormData.image || '/src/assets/images/course_network_engineering_1791894523440.jpg',
+        tags: courseFormData.tags || [],
+        galleryImages: courseFormData.galleryImages || [],
         instructor: {
           id: 'inst-1',
           name: 'مهندس محمدرضا قاسمی',
@@ -603,13 +651,16 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
       const existing = files.find(f => f.id === fileFormData.id)!;
       store.updateFile({
         ...existing,
-        ...fileFormData
+        ...fileFormData,
+        slug: fileFormData.slug?.trim() ? generateSlug(fileFormData.slug) : existing.slug,
+        tags: fileFormData.tags || existing.tags || [],
+        galleryImages: fileFormData.galleryImages || existing.galleryImages || []
       } as DigitalFile);
     } else {
       const newFile: DigitalFile = {
         id: `file-${Date.now()}`,
         title: fileFormData.title || 'فایل دانلودی جدید',
-        slug: (fileFormData.title || 'new-file').toLowerCase().replace(/\s+/g, '-'),
+        slug: fileFormData.slug?.trim() ? generateSlug(fileFormData.slug) : generateSlug(fileFormData.title || 'new-file'),
         description: fileFormData.description || 'توضیحات فایل',
         category: (fileFormData.category as any) || 'topology',
         price: Number(fileFormData.price) || 0,
@@ -621,6 +672,8 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
         downloadsCount: 0,
         downloadUrl: fileFormData.downloadUrl || 'https://parsnet-academy.com/downloads/package.zip',
         features: fileFormData.features || ['شامل فایل‌های پروژه'],
+        tags: fileFormData.tags || [],
+        galleryImages: fileFormData.galleryImages || [],
         updatedAt: new Date().toLocaleDateString('fa-IR')
       };
       store.addFile(newFile);
@@ -644,13 +697,16 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
       const existing = articles.find(a => a.id === articleFormData.id)!;
       store.updateArticle({
         ...existing,
-        ...articleFormData
+        ...articleFormData,
+        slug: articleFormData.slug?.trim() ? generateSlug(articleFormData.slug) : existing.slug,
+        tags: articleFormData.tags || existing.tags || [],
+        galleryImages: articleFormData.galleryImages || existing.galleryImages || []
       } as Article);
     } else {
       const newArt: Article = {
         id: `art-${Date.now()}`,
         title: articleFormData.title || 'نوشته جدید',
-        slug: (articleFormData.title || 'new-post').toLowerCase().replace(/\s+/g, '-'),
+        slug: articleFormData.slug?.trim() ? generateSlug(articleFormData.slug) : generateSlug(articleFormData.title || 'new-post'),
         type: (articleFormData.type as any) || 'article',
         category: articleFormData.category || 'آموزش شبکه',
         excerpt: articleFormData.excerpt || 'خلاصه مطلب',
@@ -662,6 +718,7 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
         eventLocation: articleFormData.eventLocation,
         isPinned: articleFormData.isPinned || false,
         tags: articleFormData.tags || ['شبکه', 'آموزش'],
+        galleryImages: articleFormData.galleryImages || [],
         createdAt: new Date().toLocaleDateString('fa-IR')
       };
       store.addArticle(newArt);
@@ -676,8 +733,21 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
     }
   };
 
-  // Media Library handlers
-  const handleUploadMediaFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Slug and Permalink Generator (WordPress Style)
+  const generateSlug = (text: string) => {
+    return text
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/[\s_-]+/g, '-')
+      .replace(/^-+|-+$/g, '') || `item-${Date.now()}`;
+  };
+
+  // Staged File Upload Handler (No immediate upload; opens UploadReviewModal for confirmation)
+  const handleStageFileUpload = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    target: 'media-library' | 'course-image' | 'file-image' | 'article-image' | 'course-gallery' | 'file-gallery' | 'article-gallery'
+  ) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -687,28 +757,94 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
       const sizeKb = Math.round(file.size / 1024);
       const sizeStr = sizeKb > 1024 ? `${(sizeKb / 1024).toFixed(1)} مگابایت` : `${sizeKb} کیلوبایت`;
 
-      const newMedia: MediaItem = {
-        id: `media-${Date.now()}`,
-        title: file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' '),
-        fileName: file.name,
-        fileType: file.type.startsWith('image/')
-          ? 'image'
-          : file.type.startsWith('video/')
-          ? 'video'
-          : file.name.endsWith('.zip') || file.name.endsWith('.rar') || file.name.endsWith('.pkt')
-          ? 'archive'
-          : 'document',
-        url: dataUrl,
-        size: sizeStr,
-        dimensions: 'کیفیت بالا',
-        altText: file.name,
-        tags: ['آپلود جدید'],
-        uploadedAt: new Date().toLocaleDateString('fa-IR')
-      };
+      const fileType: 'image' | 'video' | 'document' | 'archive' = file.type.startsWith('image/')
+        ? 'image'
+        : file.type.startsWith('video/')
+        ? 'video'
+        : file.name.endsWith('.zip') || file.name.endsWith('.rar') || file.name.endsWith('.pkt')
+        ? 'archive'
+        : 'document';
 
-      store.addMediaItem(newMedia);
+      setPendingUpload({
+        file,
+        previewUrl: fileType === 'image' ? dataUrl : undefined,
+        fileName: file.name,
+        title: file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' '),
+        altText: file.name,
+        sizeFormatted: sizeStr,
+        fileType
+      });
+      setUploadTarget(target);
+      setIsUploadModalOpen(true);
     };
     reader.readAsDataURL(file);
+    e.target.value = '';
+  };
+
+  // Confirmation from UploadReviewModal
+  const handleConfirmUpload = (data: {
+    file: File;
+    previewUrl?: string;
+    title: string;
+    fileName: string;
+    altText: string;
+    fileType: 'image' | 'video' | 'document' | 'archive';
+    sizeFormatted: string;
+  }) => {
+    const newMedia: MediaItem = {
+      id: `media-${Date.now()}`,
+      title: data.title,
+      fileName: data.fileName,
+      fileType: data.fileType,
+      url: data.previewUrl || '',
+      size: data.sizeFormatted,
+      dimensions: 'کیفیت بالا',
+      altText: data.altText,
+      tags: ['بارگذاری اختصاصی', uploadTarget],
+      uploadedAt: new Date().toLocaleDateString('fa-IR')
+    };
+
+    store.addMediaItem(newMedia);
+
+    if (uploadTarget === 'course-image') {
+      setCourseFormData(prev => ({ ...prev, image: newMedia.url }));
+      store.showToast('success', 'تصویر شاخص دوره با موفقیت ثبت شد.');
+    } else if (uploadTarget === 'file-image') {
+      setFileFormData(prev => ({ ...prev, image: newMedia.url }));
+      store.showToast('success', 'تصویر شاخص فایل با موفقیت ثبت شد.');
+    } else if (uploadTarget === 'article-image') {
+      setArticleFormData(prev => ({ ...prev, coverImage: newMedia.url }));
+      store.showToast('success', 'تصویر شاخص نوشته با موفقیت ثبت شد.');
+    } else if (uploadTarget === 'course-gallery') {
+      setCourseFormData(prev => ({
+        ...prev,
+        galleryImages: [...(prev.galleryImages || []), newMedia.url]
+      }));
+      store.showToast('success', 'تصویر به گالری دوره افزوده شد.');
+    } else if (uploadTarget === 'file-gallery') {
+      setFileFormData(prev => ({
+        ...prev,
+        galleryImages: [...(prev.galleryImages || []), newMedia.url]
+      }));
+      store.showToast('success', 'تصویر به گالری فایل دانلودی افزوده شد.');
+    } else if (uploadTarget === 'article-gallery') {
+      setArticleFormData(prev => ({
+        ...prev,
+        galleryImages: [...(prev.galleryImages || []), newMedia.url]
+      }));
+      store.showToast('success', 'تصویر به گالری مطلب افزوده شد.');
+    } else {
+      store.showToast('success', 'پرونده چندرسانه‌ای با موفقیت بارگذاری گردید.');
+    }
+
+    setIsUploadModalOpen(false);
+    setPendingUpload(null);
+  };
+
+  const handleCancelUpload = () => {
+    setIsUploadModalOpen(false);
+    setPendingUpload(null);
+    store.showToast('info', 'بارگذاری فایل لغو شد.');
   };
 
   const handleOpenMediaEdit = (item: MediaItem) => {
@@ -756,46 +892,6 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
     setTimeout(() => setCopiedMediaUrlId(null), 2500);
   };
 
-  // Direct featured image upload for forms
-  const handleFormDirectImageUpload = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    target: 'course' | 'file' | 'article'
-  ) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const dataUrl = event.target?.result as string;
-      const sizeKb = Math.round(file.size / 1024);
-      const sizeStr = `${sizeKb} کیلوبایت`;
-
-      // Also register into Media Library
-      const newMedia: MediaItem = {
-        id: `media-${Date.now()}`,
-        title: `تصویر شاخص ${file.name.replace(/\.[^/.]+$/, '')}`,
-        fileName: file.name,
-        fileType: 'image',
-        url: dataUrl,
-        size: sizeStr,
-        dimensions: 'کیفیت بالا',
-        altText: file.name,
-        tags: ['تصویر شاخص', target],
-        uploadedAt: new Date().toLocaleDateString('fa-IR')
-      };
-      store.addMediaItem(newMedia);
-
-      if (target === 'course') {
-        setCourseFormData(prev => ({ ...prev, image: dataUrl }));
-      } else if (target === 'file') {
-        setFileFormData(prev => ({ ...prev, image: dataUrl }));
-      } else if (target === 'article') {
-        setArticleFormData(prev => ({ ...prev, coverImage: dataUrl }));
-      }
-    };
-    reader.readAsDataURL(file);
-  };
-
   // Selected from MediaPickerModal
   const handleMediaPickerSelect = (url: string) => {
     if (mediaPickerTarget === 'course') {
@@ -804,6 +900,15 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
       setFileFormData(prev => ({ ...prev, image: url }));
     } else if (mediaPickerTarget === 'article') {
       setArticleFormData(prev => ({ ...prev, coverImage: url }));
+    } else if (mediaPickerTarget === 'course-gallery') {
+      setCourseFormData(prev => ({ ...prev, galleryImages: [...(prev.galleryImages || []), url] }));
+    } else if (mediaPickerTarget === 'file-gallery') {
+      setFileFormData(prev => ({ ...prev, galleryImages: [...(prev.galleryImages || []), url] }));
+    } else if (mediaPickerTarget === 'article-gallery') {
+      setArticleFormData(prev => ({ ...prev, galleryImages: [...(prev.galleryImages || []), url] }));
+    } else if (mediaPickerTarget === 'rich-editor' && richEditorCallback) {
+      richEditorCallback(url);
+      setRichEditorCallback(null);
     }
     setIsMediaPickerOpen(false);
     setMediaPickerTarget(null);
@@ -1250,14 +1355,96 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
               className={`w-full ${isSidebarCollapsed ? 'px-0 justify-center' : 'px-3.5'} py-2.5 text-right flex items-center gap-2.5 transition-colors cursor-pointer ${
                 activeMenu === 'orders' ? currentThemeStyle.sidebarActive : currentThemeStyle.sidebarHover
               }`}
-              title="سفارشات و مالی"
+              title="سفارشات دوره‌ها و فایل‌ها"
             >
               <ShoppingBag className="w-4 h-4 shrink-0" />
               {!isSidebarCollapsed && (
                 <>
-                  <span className="flex-1">سفارشات و مالی</span>
+                  <span className="flex-1">سفارشات دوره‌ها</span>
                   <span className="bg-amber-500/20 text-amber-300 px-1.5 py-0.2 text-[10px] rounded font-mono">
                     {orders.length}
+                  </span>
+                </>
+              )}
+            </button>
+
+            {/* DEDICATED PROJECT REQUESTS (IT, NETWORK & PROGRAMMING) */}
+            <button
+              onClick={() => setActiveMenu('project-requests')}
+              className={`w-full ${isSidebarCollapsed ? 'px-0 justify-center' : 'px-3.5'} py-2.5 text-right flex items-center gap-2.5 transition-colors cursor-pointer ${
+                activeMenu === 'project-requests'
+                  ? 'bg-indigo-600 text-white font-bold shadow-sm'
+                  : currentThemeStyle.sidebarHover
+              }`}
+              title="سفارشات پروژه‌های مشتریان (IT و شبکه)"
+            >
+              <Server className="w-4 h-4 shrink-0 text-cyan-400" />
+              {!isSidebarCollapsed && (
+                <>
+                  <span className="flex-1 font-bold">پروژه‌های IT و شبکه</span>
+                  <span className="bg-cyan-500/30 text-cyan-200 px-1.5 py-0.2 text-[10px] rounded font-mono font-bold">
+                    {projectRequests.length}
+                  </span>
+                </>
+              )}
+            </button>
+
+            {/* DEDICATED ORGANIC STORE PRODUCTS & ORDERS */}
+
+            {(() => {
+              const defaultThreshold = store.organicStockAlertConfig?.defaultThresholdKg || 25;
+              const lowStockCount = organicProducts.filter(p => {
+                const s = typeof p.stockKg === 'number' ? p.stockKg : 0;
+                const th = p.lowStockThresholdKg || defaultThreshold;
+                return s <= th;
+              }).length;
+
+              return (
+                <button
+                  onClick={() => setActiveMenu('organic-products')}
+                  className={`w-full ${isSidebarCollapsed ? 'px-0 justify-center' : 'px-3.5'} py-2.5 text-right flex items-center gap-2.5 transition-colors cursor-pointer ${
+                    activeMenu === 'organic-products'
+                      ? 'bg-emerald-600 text-white font-bold shadow-sm'
+                      : 'text-emerald-400 hover:bg-emerald-950/40 hover:text-emerald-300'
+                  }`}
+                  title="فروشگاه ارگانیک (محصولات، سفارشات و هشدار انبار)"
+                >
+                  <Leaf className="w-4 h-4 shrink-0 text-emerald-400" />
+                  {!isSidebarCollapsed && (
+                    <>
+                      <span className="flex-1 font-bold">فروشگاه ارگانیک</span>
+                      <div className="flex items-center gap-1">
+                        {lowStockCount > 0 && (
+                          <span className="bg-rose-500 text-white px-1.5 py-0.2 text-[9px] rounded-full font-mono font-bold animate-pulse" title={`${lowStockCount} قلم نیازمند تأمین انبار`}>
+                            {lowStockCount}⚠️
+                          </span>
+                        )}
+                        <span className="bg-emerald-500/30 text-emerald-300 px-1.5 py-0.2 text-[10px] rounded font-mono font-bold">
+                          {organicProducts.length}
+                        </span>
+                      </div>
+                    </>
+                  )}
+                </button>
+              );
+            })()}
+
+            {/* DEDICATED ORGANIC STORE FINANCE & SETTLEMENTS */}
+            <button
+              onClick={() => setActiveMenu('organic-finance')}
+              className={`w-full ${isSidebarCollapsed ? 'px-0 justify-center' : 'px-3.5'} py-2.5 text-right flex items-center gap-2.5 transition-colors cursor-pointer ${
+                activeMenu === 'organic-finance'
+                  ? 'bg-amber-600 text-white font-bold shadow-sm'
+                  : 'text-amber-400 hover:bg-amber-950/40 hover:text-amber-300'
+              }`}
+              title="امور مالی و تسویه حساب ارگانیک"
+            >
+              <DollarSign className="w-4 h-4 shrink-0 text-amber-400" />
+              {!isSidebarCollapsed && (
+                <>
+                  <span className="flex-1 font-bold">مالی و تسویه ارگانیک</span>
+                  <span className="bg-amber-500/30 text-amber-300 px-1.5 py-0.2 text-[10px] rounded font-mono font-bold">
+                    {organicSettlements.length}
                   </span>
                 </>
               )}
@@ -1540,29 +1727,70 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
 
                   <form onSubmit={handleSaveCourse} className="space-y-4 text-xs">
                     <div>
-                      <label className="block font-bold text-slate-700 mb-1">عنوان دوره</label>
+                      <label className="block font-bold text-slate-700 mb-1">عنوان دوره آموزشی</label>
                       <input
                         type="text"
                         value={courseFormData.title}
-                        onChange={(e) => setCourseFormData({ ...courseFormData, title: e.target.value })}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setCourseFormData(prev => ({
+                            ...prev,
+                            title: val,
+                            slug: prev.slug ? prev.slug : generateSlug(val)
+                          }));
+                        }}
                         placeholder="مثال: دوره آموزش سناریوهای عملی فایروال سیسکو ASA"
                         className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-600"
                         required
                       />
                     </div>
 
+                    {/* SLUG / PERMALINK (WORDPRESS STYLE) */}
+                    <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <label className="block font-bold text-slate-800 text-[11px]">
+                          پیوند یکتا و نامک انگلیسی (Course Slug)
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => setCourseFormData(prev => ({ ...prev, slug: generateSlug(prev.title || 'course') }))}
+                          className="text-[11px] text-indigo-600 hover:underline cursor-pointer"
+                        >
+                          تولید خودکار بر اساس عنوان
+                        </button>
+                      </div>
+                      <div className="flex items-center rounded-lg border border-slate-200 bg-white overflow-hidden focus-within:border-indigo-600" dir="ltr">
+                        <span className="px-2.5 py-1.5 bg-slate-100 border-r border-slate-200 text-slate-500 font-mono text-[11px] shrink-0">
+                          https://parsnet.ir/course/
+                        </span>
+                        <input
+                          type="text"
+                          value={courseFormData.slug || ''}
+                          onChange={(e) => setCourseFormData({ ...courseFormData, slug: e.target.value.toLowerCase().replace(/\s+/g, '-') })}
+                          placeholder="cisco-asa-firewall"
+                          className="flex-1 px-2.5 py-1.5 font-mono text-xs focus:outline-none text-slate-800"
+                        />
+                      </div>
+                      <p className="text-[10px] text-slate-400">
+                        مانند وردپرس، این نامک در ریشه آدرس سایت برای دسترسی مستقیم کاربر به دوره استفاده می‌شود.
+                      </p>
+                    </div>
+
                     {/* FEATURED IMAGE UPLOAD & SELECTOR */}
                     <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
                       <div className="flex items-center justify-between">
-                        <label className="block font-bold text-slate-800">تصویر شاخص دوره آموزشی</label>
+                        <div>
+                          <label className="block font-bold text-slate-800">تصویر شاخص دوره آموزشی</label>
+                          <p className="text-[11px] text-slate-500">انتخاب فایل از سیستم با دکمه‌های تأیید و انصراف قبل از آپلود</p>
+                        </div>
                         <div className="flex items-center gap-2">
-                          <label className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold cursor-pointer transition-colors flex items-center gap-1">
+                          <label className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold cursor-pointer transition-colors flex items-center gap-1 shadow-xs">
                             <Upload className="w-3.5 h-3.5" />
-                            <span>آپلود تصویر جدید</span>
+                            <span>انتخاب فایل تصویر</span>
                             <input
                               type="file"
                               accept="image/*"
-                              onChange={(e) => handleFormDirectImageUpload(e, 'course')}
+                              onChange={(e) => handleStageFileUpload(e, 'course-image')}
                               className="hidden"
                             />
                           </label>
@@ -1572,10 +1800,10 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
                               setMediaPickerTarget('course');
                               setIsMediaPickerOpen(true);
                             }}
-                            className="px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 rounded-lg text-xs font-bold transition-colors flex items-center gap-1"
+                            className="px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 rounded-lg text-xs font-bold transition-colors flex items-center gap-1 cursor-pointer"
                           >
                             <ImageIcon className="w-3.5 h-3.5 text-indigo-600" />
-                            <span>انتخاب از رسانه‌ها</span>
+                            <span>کتابخانه رسانه‌ها</span>
                           </button>
                         </div>
                       </div>
@@ -1675,6 +1903,122 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
                       </div>
                     </div>
 
+                    {/* GALLERY / SECONDARY IMAGES */}
+                    <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <label className="block font-bold text-slate-800">تصاویر دیگر و گالری دوره</label>
+                          <p className="text-[11px] text-slate-500">تصاویر سناریوها، دایاگرام‌های شبکه و اسلایدهای این دوره</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <label className="px-3 py-1.5 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-bold cursor-pointer transition-colors flex items-center gap-1 shadow-xs">
+                            <Upload className="w-3.5 h-3.5" />
+                            <span>آپلود عکس گالری</span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => handleStageFileUpload(e, 'course-gallery')}
+                              className="hidden"
+                            />
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setMediaPickerTarget('course-gallery');
+                              setIsMediaPickerOpen(true);
+                            }}
+                            className="px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 rounded-lg text-xs font-bold transition-colors flex items-center gap-1 cursor-pointer"
+                          >
+                            <ImageIcon className="w-3.5 h-3.5 text-indigo-600" />
+                            <span>انتخاب از رسانه‌ها</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-wrap gap-2 pt-1">
+                        {(courseFormData.galleryImages || []).map((imgUrl, idx) => (
+                          <div key={idx} className="relative group w-20 h-16 rounded-xl overflow-hidden border border-slate-200 shadow-xs">
+                            <img src={imgUrl} alt={`گالری ${idx + 1}`} className="w-full h-full object-cover" />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const curr = courseFormData.galleryImages || [];
+                                setCourseFormData({ ...courseFormData, galleryImages: curr.filter((_, i) => i !== idx) });
+                              }}
+                              className="absolute inset-0 bg-red-600/80 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                              title="حذف تصویر از گالری"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ))}
+                        {(!courseFormData.galleryImages || courseFormData.galleryImages.length === 0) && (
+                          <span className="text-[11px] text-slate-400">هنوز تصویری به گالری دوره اضافه نشده است.</span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* TAGS (برچسب‌ها) */}
+                    <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
+                      <label className="block font-bold text-slate-800">برچسب‌های دوره (Tags)</label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          value={courseTagInput}
+                          onChange={(e) => setCourseTagInput(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              if (courseTagInput.trim()) {
+                                const currentTags = courseFormData.tags || [];
+                                if (!currentTags.includes(courseTagInput.trim())) {
+                                  setCourseFormData({ ...courseFormData, tags: [...currentTags, courseTagInput.trim()] });
+                                }
+                                setCourseTagInput('');
+                              }
+                            }
+                          }}
+                          placeholder="برچسب جدید را بنویسید و Enter بزنید..."
+                          className="flex-1 px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (courseTagInput.trim()) {
+                              const currentTags = courseFormData.tags || [];
+                              if (!currentTags.includes(courseTagInput.trim())) {
+                                setCourseFormData({ ...courseFormData, tags: [...currentTags, courseTagInput.trim()] });
+                              }
+                              setCourseTagInput('');
+                            }
+                          }}
+                          className="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs cursor-pointer shadow-xs"
+                        >
+                          افزودن
+                        </button>
+                      </div>
+                      <div className="flex flex-wrap gap-1.5 pt-1">
+                        {(courseFormData.tags || []).map((t, idx) => (
+                          <span key={idx} className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white border border-slate-200 rounded-lg text-xs text-slate-700 font-medium">
+                            <span>#{t}</span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const currentTags = courseFormData.tags || [];
+                                setCourseFormData({ ...courseFormData, tags: currentTags.filter((_, i) => i !== idx) });
+                              }}
+                              className="text-slate-400 hover:text-red-600 cursor-pointer"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </span>
+                        ))}
+                        {(!courseFormData.tags || courseFormData.tags.length === 0) && (
+                          <span className="text-[11px] text-slate-400">هنوز برچسبی اضافه نشده است.</span>
+                        )}
+                      </div>
+                    </div>
+
                     <div>
                       <label className="block font-bold text-slate-700 mb-1">توضیحات کوتاه</label>
                       <input
@@ -1685,13 +2029,19 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
                       />
                     </div>
 
+                    {/* CKEDITOR ADVANCED RICH TEXT EDITOR */}
                     <div>
-                      <label className="block font-bold text-slate-700 mb-1">توضیحات جامع دوره</label>
-                      <textarea
-                        rows={4}
-                        value={courseFormData.description}
-                        onChange={(e) => setCourseFormData({ ...courseFormData, description: e.target.value })}
-                        className="w-full p-3 bg-white border border-slate-200 rounded-xl"
+                      <RichTextEditor
+                        label="توضیحات جامع و سرفصل‌های تفصیلی دوره (ویرایشگر پیشرفته با علائم، رنگ و استایل)"
+                        value={courseFormData.description || ''}
+                        onChange={(val) => setCourseFormData({ ...courseFormData, description: val })}
+                        onOpenMediaPicker={(cb) => {
+                          setRichEditorCallback(() => cb);
+                          setMediaPickerTarget('rich-editor');
+                          setIsMediaPickerOpen(true);
+                        }}
+                        placeholder="توضیحات جامع دوره، سرفصل‌ها، ابزارهای تدریس، جداول و تصاویر را در این قسمت بنویسید..."
+                        minHeight="min-h-[220px]"
                       />
                     </div>
 
@@ -1817,29 +2167,70 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
 
                   <form onSubmit={handleSaveFile} className="space-y-4 text-xs">
                     <div>
-                      <label className="block font-bold text-slate-700 mb-1">عنوان فایل</label>
+                      <label className="block font-bold text-slate-700 mb-1">عنوان فایل دانلودی یا سناریو</label>
                       <input
                         type="text"
                         value={fileFormData.title}
-                        onChange={(e) => setFileFormData({ ...fileFormData, title: e.target.value })}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setFileFormData(prev => ({
+                            ...prev,
+                            title: val,
+                            slug: prev.slug ? prev.slug : generateSlug(val)
+                          }));
+                        }}
                         placeholder="مثال: مجموعه سناریوهای روتینگ BGP در پکت‌تریسر"
                         className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl"
                         required
                       />
                     </div>
 
+                    {/* SLUG / PERMALINK (WORDPRESS STYLE) */}
+                    <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <label className="block font-bold text-slate-800 text-[11px]">
+                          پیوند یکتا و نامک انگلیسی محصول (Product / File Slug)
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => setFileFormData(prev => ({ ...prev, slug: generateSlug(prev.title || 'file') }))}
+                          className="text-[11px] text-indigo-600 hover:underline cursor-pointer"
+                        >
+                          تولید خودکار بر اساس عنوان
+                        </button>
+                      </div>
+                      <div className="flex items-center rounded-lg border border-slate-200 bg-white overflow-hidden focus-within:border-indigo-600" dir="ltr">
+                        <span className="px-2.5 py-1.5 bg-slate-100 border-r border-slate-200 text-slate-500 font-mono text-[11px] shrink-0">
+                          https://parsnet.ir/files/
+                        </span>
+                        <input
+                          type="text"
+                          value={fileFormData.slug || ''}
+                          onChange={(e) => setFileFormData({ ...fileFormData, slug: e.target.value.toLowerCase().replace(/\s+/g, '-') })}
+                          placeholder="packet-tracer-bgp-lab"
+                          className="flex-1 px-2.5 py-1.5 font-mono text-xs focus:outline-none text-slate-800"
+                        />
+                      </div>
+                      <p className="text-[10px] text-slate-400">
+                        مانند وردپرس، این نامک در ریشه آدرس سایت برای دسترسی مستقیم کاربر به فایل/محصول استفاده می‌شود.
+                      </p>
+                    </div>
+
                     {/* FEATURED IMAGE UPLOAD & SELECTOR */}
                     <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
                       <div className="flex items-center justify-between">
-                        <label className="block font-bold text-slate-800">تصویر شاخص فایل</label>
+                        <div>
+                          <label className="block font-bold text-slate-800">تصویر شاخص فایل</label>
+                          <p className="text-[11px] text-slate-500">انتخاب فایل از سیستم با دکمه‌های تأیید و انصراف قبل از آپلود</p>
+                        </div>
                         <div className="flex items-center gap-2">
-                          <label className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold cursor-pointer transition-colors flex items-center gap-1">
+                          <label className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold cursor-pointer transition-colors flex items-center gap-1 shadow-xs">
                             <Upload className="w-3.5 h-3.5" />
-                            <span>آپلود تصویر جدید</span>
+                            <span>انتخاب فایل تصویر</span>
                             <input
                               type="file"
                               accept="image/*"
-                              onChange={(e) => handleFormDirectImageUpload(e, 'file')}
+                              onChange={(e) => handleStageFileUpload(e, 'file-image')}
                               className="hidden"
                             />
                           </label>
@@ -1849,10 +2240,10 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
                               setMediaPickerTarget('file');
                               setIsMediaPickerOpen(true);
                             }}
-                            className="px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 rounded-lg text-xs font-bold transition-colors flex items-center gap-1"
+                            className="px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 rounded-lg text-xs font-bold transition-colors flex items-center gap-1 cursor-pointer"
                           >
                             <ImageIcon className="w-3.5 h-3.5 text-indigo-600" />
-                            <span>انتخاب از رسانه‌ها</span>
+                            <span>کتابخانه رسانه‌ها</span>
                           </button>
                         </div>
                       </div>
@@ -1873,6 +2264,122 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
                             dir="ltr"
                           />
                         </div>
+                      </div>
+                    </div>
+
+                    {/* GALLERY / SECONDARY IMAGES */}
+                    <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <label className="block font-bold text-slate-800">تصاویر دیگر و اسکرین‌شات‌های فایل</label>
+                          <p className="text-[11px] text-slate-500">تصاویر پیش‌نمایش محیط نرم‌افزار، سورس‌کدها یا توپولوژی سناریو</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <label className="px-3 py-1.5 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-bold cursor-pointer transition-colors flex items-center gap-1 shadow-xs">
+                            <Upload className="w-3.5 h-3.5" />
+                            <span>آپلود عکس گالری</span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => handleStageFileUpload(e, 'file-gallery')}
+                              className="hidden"
+                            />
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setMediaPickerTarget('file-gallery');
+                              setIsMediaPickerOpen(true);
+                            }}
+                            className="px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 rounded-lg text-xs font-bold transition-colors flex items-center gap-1 cursor-pointer"
+                          >
+                            <ImageIcon className="w-3.5 h-3.5 text-indigo-600" />
+                            <span>انتخاب از رسانه‌ها</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-wrap gap-2 pt-1">
+                        {(fileFormData.galleryImages || []).map((imgUrl, idx) => (
+                          <div key={idx} className="relative group w-20 h-16 rounded-xl overflow-hidden border border-slate-200 shadow-xs">
+                            <img src={imgUrl} alt={`تصویر ${idx + 1}`} className="w-full h-full object-cover" />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const curr = fileFormData.galleryImages || [];
+                                setFileFormData({ ...fileFormData, galleryImages: curr.filter((_, i) => i !== idx) });
+                              }}
+                              className="absolute inset-0 bg-red-600/80 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                              title="حذف تصویر"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ))}
+                        {(!fileFormData.galleryImages || fileFormData.galleryImages.length === 0) && (
+                          <span className="text-[11px] text-slate-400">هنوز تصویری به گالری فایل اضافه نشده است.</span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* TAGS (برچسب‌های فایل) */}
+                    <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
+                      <label className="block font-bold text-slate-800">برچسب‌های فایل (Tags)</label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          value={fileTagInput}
+                          onChange={(e) => setFileTagInput(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              if (fileTagInput.trim()) {
+                                const currentTags = fileFormData.tags || [];
+                                if (!currentTags.includes(fileTagInput.trim())) {
+                                  setFileFormData({ ...fileFormData, tags: [...currentTags, fileTagInput.trim()] });
+                                }
+                                setFileTagInput('');
+                              }
+                            }
+                          }}
+                          placeholder="برچسب فایل را بنویسید و Enter بزنید..."
+                          className="flex-1 px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (fileTagInput.trim()) {
+                              const currentTags = fileFormData.tags || [];
+                              if (!currentTags.includes(fileTagInput.trim())) {
+                                setFileFormData({ ...fileFormData, tags: [...currentTags, fileTagInput.trim()] });
+                              }
+                              setFileTagInput('');
+                            }
+                          }}
+                          className="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs cursor-pointer shadow-xs"
+                        >
+                          افزودن
+                        </button>
+                      </div>
+                      <div className="flex flex-wrap gap-1.5 pt-1">
+                        {(fileFormData.tags || []).map((t, idx) => (
+                          <span key={idx} className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white border border-slate-200 rounded-lg text-xs text-slate-700 font-medium">
+                            <span>#{t}</span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const currentTags = fileFormData.tags || [];
+                                setFileFormData({ ...fileFormData, tags: currentTags.filter((_, i) => i !== idx) });
+                              }}
+                              className="text-slate-400 hover:text-red-600 cursor-pointer"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </span>
+                        ))}
+                        {(!fileFormData.tags || fileFormData.tags.length === 0) && (
+                          <span className="text-[11px] text-slate-400">هنوز برچسبی اضافه نشده است.</span>
+                        )}
                       </div>
                     </div>
 
@@ -1944,13 +2451,19 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
                       />
                     </div>
 
+                    {/* CKEDITOR ADVANCED RICH TEXT EDITOR FOR FILE DESCRIPTION */}
                     <div>
-                      <label className="block font-bold text-slate-700 mb-1">توضیحات و نیازمندی‌ها</label>
-                      <textarea
-                        rows={3}
-                        value={fileFormData.description}
-                        onChange={(e) => setFileFormData({ ...fileFormData, description: e.target.value })}
-                        className="w-full p-3 bg-white border border-slate-200 rounded-xl"
+                      <RichTextEditor
+                        label="توضیحات و نیازمندی‌های فایل دانلودی (ویرایشگر پیشرفته با علائم، رنگ و استایل)"
+                        value={fileFormData.description || ''}
+                        onChange={(val) => setFileFormData({ ...fileFormData, description: val })}
+                        onOpenMediaPicker={(cb) => {
+                          setRichEditorCallback(() => cb);
+                          setMediaPickerTarget('rich-editor');
+                          setIsMediaPickerOpen(true);
+                        }}
+                        placeholder="توضیحات فایل دانلودی، سناریوهای شبکه، راهنمای نصب و ویژگی‌ها را در این قسمت بنویسید..."
+                        minHeight="min-h-[200px]"
                       />
                     </div>
 
@@ -2521,7 +3034,7 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
                   <input
                     type="file"
                     accept="image/*,video/*,.pdf,.zip,.pkt"
-                    onChange={handleUploadMediaFile}
+                    onChange={(e) => handleStageFileUpload(e, 'media-library')}
                     className="hidden"
                   />
                 </label>
@@ -2823,29 +3336,70 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
 
                   <form onSubmit={handleSaveArticle} className="space-y-4 text-xs">
                     <div>
-                      <label className="block font-bold text-slate-700 mb-1">عنوان مطلب یا رویداد</label>
+                      <label className="block font-bold text-slate-700 mb-1">عنوان مطلب، مقاله یا رویداد</label>
                       <input
                         type="text"
                         value={articleFormData.title}
-                        onChange={(e) => setArticleFormData({ ...articleFormData, title: e.target.value })}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setArticleFormData(prev => ({
+                            ...prev,
+                            title: val,
+                            slug: prev.slug ? prev.slug : generateSlug(val)
+                          }));
+                        }}
                         placeholder="مثال: نقشه راه جامع یادگیری شبکه سیسکو در سال ۲۰۲۵"
                         className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl"
                         required
                       />
                     </div>
 
+                    {/* SLUG / PERMALINK (WORDPRESS STYLE: e.g. /blog/neveshte3) */}
+                    <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <label className="block font-bold text-slate-800 text-[11px]">
+                          پیوند یکتا و نامک انگلیسی مطلب (Post Slug مانند وردپرس)
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => setArticleFormData(prev => ({ ...prev, slug: generateSlug(prev.title || 'post') }))}
+                          className="text-[11px] text-indigo-600 hover:underline cursor-pointer"
+                        >
+                          تولید خودکار بر اساس عنوان
+                        </button>
+                      </div>
+                      <div className="flex items-center rounded-lg border border-slate-200 bg-white overflow-hidden focus-within:border-indigo-600" dir="ltr">
+                        <span className="px-2.5 py-1.5 bg-slate-100 border-r border-slate-200 text-slate-500 font-mono text-[11px] shrink-0">
+                          https://parsnet.ir/blog/
+                        </span>
+                        <input
+                          type="text"
+                          value={articleFormData.slug || ''}
+                          onChange={(e) => setArticleFormData({ ...articleFormData, slug: e.target.value.toLowerCase().replace(/\s+/g, '-') })}
+                          placeholder="cisco-learning-roadmap-2025"
+                          className="flex-1 px-2.5 py-1.5 font-mono text-xs focus:outline-none text-slate-800"
+                        />
+                      </div>
+                      <p className="text-[10px] text-slate-400">
+                        آدرس اینترنتی مستقیم مطلب از ریشه وب‌سایت: https://parsnet.ir/blog/{articleFormData.slug || 'neveshte3'}
+                      </p>
+                    </div>
+
                     {/* FEATURED IMAGE UPLOAD & SELECTOR */}
                     <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
                       <div className="flex items-center justify-between">
-                        <label className="block font-bold text-slate-800">تصویر شاخص نوشته</label>
+                        <div>
+                          <label className="block font-bold text-slate-800">تصویر شاخص نوشته</label>
+                          <p className="text-[11px] text-slate-500">انتخاب فایل از سیستم با دکمه‌های تأیید و انصراف قبل از آپلود</p>
+                        </div>
                         <div className="flex items-center gap-2">
-                          <label className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold cursor-pointer transition-colors flex items-center gap-1">
+                          <label className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold cursor-pointer transition-colors flex items-center gap-1 shadow-xs">
                             <Upload className="w-3.5 h-3.5" />
-                            <span>آپلود تصویر جدید</span>
+                            <span>انتخاب فایل تصویر</span>
                             <input
                               type="file"
                               accept="image/*"
-                              onChange={(e) => handleFormDirectImageUpload(e, 'article')}
+                              onChange={(e) => handleStageFileUpload(e, 'article-image')}
                               className="hidden"
                             />
                           </label>
@@ -2855,10 +3409,10 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
                               setMediaPickerTarget('article');
                               setIsMediaPickerOpen(true);
                             }}
-                            className="px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 rounded-lg text-xs font-bold transition-colors flex items-center gap-1"
+                            className="px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 rounded-lg text-xs font-bold transition-colors flex items-center gap-1 cursor-pointer"
                           >
                             <ImageIcon className="w-3.5 h-3.5 text-indigo-600" />
-                            <span>انتخاب از رسانه‌ها</span>
+                            <span>کتابخانه رسانه‌ها</span>
                           </button>
                         </div>
                       </div>
@@ -2879,6 +3433,122 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
                             dir="ltr"
                           />
                         </div>
+                      </div>
+                    </div>
+
+                    {/* GALLERY / SECONDARY IMAGES FOR POST */}
+                    <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <label className="block font-bold text-slate-800">تصاویر دیگر و گالری مطلب</label>
+                          <p className="text-[11px] text-slate-500">تصاویر درون‌متنی، اینفوگرافیک‌ها یا نمودارهای مرتبط با این مقاله</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <label className="px-3 py-1.5 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-bold cursor-pointer transition-colors flex items-center gap-1 shadow-xs">
+                            <Upload className="w-3.5 h-3.5" />
+                            <span>آپلود عکس گالری</span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => handleStageFileUpload(e, 'article-gallery')}
+                              className="hidden"
+                            />
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setMediaPickerTarget('article-gallery');
+                              setIsMediaPickerOpen(true);
+                            }}
+                            className="px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 rounded-lg text-xs font-bold transition-colors flex items-center gap-1 cursor-pointer"
+                          >
+                            <ImageIcon className="w-3.5 h-3.5 text-indigo-600" />
+                            <span>انتخاب از رسانه‌ها</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-wrap gap-2 pt-1">
+                        {(articleFormData.galleryImages || []).map((imgUrl, idx) => (
+                          <div key={idx} className="relative group w-20 h-16 rounded-xl overflow-hidden border border-slate-200 shadow-xs">
+                            <img src={imgUrl} alt={`تصویر ${idx + 1}`} className="w-full h-full object-cover" />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const curr = articleFormData.galleryImages || [];
+                                setArticleFormData({ ...articleFormData, galleryImages: curr.filter((_, i) => i !== idx) });
+                              }}
+                              className="absolute inset-0 bg-red-600/80 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                              title="حذف تصویر"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ))}
+                        {(!articleFormData.galleryImages || articleFormData.galleryImages.length === 0) && (
+                          <span className="text-[11px] text-slate-400">هنوز تصویری به گالری این نوشته اضافه نشده است.</span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* TAGS (برچسب‌های مقاله) */}
+                    <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
+                      <label className="block font-bold text-slate-800">برچسب‌های نوشته (Tags)</label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          value={articleTagInput}
+                          onChange={(e) => setArticleTagInput(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              if (articleTagInput.trim()) {
+                                const currentTags = articleFormData.tags || [];
+                                if (!currentTags.includes(articleTagInput.trim())) {
+                                  setArticleFormData({ ...articleFormData, tags: [...currentTags, articleTagInput.trim()] });
+                                }
+                                setArticleTagInput('');
+                              }
+                            }
+                          }}
+                          placeholder="برچسب نوشته را بنویسید و Enter بزنید..."
+                          className="flex-1 px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (articleTagInput.trim()) {
+                              const currentTags = articleFormData.tags || [];
+                              if (!currentTags.includes(articleTagInput.trim())) {
+                                setArticleFormData({ ...articleFormData, tags: [...currentTags, articleTagInput.trim()] });
+                              }
+                              setArticleTagInput('');
+                            }
+                          }}
+                          className="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs cursor-pointer shadow-xs"
+                        >
+                          افزودن
+                        </button>
+                      </div>
+                      <div className="flex flex-wrap gap-1.5 pt-1">
+                        {(articleFormData.tags || []).map((t, idx) => (
+                          <span key={idx} className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white border border-slate-200 rounded-lg text-xs text-slate-700 font-medium">
+                            <span>#{t}</span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const currentTags = articleFormData.tags || [];
+                                setArticleFormData({ ...articleFormData, tags: currentTags.filter((_, i) => i !== idx) });
+                              }}
+                              className="text-slate-400 hover:text-red-600 cursor-pointer"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </span>
+                        ))}
+                        {(!articleFormData.tags || articleFormData.tags.length === 0) && (
+                          <span className="text-[11px] text-slate-400">هنوز برچسبی اضافه نشده است.</span>
+                        )}
                       </div>
                     </div>
 
@@ -2919,13 +3589,19 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
                       />
                     </div>
 
+                    {/* CKEDITOR ADVANCED RICH TEXT EDITOR FOR ARTICLE */}
                     <div>
-                      <label className="block font-bold text-slate-700 mb-1">متن کامل محتوا</label>
-                      <textarea
-                        rows={6}
-                        value={articleFormData.content}
-                        onChange={(e) => setArticleFormData({ ...articleFormData, content: e.target.value })}
-                        className="w-full p-3 bg-white border border-slate-200 rounded-xl font-light leading-relaxed"
+                      <RichTextEditor
+                        label="متن کامل محتوا و دانشنامه (ویرایشگر پیشرفته با علائم نگارشی، رنگ و تصویر)"
+                        value={articleFormData.content || ''}
+                        onChange={(val) => setArticleFormData({ ...articleFormData, content: val })}
+                        onOpenMediaPicker={(cb) => {
+                          setRichEditorCallback(() => cb);
+                          setMediaPickerTarget('rich-editor');
+                          setIsMediaPickerOpen(true);
+                        }}
+                        placeholder="متن کامل محتوا، تیترها، جداول، رنگ‌ها و تصاویر مقاله را اینجا بنویسید..."
+                        minHeight="min-h-[280px]"
                       />
                     </div>
 
@@ -3919,7 +4595,253 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
                 </div>
               </div>
 
-              {/* 4. FULL SITE BACKUP & RESTORE (NO DATABASE CONFIG REQUIRED) */}
+              {/* 4. SIDEBAR & WIDGETS STUDIO (BLOG & SITE SIDEBAR CONFIGURATION) */}
+              <div className="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-xs space-y-6">
+                <div className="flex items-center gap-3 pb-3 border-b border-slate-200">
+                  <div className="w-9 h-9 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center">
+                    <Layout className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-slate-900">مدیریت سایدبار، ابزارک‌ها و منوهای صفحات سایت</h3>
+                    <p className="text-xs text-slate-500">کنترل سایدبار وبلاگ، تغییر موقعیت به چپ یا راست، فعال‌سازی ویجت‌ها، بنر و لینک‌های منو</p>
+                  </div>
+                </div>
+
+                <div className="space-y-6 text-xs">
+                  {/* General Sidebar Activation & Position */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-200">
+                    <div>
+                      <span className="block font-bold text-slate-800 mb-2">وضعیت نمایش سایدبار در صفحات وبلاگ:</span>
+                      <label className="flex items-center gap-2 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={settings.showBlogSidebar !== false}
+                          onChange={(e) => setSettings({ ...settings, showBlogSidebar: e.target.checked })}
+                          className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                        />
+                        <span className="text-xs font-bold text-slate-700">
+                          {settings.showBlogSidebar !== false ? 'سایدبار در صفحات وبلاگ فعال و نمایان است' : 'سایدبار مخفی است (نمایش تک‌ستونه تمام‌عرض)'}
+                        </span>
+                      </label>
+                      <p className="text-[11px] text-slate-500 mt-1">با غیرفعال‌سازی این گزینه، مقالات وبلاگ به صورت تمام‌عرض و بدون سایدبار نمایش داده می‌شوند.</p>
+                    </div>
+
+                    <div>
+                      <span className="block font-bold text-slate-800 mb-2">موقعیت قرارگیری سایدبار (چپ / راست):</span>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setSettings({ ...settings, sidebarPosition: 'left' })}
+                          className={`flex-1 py-2 px-3 rounded-xl border text-center font-bold transition-all cursor-pointer ${
+                            (settings.sidebarPosition || 'left') === 'left'
+                              ? 'bg-indigo-600 text-white border-indigo-600 shadow-xs'
+                              : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'
+                          }`}
+                        >
+                          سمت چپ (استاندارد)
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setSettings({ ...settings, sidebarPosition: 'right' })}
+                          className={`flex-1 py-2 px-3 rounded-xl border text-center font-bold transition-all cursor-pointer ${
+                            settings.sidebarPosition === 'right'
+                              ? 'bg-indigo-600 text-white border-indigo-600 shadow-xs'
+                              : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'
+                          }`}
+                        >
+                          سمت راست
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Active Widgets */}
+                  <div className="space-y-3">
+                    <span className="font-bold text-slate-800 block">
+                      ابزارک‌ها و بخش‌های فعال در سایدبار (Widgets Configuration):
+                    </span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {[
+                        { key: 'search', title: 'کادر جستجوی مقالات', desc: 'جستجوی آنی در عنوان، متن و برچسب‌ها' },
+                        { key: 'categories', title: 'فهرست دسته‌بندی‌ها', desc: 'لیست موضوعات همراه با تعداد نوشته‌ها' },
+                        { key: 'recentPosts', title: 'آخرین مقالات و نوشته‌ها', desc: 'نمایش ۴ نوشته جدید همراه با تاریخ' },
+                        { key: 'featuredCourse', title: 'بنر دوره یا فایل شاخص', desc: 'کارت جذاب معرفی دوره برگزیده ماه' },
+                        { key: 'popularTags', title: 'ابر برچسب‌های پربازدید', desc: 'کلمات کلیدی و تگ‌های مقالات' },
+                        { key: 'customLinks', title: 'پیوندهای سفارشی و منو', desc: 'لینک‌های مهم و کاربردی آکادمی' },
+                        { key: 'newsletter', title: 'عضویت در خبرنامه ایمیلی', desc: 'فرم اشتراک رایگان در خبرنامه' }
+                      ].map(w => {
+                        const currentWidgets = settings.sidebarWidgets || {};
+                        const isChecked = (currentWidgets as any)[w.key] !== false;
+                        return (
+                          <label
+                            key={w.key}
+                            className={`p-3 rounded-xl border cursor-pointer transition-all flex items-start gap-2.5 ${
+                              isChecked ? 'bg-indigo-50/50 border-indigo-200 text-slate-900' : 'bg-slate-50 border-slate-200 text-slate-500'
+                            }`}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={isChecked}
+                              onChange={(e) => {
+                                setSettings({
+                                  ...settings,
+                                  sidebarWidgets: {
+                                    ...(settings.sidebarWidgets || {}),
+                                    [w.key]: e.target.checked
+                                  }
+                                });
+                              }}
+                              className="mt-0.5 rounded text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                            />
+                            <div>
+                              <div className="font-bold text-xs">{w.title}</div>
+                              <div className="text-[10px] text-slate-500 mt-0.5">{w.desc}</div>
+                            </div>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Banner / Promotion Widget Settings */}
+                  <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+                    <span className="font-bold text-slate-800 block">
+                      تنظیمات ابزارک بنر تبلیغاتی یا دوره برگزیده سایدبار:
+                    </span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-slate-600 mb-1 font-medium">عنوان بنر سایدبار</label>
+                        <input
+                          type="text"
+                          value={settings.sidebarBannerTitle || ''}
+                          onChange={(e) => setSettings({ ...settings, sidebarBannerTitle: e.target.value })}
+                          placeholder="تخفیف ویژه دوره‌های شبکه سیسکو"
+                          className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-slate-600 mb-1 font-medium">پیوند یا شناسه مقصد بنر</label>
+                        <input
+                          type="text"
+                          value={settings.sidebarBannerLink || ''}
+                          onChange={(e) => setSettings({ ...settings, sidebarBannerLink: e.target.value })}
+                          placeholder="course-ccna-200-301 یا https://..."
+                          className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl font-mono text-left"
+                          dir="ltr"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-slate-600 mb-1 font-medium">متن زیرعنوان یا توضیح بنر</label>
+                      <input
+                        type="text"
+                        value={settings.sidebarBannerSubtitle || ''}
+                        onChange={(e) => setSettings({ ...settings, sidebarBannerSubtitle: e.target.value })}
+                        placeholder="با کد تخفیف CCNA30 تا ۳۰٪ تخفیف اختصاصی دریافت کنید"
+                        className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Custom Sidebar Links / Menu Manager */}
+                  <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+                    <span className="font-bold text-slate-800 block">
+                      مدیریت پیوندهای اختصاصی و منوی سایدبار:
+                    </span>
+
+                    {/* Links List */}
+                    <div className="space-y-2">
+                      {(settings.sidebarCustomLinks || []).map((link, idx) => (
+                        <div
+                          key={link.id || idx}
+                          className="flex items-center justify-between p-2.5 bg-white border border-slate-200 rounded-xl shadow-2xs"
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="w-5 h-5 rounded-md bg-indigo-100 text-indigo-700 flex items-center justify-center font-mono font-bold text-[10px]">
+                              {idx + 1}
+                            </span>
+                            <span className="font-bold text-slate-800">{link.title}</span>
+                            <span className="text-[11px] font-mono text-slate-400" dir="ltr">({link.url})</span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const curr = settings.sidebarCustomLinks || [];
+                              setSettings({
+                                ...settings,
+                                sidebarCustomLinks: curr.filter((_, i) => i !== idx)
+                              });
+                            }}
+                            className="p-1 text-slate-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors cursor-pointer"
+                            title="حذف پیوند"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ))}
+                      {(!settings.sidebarCustomLinks || settings.sidebarCustomLinks.length === 0) && (
+                        <p className="text-slate-400 text-xs py-1">هیچ پیوند اختصاصی تعریف نشده است.</p>
+                      )}
+                    </div>
+
+                    {/* Add Link Form */}
+                    <div className="flex flex-col sm:flex-row items-center gap-2 pt-2 border-t border-slate-200">
+                      <input
+                        type="text"
+                        placeholder="عنوان پیوند (مثلاً: مستندات رسمی سیسکو)"
+                        value={newSidebarLinkTitle}
+                        onChange={(e) => setNewSidebarLinkTitle(e.target.value)}
+                        className="flex-1 w-full sm:w-auto px-3 py-2 bg-white border border-slate-200 rounded-xl"
+                      />
+                      <input
+                        type="url"
+                        placeholder="نشانی اینترنتی (https://...)"
+                        value={newSidebarLinkUrl}
+                        onChange={(e) => setNewSidebarLinkUrl(e.target.value)}
+                        className="flex-1 w-full sm:w-auto px-3 py-2 bg-white border border-slate-200 rounded-xl font-mono text-left"
+                        dir="ltr"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (!newSidebarLinkTitle.trim() || !newSidebarLinkUrl.trim()) return;
+                          const newLink: SidebarCustomLink = {
+                            id: `slink-${Date.now()}`,
+                            title: newSidebarLinkTitle.trim(),
+                            url: newSidebarLinkUrl.trim()
+                          };
+                          setSettings({
+                            ...settings,
+                            sidebarCustomLinks: [...(settings.sidebarCustomLinks || []), newLink]
+                          });
+                          setNewSidebarLinkTitle('');
+                          setNewSidebarLinkUrl('');
+                        }}
+                        className="w-full sm:w-auto px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-colors cursor-pointer shrink-0 shadow-xs"
+                      >
+                        افزودن پیوند به منو
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Save Button for Sidebar Settings */}
+                  <div className="pt-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        store.updateSettings(settings);
+                        store.showToast('success', 'تنظیمات سایدبار و ابزارک‌های سایت با موفقیت ذخیره گردید.');
+                      }}
+                      className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-xs transition-colors cursor-pointer flex items-center gap-2"
+                    >
+                      <Check className="w-4 h-4" />
+                      <span>ذخیره تغییرات سایدبار و ابزارک‌ها</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* 5. FULL SITE BACKUP & RESTORE (NO DATABASE CONFIG REQUIRED) */}
               <div className="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-xs space-y-4">
                 <div className="flex items-center gap-3 pb-3 border-b border-slate-200">
                   <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
@@ -4018,7 +4940,231 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
               </div>
             </div>
           )}
+
+          {/* DEDICATED ORGANIC PRODUCTS AND ORDERS VIEW */}
+          {activeMenu === 'organic-products' && (
+            <OrganicAdminSection
+              mode="products"
+              organicProducts={organicProducts}
+              organicOrders={organicOrders}
+              organicSettlements={organicSettlements}
+            />
+          )}
+
+          {/* DEDICATED ORGANIC FINANCIAL AND SETTLEMENTS VIEW */}
+          {activeMenu === 'organic-finance' && (
+            <OrganicAdminSection
+              mode="finance"
+              organicProducts={organicProducts}
+              organicOrders={organicOrders}
+              organicSettlements={organicSettlements}
+            />
+          )}
+
+          {/* DEDICATED PROJECT REQUESTS (IT, NETWORK & SOFTWARE) VIEW */}
+          {activeMenu === 'project-requests' && (
+            <div className="space-y-6 max-w-6xl">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h1 className="text-xl font-black text-slate-900 flex items-center gap-2">
+                    <Server className="w-5 h-5 text-indigo-600" />
+                    <span>مدیریت و پذیرش پروژه‌های IT، شبکه و نرم‌افزار</span>
+                  </h1>
+                  <p className="text-xs text-slate-500 mt-1">
+                    بررسی سفارشات آنلاین مشتریان، ارزیابی نیازمندی‌ها، تعیین مهندس ناظر و به‌روزرسانی وضعیت رهگیری
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="text-xs bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-xl border border-indigo-200 font-bold font-mono">
+                    کل پروژه‌ها: {projectRequests.length}
+                  </span>
+                </div>
+              </div>
+
+              {/* KPI Strip */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div className="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-2xs">
+                  <span className="text-xs text-slate-400 block mb-1">در انتظار بررسی</span>
+                  <span className="text-xl font-black text-amber-600 font-mono">
+                    {projectRequests.filter(r => r.status === 'pending' || r.status === 'reviewing').length}
+                  </span>
+                </div>
+                <div className="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-2xs">
+                  <span className="text-xs text-slate-400 block mb-1">در حال اجرا و استقرار</span>
+                  <span className="text-xl font-black text-indigo-600 font-mono">
+                    {projectRequests.filter(r => r.status === 'in_progress').length}
+                  </span>
+                </div>
+                <div className="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-2xs">
+                  <span className="text-xs text-slate-400 block mb-1">تایید شده / پیش‌فاکتور</span>
+                  <span className="text-xl font-black text-teal-600 font-mono">
+                    {projectRequests.filter(r => r.status === 'approved' || r.status === 'consultation').length}
+                  </span>
+                </div>
+                <div className="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-2xs">
+                  <span className="text-xs text-slate-400 block mb-1">تحویل نهایی شده</span>
+                  <span className="text-xl font-black text-emerald-600 font-mono">
+                    {projectRequests.filter(r => r.status === 'completed').length}
+                  </span>
+                </div>
+              </div>
+
+              {/* Projects List */}
+              <div className="space-y-4">
+                {projectRequests.length === 0 ? (
+                  <div className="bg-white p-12 text-center text-slate-400 rounded-3xl border border-slate-200">
+                    <Server className="w-12 h-12 stroke-1 mx-auto mb-2 text-slate-300" />
+                    <p className="text-sm font-bold text-slate-700">هیچ سفارش پروژه‌ای تاکنون ثبت نشده است.</p>
+                  </div>
+                ) : (
+                  projectRequests.map((req) => (
+                    <div key={req.id} className="bg-white rounded-3xl border border-slate-200 p-6 space-y-5 shadow-2xs hover:border-indigo-300 transition-colors">
+                      {/* Top Bar */}
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
+                        <div className="flex items-center gap-3">
+                          <span className="font-mono text-sm font-black text-indigo-700 bg-indigo-50 border border-indigo-200 px-3 py-1 rounded-xl">
+                            {req.trackingCode}
+                          </span>
+                          <span className="text-xs font-bold text-slate-800">{req.categoryTitle}</span>
+                          <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full border ${
+                            req.urgency === 'enterprise' 
+                              ? 'bg-purple-50 text-purple-700 border-purple-200' 
+                              : req.urgency === 'urgent'
+                              ? 'bg-rose-50 text-rose-700 border-rose-200'
+                              : 'bg-slate-50 text-slate-600 border-slate-200'
+                          }`}>
+                            {req.urgency === 'enterprise' ? 'سازمانی' : req.urgency === 'urgent' ? 'فوری' : 'عادی'}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-3 text-xs">
+                          <span className="font-mono text-slate-400">{req.createdAt}</span>
+                          <button
+                            onClick={() => {
+                              if (confirm('آیا از حذف این درخواست پروژه مطمئن هستید؟')) {
+                                store.deleteProjectRequest(req.id);
+                              }
+                            }}
+                            className="text-rose-500 hover:text-rose-700 hover:bg-rose-50 p-1.5 rounded-lg transition-colors cursor-pointer"
+                            title="حذف درخواست"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Title & Client details */}
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="md:col-span-2 space-y-1.5">
+                          <h3 className="text-base font-black text-slate-900">{req.title}</h3>
+                          <p className="text-xs text-slate-600 leading-relaxed font-light">{req.description}</p>
+                          {req.location && (
+                            <div className="text-[11px] text-slate-500 pt-1">
+                              محل پروژه: <strong className="text-slate-700">{req.location}</strong> · بودجه تخمینی: <strong className="text-slate-700">{req.budgetRange || 'اعلام نشده'}</strong>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200/80 space-y-1.5 text-xs">
+                          <div className="font-bold text-slate-800 mb-1">اطلاعات کارفرما:</div>
+                          <div>نام: <strong className="text-slate-900">{req.clientName}</strong></div>
+                          <div>شماره تماس: <a href={`tel:${req.clientPhone}`} className="text-indigo-600 font-mono font-bold hover:underline" dir="ltr">{req.clientPhone}</a></div>
+                          {req.organization && <div>شرکت: <span className="text-slate-700">{req.organization}</span></div>}
+                          {req.clientEmail && <div>ایمیل: <span className="font-mono text-slate-600">{req.clientEmail}</span></div>}
+                        </div>
+                      </div>
+
+                      {/* Admin Status & Notes Controls */}
+                      <div className="bg-indigo-50/50 p-5 rounded-2xl border border-indigo-100 space-y-4 text-xs">
+                        <div className="font-bold text-indigo-950 flex items-center gap-1.5">
+                          <Sliders className="w-4 h-4 text-indigo-600" />
+                          <span>کنترل وضعیت فنی و گزارش پیشرفت (مشتری این بخش را در صفحه رهگیری مشاهده می‌کند):</span>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                          <div>
+                            <label className="block text-slate-600 font-medium mb-1">وضعیت مرحله پروژه:</label>
+                            <select
+                              value={req.status}
+                              onChange={(e) => {
+                                store.updateProjectRequestStatus(req.id, e.target.value as ProjectStatus);
+                              }}
+                              className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl font-bold text-slate-800 focus:outline-none focus:border-indigo-500 cursor-pointer"
+                            >
+                              <option value="pending">ثبت اولیه (Pending)</option>
+                              <option value="reviewing">در حال بررسی فنی کارشناس (Reviewing)</option>
+                              <option value="consultation">مشاوره و هماهنگی نیازها (Consultation)</option>
+                              <option value="approved">تایید و صدور پیش‌فاکتور (Approved)</option>
+                              <option value="in_progress">در حال پیاده‌سازی و اجرا (In Progress)</option>
+                              <option value="completed">تحویل نهایی با گارانتی (Completed)</option>
+                              <option value="cancelled">لغو سفارش (Cancelled)</option>
+                            </select>
+                          </div>
+
+                          <div>
+                            <label className="block text-slate-600 font-medium mb-1">مهندس ناظر اختصاص داده شده:</label>
+                            <input
+                              type="text"
+                              defaultValue={req.assignedEngineer || ''}
+                              onBlur={(e) => {
+                                store.updateProjectRequestStatus(req.id, req.status, undefined, undefined, undefined, e.target.value);
+                              }}
+                              placeholder="مثال: مهندس محمدرضا قاسمی"
+                              className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-slate-600 font-medium mb-1">تاریخ تحویل تخمینی:</label>
+                            <input
+                              type="text"
+                              defaultValue={req.estimatedDelivery || ''}
+                              onBlur={(e) => {
+                                store.updateProjectRequestStatus(req.id, req.status, undefined, undefined, e.target.value);
+                              }}
+                              placeholder="مثال: ۱۴۰۳/۰۸/۳۰"
+                              className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl font-mono focus:outline-none focus:border-indigo-500"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-slate-600 font-medium mb-1">گزارش وضعیت عمومی (قابل مشاهده توسط مشتری):</label>
+                            <textarea
+                              rows={2}
+                              defaultValue={req.statusNotes || ''}
+                              onBlur={(e) => {
+                                store.updateProjectRequestStatus(req.id, req.status, e.target.value);
+                              }}
+                              placeholder="توضیح آخرین اقدامات برای نمایش در سامانه رهگیری..."
+                              className="w-full p-2.5 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 text-xs"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-slate-600 font-medium mb-1">یادداشت محرمانه ادمین (فقط مدیریت):</label>
+                            <textarea
+                              rows={2}
+                              defaultValue={req.adminNotes || ''}
+                              onBlur={(e) => {
+                                store.updateProjectRequestStatus(req.id, req.status, undefined, e.target.value);
+                              }}
+                              placeholder="پیش‌پرداخت دریافت شد، تجهیزات از انبار ارسال گردید و..."
+                              className="w-full p-2.5 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 text-xs"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
         </main>
+
       </div>
 
       {/* MEDIA PICKER MODAL FOR FORMS */}
@@ -4034,7 +5180,38 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
             ? 'انتخاب تصویر شاخص برای دوره آموزشی'
             : mediaPickerTarget === 'file'
             ? 'انتخاب تصویر شاخص برای فایل دانلودی'
-            : 'انتخاب تصویر شاخص برای نوشته یا رویداد'
+            : mediaPickerTarget === 'article'
+            ? 'انتخاب تصویر شاخص برای نوشته یا رویداد'
+            : mediaPickerTarget === 'course-gallery'
+            ? 'انتخاب تصویر برای گالری دوره آموزشی'
+            : mediaPickerTarget === 'file-gallery'
+            ? 'انتخاب تصویر برای گالری فایل دانلودی'
+            : mediaPickerTarget === 'article-gallery'
+            ? 'انتخاب تصویر برای گالری نوشته وبلاگ'
+            : 'انتخاب تصویر از کتابخانه رسانه‌ها'
+        }
+      />
+
+      {/* STAGED FILE UPLOAD REVIEW & CONFIRMATION MODAL */}
+      <UploadReviewModal
+        isOpen={isUploadModalOpen}
+        pendingFile={pendingUpload}
+        onConfirmUpload={handleConfirmUpload}
+        onCancel={handleCancelUpload}
+        targetDescription={
+          uploadTarget === 'course-image'
+            ? 'تصویر شاخص دوره آموزشی'
+            : uploadTarget === 'file-image'
+            ? 'تصویر شاخص فایل دانلودی'
+            : uploadTarget === 'article-image'
+            ? 'تصویر شاخص نوشته وبلاگ'
+            : uploadTarget === 'course-gallery'
+            ? 'تصاویر گالری دوره'
+            : uploadTarget === 'file-gallery'
+            ? 'تصاویر گالری فایل'
+            : uploadTarget === 'article-gallery'
+            ? 'تصاویر گالری نوشته'
+            : 'کتابخانه پرونده‌های چندرسانه‌ای'
         }
       />
 

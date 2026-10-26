@@ -14,7 +14,9 @@ import {
   Download,
   MessageSquare,
   Send,
-  Sparkles
+  Sparkles,
+  Share2,
+  Tag
 } from 'lucide-react';
 import { Course, DigitalFile, Review } from '../types';
 import { store } from '../services/store';
@@ -124,9 +126,64 @@ export const CourseDetailModal: React.FC<CourseDetailModalProps> = ({
                 {course.title}
               </h1>
 
-              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-light">
-                {course.description}
-              </p>
+              {course.description.includes('<') ? (
+                <div
+                  dangerouslySetInnerHTML={{ __html: course.description }}
+                  className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-light prose dark:prose-invert max-w-none"
+                />
+              ) : (
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-light">
+                  {course.description}
+                </p>
+              )}
+
+              {/* Gallery Images (if available) */}
+              {course.galleryImages && course.galleryImages.length > 0 && (
+                <div className="space-y-2 pt-2">
+                  <div className="text-xs font-bold text-slate-700 dark:text-slate-300">تصاویر و اسناد دوره:</div>
+                  <div className="grid grid-cols-3 gap-2">
+                    {course.galleryImages.map((img, i) => (
+                      <a key={i} href={img} target="_blank" rel="noopener noreferrer" className="rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 aspect-video block">
+                        <img src={img} alt={`تصویر دوره ${i+1}`} className="w-full h-full object-cover" />
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* WordPress-style Permalink & Slug */}
+              <div className="p-2.5 bg-slate-100 dark:bg-slate-800/80 rounded-xl flex items-center justify-between gap-2 text-[11px] font-mono">
+                <span className="text-slate-500 font-sans">پیوند یکتا:</span>
+                <span dir="ltr" className="text-indigo-600 dark:text-indigo-400 truncate">
+                  https://parsnet-academy.com/courses/{course.slug || course.id}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigator.clipboard.writeText(`https://parsnet-academy.com/courses/${course.slug || course.id}`);
+                    store.showToast('info', 'پیوند یکتای دوره کپی شد');
+                  }}
+                  className="text-slate-500 hover:text-indigo-600 shrink-0 cursor-pointer"
+                  title="کپی آدرس دوره"
+                >
+                  <Share2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
+              {/* Course Tags */}
+              {course.tags && course.tags.length > 0 && (
+                <div className="flex items-center gap-1.5 flex-wrap pt-1">
+                  <span className="text-xs text-slate-400 flex items-center gap-1">
+                    <Tag className="w-3 h-3" />
+                    <span>برچسب‌ها:</span>
+                  </span>
+                  {course.tags.map((t, idx) => (
+                    <span key={idx} className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded-md">
+                      #{t}
+                    </span>
+                  ))}
+                </div>
+              )}
 
               {/* Certificate & Exam Feature Strip */}
               <div className="flex items-center gap-2 p-3 bg-amber-500/10 border border-amber-500/20 rounded-2xl text-amber-800 dark:text-amber-300 text-xs font-medium">

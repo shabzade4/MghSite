@@ -1,7 +1,12 @@
 import {
   Course, DigitalFile, User, Order, Ticket, Article, SiteSettings,
-  CartItem, MediaItem, ContactMessage, Review, Coupon, CourseQuiz, Certificate, ToastMessage, VideoNote, ColorTheme, AdminTheme
+  CartItem, MediaItem, ContactMessage, Review, Coupon, CourseQuiz, Certificate, ToastMessage, VideoNote, ColorTheme, AdminTheme,
+  OrganicProduct, OrganicCartItem, OrganicOrder, OrganicSettlement, OrganicShippingMethod, OrganicPaymentMethod,
+  OrganicPackageOption, OrganicShippingMethodId, OrganicOrderItem, OrganicProductReview,
+  OrganicStockAlertConfig, OrganicStockAlertLog,
+  ProjectRequest, ITServiceItem, ProjectServiceCategory, ProjectStatus, ProjectUrgency
 } from '../types';
+
 
 // Generated asset image paths
 const HERO_IMAGE = '/src/assets/images/hero_tech_academy_1791894522996.jpg';
@@ -880,32 +885,344 @@ export const INITIAL_QUIZZES: CourseQuiz[] = [
 ];
 
 export const INITIAL_SETTINGS: SiteSettings = {
-  siteTitle: 'آکادمی شبکه و وب پارس نت',
-  tagline: 'مرجع تخصصی آموزش زیرساخت شبکه، سیسکو، لینوکس و برنامه‌نویسی وب',
+  siteTitle: 'مهرادینت',
+  tagline: 'آموزش تخصصی شبکه، وب، برنامه‌نویسی و انجام پروژه‌های کامپیوتری',
   supportPhone: '۰۲۱-۸۸۴۵۶۷۸۹',
-  supportEmail: 'support@parsnet-academy.com',
+  supportEmail: 'info@mehradinet.com',
   address: 'تهران، خیابان شریعتی، بالاتر از مطهری، برج فناوری طبقه ۵',
   workHours: 'شنبه تا چهارشنبه ۹:۰۰ الی ۱۸:۰۰ - پنج‌شنبه‌ها ۹:۰۰ الی ۱۴:۰۰',
   zarinpalMerchantId: 'a1b2c3d4-e5f6-7890-abcd-1234567890ab',
   isGatewaySandbox: true,
-  telegramUsername: 'parsnet_academy',
-  instagramUsername: 'parsnet.academy',
+  telegramUsername: 'mehradinet',
+  instagramUsername: 'mehradinet',
   adminUsername: 'admin',
   adminPassword: 'admin',
-  aboutText: `آکادمی تخصصی پارس‌نت از سال ۱۳۹۶ با هدف ارتقای دانش مهندسی شبکه، فناوری اطلاعات و توسعه وب در کشور فعالیت خود را آغاز نموده است.
-ما باور داریم که یادگیری فناوری باید کاملاً عملی، پروژه‌محور و منطبق بر نیازهای واقعی دیتاسنترها و شرکت‌های پیشرو باشد. به همین منظور تمامی دوره‌های سیسکو (Cisco)، میکروتیک (MikroTik)، سیستم‌عامل لینوکس سرور و فریمورک‌های مدرن فرانت‌اند و بک‌اند با سناریوهای آماده، فایل‌های شبیه‌سازی و پشتیبانی مستقیم اساتید ارائه می‌گردند.
+  aboutText: `مجموعه مهندسی و آکادمی تخصصی مهرادینت از سال ۱۳۹۶ با تکیه بر تجارب عملی در اجرای پروژه‌های بزرگ زیرساخت شبکه، دیتاسنتر و توسعه سامانه‌های نرم‌افزاری فعالیت خود را آغاز نموده است.
+ما باور داریم که مرز بین آموزش و صنعت باید برداشته شود؛ از این رو متخصصان مهرادینت همزمان با اجرای پروژه‌های کابل‌کشی پسیو، کانفیگ اکتیو سیسکو و میکروتیک، مجازی‌سازی سرور و برنامه‌نویسی سیستم‌های مدرن وب، دانش کاربردی خود را در قالب دوره‌های جامع و پروژه‌محور در اختیار علاقه‌مندان و متخصصان سراسر کشور قرار می‌دهند.
 
-افتخارات ما:
-• آموزش بیش از ۳,۵۰۰ دانشجوی متخصص در سراسر کشور
-• ارائه بیش از ۱۲۰ فایل سناریوی عملی تست شده
-• گارانتی اصالت محتوا و پشتیبانی فنی مستقیم با مدرسین`,
-  termsText: `قوانین و دستورالعمل‌های استفاده از آکادمی پارس‌نت:
+زمینه‌های فعالیت مهرادینت:
+• انجام پروژه‌های طراحی و اجرای شبکه پسیو (کابل‌کشی، رک‌بندی، فیبر نوری، فلوک)
+• کانفیگ و پیاده‌سازی تجهیزات اکتیو شبکه (Cisco, MikroTik, FortiGate, VPN)
+• مجازی‌سازی سرور و دیتاسنتر (VMware ESXi, vCenter, Proxmox, Hyper-V)
+• نصب و استانداردسازی سیستم‌عامل‌های سرور (Windows Server, Linux Server, macOS)
+• طراحی وب‌سایت‌های شرکتی، فروشگاهی، پرتال و وب‌اپلیکیشن‌های پیشرفته
+• برنامه‌نویسی نرم‌افزارهای سفارشی، اسکریپت‌های اتوماسیون پایتون و ربات‌ها
+• آموزش تخصصی و مهارت‌محور همراه با صدور مدارک معتبر با قابلیت استعلام آنلاین`,
+  termsText: `قوانین و دستورالعمل‌های استفاده از خدمات و آکادمی مهرادینت:
 
-۱. مالکیت معنوی: کلیه ویدیوها، کدهای سناریو و فایل‌های دانلودی متعلق به آکادمی پارس‌نت بوده و انتشار عمومی یا فروش مجدد آن‌ها بدون اجازه کتبی پیگرد قانونی دارد.
-۲. لایسنس کاربری: هر خرید متعلق به یک شخص یا یک حساب کاربری است و دانشجو می‌تواند فایل‌ها را بر روی سیستم شخصی خود دانلود و اجرا نماید.
-۳. پشتیبانی علمی: سوالات و تیکت‌های پشتیبانی مربوط به دوره‌ها حداکثر ظرف ۲۴ ساعت کاری توسط مدرس دوره بررسی و پاسخ داده می‌شود.
-۴. بازگشت وجه: در صورت وجود مغایرت در سرفصل‌های اعلامی با محتوای دوره تا ۴۸ ساعت پس از خرید امکان استرداد وجه طبق ضوابط مالی فراهم است.`
+۱. مالکیت معنوی: کلیه ویدیوها، کدهای سناریو و فایل‌های دانلودی متعلق به مهرادینت بوده و هرگونه بازنشر بدون مجوز کتبی پیگرد قانونی دارد.
+۲. قراردادهای پروژه‌ای: تمامی پروژه‌های اجرایی شبکه و نرم‌افزار مهرادینت دارای قرارداد رسمی، شرح خدمات دقیق (SLA) و دوره گارانتی و پشتیبانی مکتوب می‌باشند.
+۳. لایسنس کاربری: هر خرید آموزشی متعلق به یک شخص یا حساب کاربری است.
+۴. پشتیبانی علمی و فنی: پاسخگویی تیکت‌ها و مشاوره‌های فنی ظرف حداکثر ۲۴ ساعت کاری انجام می‌گردد.
+۵. گارانتی اصالت و کیفیت: تطابق ۱۰۰٪ سرفصل‌های اعلامی با محتوا تضمین شده است.`,
+  showBlogSidebar: true,
+  sidebarPosition: 'left',
+  sidebarWidgets: {
+    search: true,
+    categories: true,
+    recentPosts: true,
+    featuredCourse: true,
+    popularTags: true,
+    customLinks: true,
+    newsletter: true
+  },
+  sidebarCustomLinks: [
+    { id: 'slink-1', title: 'مستندات پیکربندی سیسکو CCNA', url: 'https://www.cisco.com' },
+    { id: 'slink-2', title: 'لابراتوار شبیه‌سازی آنلاین EVE-NG', url: 'https://www.eve-ng.net' },
+    { id: 'slink-3', title: 'راهنمای راه‌اندازی MikroTik CHR', url: 'https://mikrotik.com' },
+    { id: 'slink-4', title: 'مخزن سورس‌های آموزشی گیت‌هاب', url: 'https://github.com' }
+  ],
+  sidebarBannerTitle: 'تخفیف ویژه دوره‌های شبکه سیسکو',
+  sidebarBannerSubtitle: 'با کد تخفیف CCNA30 تا ۳۰٪ تخفیف اختصاصی دریافت کنید',
+  sidebarBannerLink: 'course-ccna-200-301'
 };
+
+export const INITIAL_PROJECT_SERVICES: ITServiceItem[] = [
+  {
+    id: 'srv-software',
+    category: 'software-install',
+    title: 'نصب و پیکربندی نرم‌افزارهای تخصصی و کاربردی',
+    englishTitle: 'Specialized & Enterprise Software Deployment',
+    shortDescription: 'نصب، راه‌اندازی و لایسنسینگ نرم‌افزارهای مهندسی، مالی، اداری و امنیتی سازمانی با کانفیگ بهینه و دیتابیس پایدار',
+    fullDescription: 'پیاده‌سازی و استقرار بدون اختلال نرم‌افزارهای سنگین مهندسی (AutoCAD, Revit, SolidWorks, MATLAB)، سامانه‌های جامع حسابداری و مالی (سپیدار، هلو، پیوست)، مجموعه‌های آفیس سازمانی، آنتی‌ویروس‌های تحت شبکه (Kaspersky Endpoint, ESET Protect) با کنسول مرکزی مدیریت لایسنس و به‌روزرسانی محلی.',
+    iconName: 'Package',
+    features: [
+      'نصب تخصصی نرم‌افزارهای سنگین محاسباتی و مهندسی',
+      'راه‌اندازی سامانه‌های حسابداری، مالی و اتوماسیون اداری',
+      'استقرار آنتی‌ویروس تحت شبکه با کنسول مرکزی ابری/محلی',
+      'رفع خطاهای پیش‌نیاز (Dependencies, Visual C++, .NET Framework)',
+      'تنظیم دسترسی‌های کاربری و فایروال برای نرم‌افزارهای کلاینت-سرور'
+    ],
+    deliverables: [
+      'نصب کامل و تست کارکرد پایدار روی کلاینت‌ها/سرور',
+      'پیکربندی پایگاه داده و اتصال امن به سرور اصلی',
+      'ایجاد چک‌پوینت و ایمیج بکاپ قبل و بعد از نصب',
+      'مستند خلاصه راه‌اندازی و آموزش کاربری به پرسنل'
+    ],
+    techStack: ['Kaspersky', 'ESET Security', 'SQL Server', 'AutoCAD', 'Revit', 'Office 365', 'Sepidar'],
+    estimatedDelivery: '۱ الی ۲ روز کاری',
+    pricingGuide: 'شروع از ۱,۵۰۰,۰۰۰ تومان (بسته به تعداد کلاینت‌ها)',
+    isPopular: false
+  },
+  {
+    id: 'srv-os',
+    category: 'os-setup',
+    title: 'نصب و پیکربندی تخصصی سیستم‌عامل سرور و کلاینت',
+    englishTitle: 'Enterprise OS Setup & Hardening (Windows / Linux / macOS)',
+    shortDescription: 'راه‌اندازی Windows Server با اکتیو دایرکتوری و لینوکس سرور سخت‌سازی‌شده (Ubuntu/Rocky) با امنیت چندلایه',
+    fullDescription: 'نصب و استانداردسازی سیستم‌عامل‌های سرور شامل ویندوز سرور ۲۰۲۲ و ۲۰۲۵، راه‌اندازی کامل Active Directory Domain Services (AD DS)، سرورهای DNS، DHCP، فایل سرور با Permissionهای دقیق NTFS، لینوکس‌های سازمانی Ubuntu Server، Debian و Rocky Linux به همراه سخت‌سازی امنیتی SSH، فایروال UFW/iptables، بهینه‌سازی کرنل و مکینتاش اداری.',
+    iconName: 'Server',
+    features: [
+      'نصب استاندارد Windows Server 2022 / 2025 با تنظیمات امنیتی CIS Benchmark',
+      'راه‌اندازی Active Directory، جنگل دومین، OUها و پالیسی‌های Group Policy (GPO)',
+      'نصب توزیع‌های سازمانی لینوکس (Ubuntu, Rocky Linux, AlmaLinux, RHEL)',
+      'سخت‌سازی امنیتی SSH با احراز هویت کلید عمومی (Key-based) و بستن پورت‌های غیرضروری',
+      'راه‌اندازی Failover DHCP، سرور DNS داخلی و NTP سرور محلی'
+    ],
+    deliverables: [
+      'سیستم‌عامل کاملاً به‌روزرسانی شده با درایورهای اختصاصی سرور (HP, Dell, Supermicro)',
+      'ساختار طبقه‌بندی شده کاربران، گروه‌ها و اشتراک فایل امن',
+      'تست نفوذپذیری اولیه و اسکن آسیب‌پذیری پس از نصب',
+      'مستند دسترسی‌های ادمین و راهنمای مدیریت سرور'
+    ],
+    techStack: ['Windows Server 2025', 'Active Directory', 'Rocky Linux', 'Ubuntu Server', 'Group Policy', 'DNS/DHCP'],
+    estimatedDelivery: '۲ الی ۳ روز کاری',
+    pricingGuide: 'شروع از ۳,۸۰۰,۰۰۰ تومان',
+    isPopular: true
+  },
+  {
+    id: 'srv-virtualization',
+    category: 'virtualization',
+    title: 'مجازی‌سازی سرور و دیتاسنتر (VMware / Proxmox / Hyper-V)',
+    englishTitle: 'Datacenter Virtualization & Cluster Infrastructure',
+    shortDescription: 'پیاده‌سازی کلاستر VMware ESXi 8.0، vCenter Appliance، خوشه‌بندی High Availability (HA) و استوریج vSAN/NAS',
+    fullDescription: 'تبدیل سرورهای فیزیکی به زیرساخت مجازی فوق‌پایدار با VMware vSphere ESXi 8.0، راه‌اندازی کلاستر vCenter با قابلیت‌های تحمل خطای پیشرفته HA، vMotion بلادرنگ، توزیع بار DRS، استقرار Proxmox VE سازمانی بدون هزینه لایسنس، پیکربندی استوریج مشترک iSCSI/NFS/TrueNAS و سناریوی بکاپ فشرده با Veeam Backup & Replication.',
+    iconName: 'Layers',
+    features: [
+      'نصب هایپروایزر VMware ESXi 8.0 روی سرورهای HP ProLiant و Dell PowerEdge',
+      'راه‌اندازی سرور مدیریتی vCenter Server Appliance (VCSA) و ساخت کلاستر',
+      'فعال‌سازی High Availability (HA) برای جلوگیری از قطعی سرویس‌ها هنگام سوختن سخت‌افزار',
+      'انتقال زنده ماشین‌ها با vMotion و ذخیره‌سازی vSphere Storage vMotion بدون قطعی',
+      'راه‌اندازی پروکسموکس کلاستر (Proxmox VE Cluster) و Ceph Storage به عنوان آلترناتیو متن‌باز',
+      'استقرار سرور بکاپ‌گیری Veeam Backup & Replication با ذخیره‌سازی ابری و آفلاین'
+    ],
+    deliverables: [
+      'معماری کلاستر مجازی فعال با تست سناریوی شبیه‌سازی قطعی سخت‌افزار (Failover Test)',
+      'داشبورد مدیریتی وب متمرکز و مانیتورینگ منابع پردازنده و رم',
+      'سیاست‌گذاری بکاپ اتوماتیک روزانه و ماهانه با بازیابی سریع (Instant VM Recovery)',
+      'نقشه معماری مجازی‌سازی (Topology Diagram) و چک‌لیست نگهداری'
+    ],
+    techStack: ['VMware ESXi 8.0', 'vCenter VCSA', 'Proxmox VE', 'Veeam Backup', 'TrueNAS', 'vSAN', 'Hyper-V'],
+    estimatedDelivery: '۳ الی ۵ روز کاری',
+    pricingGuide: 'شروع از ۶,۵۰۰,۰۰۰ تومان',
+    isPopular: true
+  },
+  {
+    id: 'srv-passive',
+    category: 'passive-network',
+    title: 'طراحی، کابل‌کشی و اجرای پسیو شبکه و دیتاسنتر',
+    englishTitle: 'Structured Cabling, Fiber Optic & Rack Engineering',
+    shortDescription: 'کابل‌کشی ساخت‌یافته استاندارد Cat6/Cat7، آرایش حرفه‌ای رک و پچ‌پنل، فیوژن فیبر نوری و تست فلوک',
+    fullDescription: 'اجرای مهندسی کابل‌کشی ساخت‌یافته مطابق استاندارد بین‌المللی ANSI/TIA-568-D با کابل‌های تمام‌مس SFTP Cat6/Cat7، کابل‌کشی فیبر نوری (Single-mode / Multi-mode) با فیوژن اسپلایسینگ دقیق (Fusion Splicing)، نصب و آرایش ترانکینگ و داکت‌های لگراند، نام‌گذاری و لیبل‌گذاری دوطرفه کابل‌ها، آرایش حرفه‌ای رک‌های دیواری و ایستاده دیتاسنتر با پچ‌کوردها و مدیریت کابل (Cable Management).',
+    iconName: 'Cable',
+    features: [
+      'کابل‌کشی استاندارد با کابل‌های تمام‌مس (Pure Bare Copper) برندهای Legrand, Nexans, Schneider',
+      'طراحی و آرایش کامل رک ایستاده تا ۴۲ یونیت به همراه مدیریت افقی و عمودی پچ‌کوردها',
+      'اجرای فیوژن فیبر نوری با دستگاه‌های نسل جدید و افت بسیار پایین کمتر از 0.02dB',
+      'نصب کیستون، پچ‌پنل، پریزهای برق اضطراری (UPS) و کابل شبکه استاندارد در اتاق‌ها',
+      'ارائه تست فلوک چنل و پرمننت (Fluke DTX / DSX) با سرتیفیکیت معتبر برای پروژه'
+    ],
+    deliverables: [
+      'پسیو تمیز، کدگذاری شده و استاندارد با قابلیت عیب‌یابی سریع در چند ثانیه',
+      'نقشه ازبیلت (As-Built) لیبل‌گذاری شده تمامی پریزها و شماره پورت‌های پچ‌پنل',
+      'تست فیزیکی و سیگنالی ۱۰۰٪ نودهای شبکه',
+      'گارانتی کتبی ۱۲ ماهه پایداری کابل‌کشی و آرایش فیزیکی'
+    ],
+    techStack: ['Legrand Trunking', 'Nexans Cat6/Cat7', 'Fiber Optic Fusion', 'Fluke Networks', 'APC Rack Systems'],
+    estimatedDelivery: '۲ الی ۷ روز کاری (بسته به متراژ و تعداد نودها)',
+    pricingGuide: 'استعلام قیمت بر اساس متراژ و تعداد نود (از نودی ۲۸۰,۰۰۰ تومان)',
+    isPopular: true
+  },
+  {
+    id: 'srv-active',
+    category: 'active-network',
+    title: 'طراحی و اجرای اکتیو شبکه و امنیت (سیسکو / میکروتیک / فورتی‌گیت)',
+    englishTitle: 'Enterprise Active Network, Routing, Switching & Firewalls',
+    shortDescription: 'کانفیگ سوئیچ و روتر سیسکو، میکروتیک، فایروال فورتی‌گیت، سگمنت‌بندی VLAN، روتینگ و اتصال شعب VPN',
+    fullDescription: 'پیکربندی پیشرفته و مهندسی تجهیزات اکتیو شامل سوئیچ‌های سیسکو سری کاتالیست (Cisco Catalyst 2960/3850/9200/9300)، روترهای میکروتیک (CCR / RB)، فایروال‌های سخت‌افزاری FortiGate و Sophos. سگمنت‌بندی ترافیک با VLAN و Private VLAN، پروتکل‌های مسیریابی OSPF، BGP و EIGRP، پروتکل‌های جلوگیری از لوپ STP/RSTP، تانل‌های امن و ضدشنود IPsec Site-to-Site بین دفاتر و شعب، سرویس SSL VPN برای دورکاری پرسنل، کنترل پهنای باند و مدیریت اینترنت پرسنل (Queue & Web Filtering).',
+    iconName: 'Radio',
+    features: [
+      'کانفیگ کامل سوئیچینگ لایه ۲ و لایه ۳ سیسکو با VLAN، Trunking و EtherChannel (LACP)',
+      'پیاده‌سازی پروتکل‌های روتینگ داینامیک OSPFv2/OSPFv3 و اینترنت چند مسیره (Load Balancing / Failover)',
+      'پیکربندی فایروال FortiGate با پالیسی‌های آنتی‌ویروس، IPS، Web Filtering و جلوگیری از حملات',
+      'راه‌اندازی تانل‌های بین‌شهری و بین‌المللی IPsec، WireGuard، OpenVPN با پایداری ۹۹.۹٪',
+      'امنیت پورت‌ها با Port Security، ۸۰۲.۱X، DHCP Snooping و Dynamic ARP Inspection',
+      'راه‌اندازی مانیتورینگ بلادرنگ با Zabbix و ارسال هشدار پیامکی/تلگرامی هنگام قطعی'
+    ],
+    deliverables: [
+      'زیرساخت شبکه بهینه‌شده بدون لوپ و با کمترین تاخیر (Latency)',
+      'سند توپولوژی منطقی شبکه (Logical Architecture) با فرمت Visio / PDF',
+      'فایل‌های بکاپ پیکربندی کانفیگ روترها و سوئیچ‌ها',
+      'پشتیبانی تست و مانیتورینگ ۴۸ ساعته پس از راه‌اندازی'
+    ],
+    techStack: ['Cisco IOS-XE', 'MikroTik RouterOS', 'Fortinet FortiOS', 'Zabbix', 'IPsec VPN', 'OSPF/BGP'],
+    estimatedDelivery: '۲ الی ۵ روز کاری',
+    pricingGuide: 'شروع از ۴,۵۰۰,۰۰۰ تومان',
+    isPopular: true
+  },
+  {
+    id: 'srv-web',
+    category: 'web-design',
+    title: 'طراحی وب‌سایت مدرن، فروشگاهی و پورتال سازمانی',
+    englishTitle: 'Modern Web Design, E-Commerce & Web Applications',
+    shortDescription: 'طراحی سایت‌های فوق‌العاده سریع با React 19، Next.js یا وردپرس سفارشی با درگاه پرداخت، سئو و واکنش‌گرا',
+    fullDescription: 'خلق وب‌سایت‌های منحصربه‌فرد، مدرن و استاندارد متناسب با برند شما. از وب‌سایت‌های شرکتی شیک و کاتالوگ دیجیتال گرفته تا فروشگاه‌های اینترنتی قدرتمند با سبد خرید پیشرفته، اتصال به درگاه‌های پرداخت شاپرک (زرین‌پال، به‌پرداخت ملت، پاسارگاد)، سامانه پیامکی احراز هویت با کد OTP، طراحی کامپوننت‌های اختصاصی با React و Next.js یا قالب‌های اختصاصی وردپرس بهینه‌سازی‌شده برای سئو و بارگذاری زیر ۱.۵ ثانیه.',
+    iconName: 'Layout',
+    features: [
+      'طراحی کاملاً واکنش‌گرا (Responsive) سازگار با موبایل، تبلت و دسکتاپ',
+      'پیاده‌سازی با فریمورک‌های روز دنیا (Next.js 15, React 19, Tailwind CSS) یا وردپرس بهینه',
+      'اتصال به درگاه‌های پرداخت آنلاین شاپرک، اینماد و سامانه‌های پیامکی معتبر',
+      'طراحی رابط کاربری (UI/UX) تمیز، مدرن، جذاب و منطبق بر اصول تجربه کاربری',
+      'بهینه‌سازی سئو فنی (Technical SEO)، متاتگ‌ها، OpenGraph و ساختار Schema.org',
+      'پنل مدیریت فارسی ساده و سریع با امکان ویرایش نامحدود محتوا و محصولات'
+    ],
+    deliverables: [
+      'سایت کامل آماده بهره‌برداری همراه با دامنه و هاست یا سرور ابری',
+      'لایسنس‌ها و کدهای سورس تمیز و استاندارد',
+      'ویدیوهای آموزشی کار با پنل مدیریت سایت مخصوص ادمین',
+      '۶ ماه پشتیبانی فنی و امنیتی رایگان'
+    ],
+    techStack: ['React 19', 'Next.js', 'Tailwind CSS', 'WordPress', 'TypeScript', 'Node.js', 'PostgreSQL'],
+    estimatedDelivery: '۷ الی ۲۱ روز کاری',
+    pricingGuide: 'شروع از ۸,۹۰۰,۰۰۰ تومان',
+    isPopular: true
+  },
+  {
+    id: 'srv-programming',
+    category: 'custom-programming',
+    title: 'طراحی و برنامه‌نویسی نرم‌افزار، اپلیکیشن و اسکریپت‌های اتوماسیون',
+    englishTitle: 'Custom Software Development, Mobile Apps & Automation Bots',
+    shortDescription: 'توسعه نرم‌افزارهای اختصاصی وب، ویندوز و موبایل (Python, Node.js, C#, React Native)، بات‌ها و پردازش داده',
+    fullDescription: 'برنامه‌نویسی و توسعه سامانه‌های نرم‌افزاری اختصاصی متناسب با فرایندهای منحصربه‌فرد کسب‌وکار شما. توسعه وب‌اپلیکیشن‌های داشبورد مدیریتی، سیستم‌های انبارداری و CRM اختصاصی، اسکریپت‌های هوشمند استخراج و پردازش داده با پایتون (Web Scraping / Data ETL)، ربات‌های تلگرام و بله برای پشتیبانی مشتریان و ثبت سفارش، توسعه APIهای میکروسرویس پرسرعت و پایگاه داده‌های مقیاس‌پذیر.',
+    iconName: 'Code2',
+    features: [
+      'توسعه سیستم‌های سفارشی با معماری ماژولار و کدنویسی تمیز (Clean Code)',
+      'اسکریپت‌های اتوماسیون پایتون برای خودکارسازی کارهای تکراری اداری و گزارش‌گیری',
+      'ساخت ربات‌های کاربردی تلگرام، بله و ایتا با اتصال به دیتابیس اختصاصی',
+      'توسعه اپلیکیشن‌های موبایل کراس‌پلتفرم (React Native / Flutter) برای اندروید و iOS',
+      'طراحی دیتابیس‌های بهینه PostgreSQL, MySQL, Redis و کوئری‌های سریع',
+      'یکپارچه‌سازی سیستم‌های مختلف از طریق RESTful API و Webhook'
+    ],
+    deliverables: [
+      'سورس‌کد کامل پروژه با مخزن گیت اختصاصی و مستندات کد (Code Docs)',
+      'نسخه اجرایی، داکرایز شده (Dockerfile) و آماده استقرار روی سرور',
+      'محیط تستی (Staging) و تحویل نهایی با تست‌های واحد و یکپارچگی',
+      'آموزش و دوره پشتیبانی و توسعه فیچرهای جدید'
+    ],
+    techStack: ['Python', 'Node.js', 'C# .NET', 'TypeScript', 'React Native', 'Docker', 'PostgreSQL', 'Redis'],
+    estimatedDelivery: '۱۰ الی ۳۵ روز کاری',
+    pricingGuide: 'استعلام قیمت بر اساس بریف و سند نیازمندی‌ها (شروع از ۹,۵۰۰,۰۰۰ تومان)',
+    isPopular: true
+  },
+  {
+    id: 'srv-support',
+    category: 'it-support',
+    title: 'پشتیبانی، عیب‌یابی و نگهداری دوره‌ای زیرساخت IT',
+    englishTitle: 'Proactive IT Maintenance, Helpdesk & Emergency Support',
+    shortDescription: 'قراردادهای دوره‌ای هلپ‌دسک و نگهداری شبکه، پایش پایداری ۲۴/۷، بکاپ‌گیری و رفع عیب اضطراری در محل و ریموت',
+    fullDescription: 'بیمه کردن زیرساخت فناوری اطلاعات شرکت شما با خدمات پشتیبانی فعال مهرادینت. قراردادهای پشتیبانی منظم هفتگی و ماهانه شامل بازدید حضوری ادواری، رفع فوری ایرادات کاربران و پرسنل، تست سلامت هاردها و سرورها، بررسی منظم لاگ‌های امنیتی، کنترل صحت بکاپ‌ها و حضور فوری کارشناس در صورت بروز حوادث اضطراری.',
+    iconName: 'ShieldCheck',
+    features: [
+      'پشتیبانی آنلاین و ریموت فوری با نرم‌افزارهای امن ریموت دسکتاپ',
+      'حضور کارشناس ارشد شبکه در محل شرکت طبق جدول زمان‌بندی منظم',
+      'کنترل روزانه سلامت فایل‌های بکاپ سرورها و پایگاه‌های داده',
+      'به‌روزرسانی امنیتی لینوکس و ویندوز و رفع باگ‌های سیستم‌عامل',
+      'تامین و ارتقای قطعات سخت‌افزاری سرورها، رک‌ها و کامپیوترها',
+      'تضمین SLA و بازه پاسخگویی کوتاه در قرارداد رسمی پشتیبانی'
+    ],
+    deliverables: [
+      'گزارش مکتوب ماهانه از وضعیت سلامت زیرساخت، حوادث و اقدامات اصلاحی',
+      'خط تماس اختصاصی پشتیبانی سریع برای مدیران و پرسنل',
+      'کاهش هزینه‌های استخدامی با برون‌سپاری تخصصی واحد انفورماتیک',
+      'آرامش خاطر از پایداری ۹۹.۹ درصدی سرویس‌ها'
+    ],
+    techStack: ['Remote Support Tools', 'Zabbix', 'Syslog Server', 'Backup Verification', 'Helpdesk Ticketing'],
+    estimatedDelivery: 'قرارداد ماهانه / سالانه (با ۲ هفته دوره آزمایشی)',
+    pricingGuide: 'شروع از ۳,۲۰۰,۰۰۰ تومان در ماه',
+    isPopular: false
+  }
+];
+
+export const INITIAL_PROJECT_REQUESTS: ProjectRequest[] = [
+  {
+    id: 'prj-req-101',
+    trackingCode: 'PRJ-1403-9124',
+    title: 'طراحی و اجرای کابل‌کشی پسیو و راه‌اندازی شبکه شرکت مهندسی پتروآریا',
+    category: 'passive-network',
+    categoryTitle: 'طراحی و اجرای پسیو شبکه',
+    clientName: 'مهندس سعید کریمی',
+    clientPhone: '09121118899',
+    clientEmail: 's.karimi@petroaria.ir',
+    organization: 'شرکت مهندسی و بازرگانی پتروآریا',
+    description: 'نیاز به کابل‌کشی ساخت‌یافته Cat6 SFTP برای ۴۸ نود کاری در ۲ طبقه اداری، نصب و آرایش رک ۴۲ یونیت دیتاسنتر، فیوژن فیبر نوری بین طبقات و تست فلوک چنل.',
+    urgency: 'enterprise',
+    budgetRange: '۳۰ تا ۷۰ میلیون تومان',
+    location: 'تهران، خیابان وزرا',
+    preferredContact: 'phone',
+    status: 'in_progress',
+    statusNotes: 'فاز کابل‌کشی طبقه اول تکمیل شد. کابل‌های طبقه دوم در حال ترانکینگ و بستن کیستون است. رک دیتاسنتر مستقر گردیده است.',
+    estimatedDelivery: '۱۴۰۳/۰۸/۲۵',
+    assignedEngineer: 'مهندس محمدرضا قاسمی (کارشناس ارشد زیرساخت)',
+    createdAt: '۱۴۰۳/۰۸/۰۸',
+    updatedAt: '۱۴۰۳/۰۸/۱۴',
+    adminNotes: 'قرارداد فاز اول منعقد و پیش‌پرداخت دریافت گردید. تجهیزات لگراند و نگزنس تحویل کارگاه شد.'
+  },
+  {
+    id: 'prj-req-102',
+    trackingCode: 'PRJ-1403-9125',
+    title: 'مجازی‌سازی سرور با VMware ESXi 8.0 و راه‌اندازی بکاپ‌گیری Veeam',
+    category: 'virtualization',
+    categoryTitle: 'مجازی‌سازی سرور و دیتاسنتر',
+    clientName: 'دکتر علیرضا صدری',
+    clientPhone: '09123456789',
+    clientEmail: 'sadri@novinclinics.com',
+    organization: 'مرکز تصویربرداری و کلینیک نوین',
+    description: 'راه‌اندازی دو دستگاه سرور HP DL380 Gen10 با هایپروایزر VMware ESXi 8.0، انتقال سیستم HIS و PACS و دیتابیس بیماران بدون قطعی سرویس‌دهی، و پیکربندی بکاپ خودکار شبانه روی استوریج NAS.',
+    urgency: 'urgent',
+    budgetRange: '۱۰ تا ۳۰ میلیون تومان',
+    location: 'تهران، سعادت‌آباد',
+    preferredContact: 'phone',
+    status: 'approved',
+    statusNotes: 'طرح معماری و پیش‌فاکتور تایید شد. زمان مراجعه حضوری برای پیاده‌سازی روز پنج‌شنبه هماهنگ گردید.',
+    estimatedDelivery: '۱۴۰۳/۰۸/۲۰',
+    assignedEngineer: 'مهندس نوید رادمنش (متخصص مجازی‌سازی و لینوکس)',
+    createdAt: '۱۴۰۳/۰۸/۱۲',
+    updatedAt: '۱۴۰۳/۰۸/۱۵',
+    adminNotes: 'ایمیج سفارشی ESXi برای سخت‌افزار HP آماده شد. لایسنس‌ها صادر گردید.'
+  },
+  {
+    id: 'prj-req-103',
+    trackingCode: 'PRJ-1403-9126',
+    title: 'طراحی وب‌سایت فروشگاهی تخصصی تجهیزات مخابراتی و شبکه',
+    category: 'web-design',
+    categoryTitle: 'طراحی وب‌سایت مدرن و فروشگاهی',
+    clientName: 'احسان موسوی',
+    clientPhone: '09351234567',
+    clientEmail: 'e.mousavi@netkala.com',
+    organization: 'فروشگاه اینترنتی نت‌کالا',
+    description: 'طراحی وب‌سایت فروشگاهی مدرن با React/Next.js یا وردپرس ووکامرس بهینه‌سازی شده، دارای فیلترهای پیشرفته مشخصات فنی سوئیچ و روتر، درگاه مستقیم بانکی و سیستم پیامک آنی.',
+    urgency: 'normal',
+    budgetRange: '۱۰ تا ۳۰ میلیون تومان',
+    location: 'سراسر کشور (پروژه ریموت و آنلاین)',
+    preferredContact: 'telegram',
+    status: 'consultation',
+    statusNotes: 'جلسه نیازسنجی آنلاین از طریق گوگل‌میت برگزار شد و نمونه کارهای فروشگاهی ارائه گردید. پیش‌فاکتور ارسال شده و در انتظار تایید نهایی است.',
+    estimatedDelivery: '۱۴۰۳/۰۹/۱۰',
+    assignedEngineer: 'مهندس سپهری (طراح ارشد وب و فرانت‌اند)',
+    createdAt: '۱۴۰۳/۰۸/۱۳',
+    updatedAt: '۱۴۰۳/۰۸/۱۵'
+  }
+];
 
 export const INITIAL_OFFICIAL_CERTS: Certificate[] = [
   {
@@ -949,6 +1266,773 @@ export const INITIAL_OFFICIAL_CERTS: Certificate[] = [
   }
 ];
 
+export const INITIAL_ORGANIC_SHIPPING_METHODS: OrganicShippingMethod[] = [
+  {
+    id: 'post_pishtaz',
+    title: 'پست پیشتاز سراسری (شرکت ملی پست)',
+    cost: 45000,
+    estimatedDelivery: '۳ الی ۵ روز کاری',
+    description: 'تحویل درب منزل در تمام شهرها و روستاهای ایران با کارتن استاندارد و حباب‌دار',
+    badge: 'اقتصادی و مطمئن'
+  },
+  {
+    id: 'tipax',
+    title: 'تیپاکس اکسپرس درب منزل (Tipax Courier)',
+    cost: 65000,
+    estimatedDelivery: '۲۴ الی ۴۸ ساعت کاری',
+    description: 'سریع‌ترین روش ارسال بین‌شهری همراه با پیامک رهگیری وضعیت مرسوله',
+    badge: 'پیشنهادی'
+  },
+  {
+    id: 'express_courier',
+    title: 'پیک ویژه موتوری روز (مخصوص تهران و کرج)',
+    cost: 85000,
+    estimatedDelivery: 'تحویل همان روز (کمتر از ۴ ساعت)',
+    description: 'ارسال فوری ویژه ساکنین استان تهران و البرز',
+    badge: 'تحویل فوری روز'
+  },
+  {
+    id: 'special_coldpack',
+    title: 'ارسال ویژه با کلمن و یخ‌دان (Cold-Pack)',
+    cost: 95000,
+    estimatedDelivery: 'ارسال خنک و تضمینی',
+    description: 'مخصوص زغال‌اخته نوبرانه تازه، آلوهای گوشتی و محصولات نیازمند برودت',
+    badge: 'تضمین تازگی نوبرانه'
+  },
+  {
+    id: 'barbari',
+    title: 'باربری و اتوبوس‌رانی بین‌شهری (سفارشات عمده بالای ۱۰ کیلوگرم)',
+    cost: 50000,
+    estimatedDelivery: '۲۴ الی ۴۸ ساعت',
+    description: 'تحویل در انبار باربری ترمینال شهر مقصد ویژه خریدهای عمده و رستورانی',
+    badge: 'ویژه سفارشات عمده'
+  }
+];
+
+export const INITIAL_ORGANIC_PRODUCTS: OrganicProduct[] = [
+  {
+    id: 'org-prod-1',
+    title: 'گردوی کاغذی اعلا تویسرکان (سوپر ممتاز دست‌چین)',
+    slug: 'organic-toyserkan-walnut',
+    category: 'nuts',
+    grade: 'ممتاز صادراتی',
+    type: 'پوست‌کاغذی سوزنی، مغز سفید برفی و پرچرب',
+    shortDescription: 'گردوی اصل تویسرکان با پوسته نازک که به آسانی با فشار دست می‌شکند، ۱۰۰٪ پرچرب و بدون مغز سوخته.',
+    description: `<p><strong>گردوی کاغذی اعلا تویسرکان</strong> محصول باغات دامنه‌های الوند همدان است که به عنوان پایتخت گردوی جهان شناخته می‌شود. این گردو دارای پوسته فوق‌العاده نازک (پوست کاغذی واقعی) است که به راحتی با فشار دو انگشت می‌شکند.</p>
+<h3>ویژگی‌های اختصاصی گردوی تویسرکان:</h3>
+<ul>
+  <li>مغز روشن و یکدست با درصد سفیدی بالای ۹۲٪</li>
+  <li>چربی طبیعی و روغن ارگانیک فوق‌العاده لذیذ بدون طعم ماندگی یا تلخی</li>
+  <li>کاملاً ارگانیک، بدون سم‌پاشی شیمیایی و کودهای هورمونی</li>
+  <li>برداشت امسال (پاییز ۱۴۰۳) با رطوبت استاندارد انبارداری</li>
+</ul>
+<p>این محصول منبع سرشار اسیدهای چرب غیراشباع <strong>امگا ۳</strong>، آنتی‌اکسیدان‌های ضدپیری و ویتامین‌های گروه B است که برای تقویت حافظه، جلوگیری از آلزایمر و کاهش چربی خون توصیه اکید می‌شود.</p>`,
+    image: '/src/assets/images/organic_walnuts_1792656122598.jpg',
+    galleryImages: [
+      '/src/assets/images/organic_store_banner_1792656193622.jpg',
+      '/src/assets/images/organic_hazelnuts_1792656157355.jpg'
+    ],
+    packageOptions: [
+      { id: 'pkg-w-500', weightLabel: '۵۰۰ گرم پاکتی', weightGrams: 500, price: 340000, originalPrice: 390000, inStock: true },
+      { id: 'pkg-w-1000', weightLabel: '۱ کیلوگرم اعلا', weightGrams: 1000, price: 650000, originalPrice: 750000, inStock: true },
+      { id: 'pkg-w-3000', weightLabel: '۳ کیلوگرم خانگی', weightGrams: 3000, price: 1850000, originalPrice: 2200000, inStock: true },
+      { id: 'pkg-w-5000', weightLabel: '۵ کیلوگرم عمده اقتصادی', weightGrams: 5000, price: 2980000, originalPrice: 3600000, inStock: true }
+    ],
+    basePrice: 650000,
+    originalBasePrice: 750000,
+    unit: 'کیلوگرم',
+    stockQuantityKg: 185,
+    harvestYear: 'پاییز ۱۴۰۳ (برداشت امسال)',
+    originRegion: 'باغات کهن تویسرکان، همدان (ارتفاع ۲۰۰۰ متری)',
+    colorAndAppearance: 'مغز سفید شیری و روشن، پوسته تمیز و بدون خال یا تیرگی، روغن‌دهی بالا',
+    dimensionsAndSize: 'کالیبر درشت ۳۴ الی ۳۶ میلی‌متر، گرد و کاملاً یکدست',
+    properties: [
+      'سرشار از اسیدهای چرب امگا ۳ طبیعی',
+      'تقویت چشمگیر حافظه و تمرکز ذهنی',
+      'کاهنده کلسترول بد (LDL) و تنظیم فشار خون',
+      'فاقد هرگونه مواد نگه‌دارنده و فرآوری صنعتی'
+    ],
+    nutritionalFacts: {
+      servingSize: '۱۰۰ گرم مغز گردو',
+      calories: 654,
+      proteinGrams: 15.2,
+      carbsGrams: 13.7,
+      fiberGrams: 6.7,
+      fatGrams: 65.2,
+      saturatedFatGrams: 6.1,
+      sugarGrams: 2.6,
+      sodiumMg: 2,
+      potassiumMg: 441,
+      magnesiumMg: 158,
+      ironMg: 2.9,
+      calciumMg: 98,
+      zincMg: 3.1,
+      vitaminE_Mg: 0.7,
+      omega3_Grams: 9.1,
+      highlights: [
+        'منبع استثنایی اسیدهای چرب امگا ۳ (۹.۱ گرم در هر ۱۰۰ گرم)',
+        'تقویت‌کننده طبیعی سلول‌های خاکستری مغز و تمرکز ذهنی',
+        'غنی از منیزیم، مس و فسفر با اثرات اثبات‌شده ضدپیری'
+      ]
+    },
+    tags: ['گردو', 'تویسرکان', 'پوست_کاغذی', 'خشکبار_ارگانیک', 'آجیل_اعلا'],
+    isFeatured: true,
+    rating: 4.96,
+    reviewsCount: 48,
+    farmCost: 470000,
+    updatedAt: '۱۴۰۳/۰۸/۰۱'
+  },
+  {
+    id: 'org-prod-2',
+    title: 'فندق خندان اشکورات رودسر (کوهی و درشت)',
+    slug: 'organic-eshkevarat-hazelnut',
+    category: 'nuts',
+    grade: 'درجه یک اعلا',
+    type: 'خام کوهی، خندان طبیعی دست‌چین',
+    shortDescription: 'فندق اصیل اشکورات گیلان، پرچرب و ترد با خندانی بالای ۹۵ درصد، بو نداده و کاملاً تازه.',
+    description: `<p><strong>فندق اشکورات رودسر</strong> معروف‌ترین و باکیفیت‌ترین فندق خاورمیانه است که در ارتفاعات مه‌آلود گیلان تولید می‌شود. آب‌وهوای کوهستانی منطقه باعث تجمع چربی مفید طبیعی و طعم شیرین بی‌نظیری در این فندق گردیده است.</p>
+<h3>مزایای مصرف فندق ارگانیک اشکورات:</h3>
+<ul>
+  <li>غنی‌ترین منبع گیاهی ویتامین E برای جوانی و طراوت پوست</li>
+  <li>تقویت سیستم عضلانی ورزشکاران و کودکان در حال رشد</li>
+  <li>خام و فاقد نمک یا مواد افزودنی شیمیایی</li>
+</ul>`,
+    image: '/src/assets/images/organic_hazelnuts_1792656157355.jpg',
+    galleryImages: [
+      '/src/assets/images/organic_store_banner_1792656193622.jpg'
+    ],
+    packageOptions: [
+      { id: 'pkg-h-500', weightLabel: '۵۰۰ گرم پاکتی', weightGrams: 500, price: 310000, originalPrice: 360000, inStock: true },
+      { id: 'pkg-h-1000', weightLabel: '۱ کیلوگرم اعلا', weightGrams: 1000, price: 590000, originalPrice: 690000, inStock: true },
+      { id: 'pkg-h-2000', weightLabel: '۲ کیلوگرم', weightGrams: 2000, price: 1140000, originalPrice: 1350000, inStock: true }
+    ],
+    basePrice: 590000,
+    originalBasePrice: 690000,
+    unit: 'کیلوگرم',
+    stockQuantityKg: 130,
+    harvestYear: 'شهریور ۱۴۰۳ (تازه‌چین)',
+    originRegion: 'روستای دیورود، منطقه اشکورات رودسر، گیلان',
+    colorAndAppearance: 'پوسته قهوه‌ای شفاف و براق، مغز طلایی مایل به سفید و پرچرب',
+    dimensionsAndSize: 'کالیبر درشت ۱۸ الی ۲۰ میلی‌متر، مغزهای سالم و پر',
+    properties: [
+      'سرشار از ویتامین E و منیزیم',
+      'تقویت عضلات قلب و تنظیم ضربان',
+      'کمک به بهبود کم‌خونی و خستگی مفرط'
+    ],
+    nutritionalFacts: {
+      servingSize: '۱۰۰ گرم مغز فندق',
+      calories: 628,
+      proteinGrams: 15.0,
+      carbsGrams: 16.7,
+      fiberGrams: 9.7,
+      fatGrams: 60.8,
+      saturatedFatGrams: 4.5,
+      sugarGrams: 4.3,
+      sodiumMg: 0,
+      potassiumMg: 680,
+      magnesiumMg: 163,
+      calciumMg: 114,
+      ironMg: 4.7,
+      zincMg: 2.5,
+      vitaminE_Mg: 15.0,
+      highlights: [
+        'بالاترین میزان ویتامین E در بین تمام مغزها (۱۰۰٪ نیاز روزانه پوست و مو)',
+        'سرشار از اسید اولئیک برای تنظیم کلسترول و عروق کرونر قلب',
+        'حاوی ۹.۷ گرم فیبر پروبیوتیک گیاهی برای سلامت روده'
+      ]
+    },
+    tags: ['فندق', 'اشکورات', 'رودسر', 'فندق_خندان', 'ارگانیک'],
+    isFeatured: true,
+    rating: 4.91,
+    reviewsCount: 36,
+    farmCost: 420000,
+    updatedAt: '۱۴۰۳/۰۷/۲۸'
+  },
+  {
+    id: 'org-prod-3',
+    title: 'زغال اخته ترش و ملس الموت قزوین (آفتاب‌خشک سنتی)',
+    slug: 'organic-alamut-cornelian-cherry',
+    category: 'dried-fruits',
+    grade: 'ارگانیک وحشی کوهستان',
+    type: 'آفتاب‌خشک سنتی بدون گوگرد و شکر',
+    shortDescription: 'زغال اخته اصیل دره‌های تاریخی الموت، گوشتی و تمیز با طعم ترش و ملس بهشتی و خواص دارویی اثبات‌شده.',
+    description: `<p><strong>زغال اخته الموت قزوین</strong> سوغات نامدار دره‌های کوهستانی البرز است. این میوه یاقوتی به شیوه ۱۰۰٪ سنتی در زیر تابش آفتاب کوهستان خشک شده و فاقد هرگونه ماده نگهدارنده شیمیایی، گوگرد یا شکر افزوده است.</p>
+<h3>خواص درمانی زغال اخته ارگانیک:</h3>
+<ul>
+  <li>بهترین آنتی‌اکسیدان طبیعی برای چربی‌سوزی و پاکسازی آنزیم‌های کبد چرب</li>
+  <li>درمان و پیشگیری اثبات‌شده از عفونت‌های ادراری و سنگ کلیه</li>
+  <li>تنظیم ترشح انسولین و کاهش قند خون بیماران دیابتی</li>
+</ul>`,
+    image: '/src/assets/images/organic_cornelian_1792656138756.jpg',
+    galleryImages: [
+      '/src/assets/images/organic_store_banner_1792656193622.jpg'
+    ],
+    packageOptions: [
+      { id: 'pkg-c-250', weightLabel: '۲۵۰ گرم', weightGrams: 250, price: 135000, originalPrice: 160000, inStock: true },
+      { id: 'pkg-c-500', weightLabel: '۵۰۰ گرم', weightGrams: 500, price: 255000, originalPrice: 300000, inStock: true },
+      { id: 'pkg-c-1000', weightLabel: '۱ کیلوگرم ویژه', weightGrams: 1000, price: 480000, originalPrice: 570000, inStock: true }
+    ],
+    basePrice: 480000,
+    originalBasePrice: 570000,
+    unit: 'کیلوگرم',
+    stockQuantityKg: 18,
+    stockKg: 18,
+    lowStockThresholdKg: 25,
+    harvestYear: 'تابستان ۱۴۰۳',
+    originRegion: 'روستای هیر و دره‌های الموت، قزوین',
+    colorAndAppearance: 'یاقوتی تیره، گوشتی و تمیز بدون گرد و غبار، ترش ملس طبیعی',
+    dimensionsAndSize: 'دانه‌های متوسط و درشت گوشتی دست‌چین',
+    properties: [
+      'چربی‌سوز طبیعی و سم‌زدایی کبد',
+      'درمان عفونت‌های مجاری ادراری و کلیه',
+      'سرشار از آنتوسیانین و ویتامین C ضدسرطان'
+    ],
+    nutritionalFacts: {
+      servingSize: '۱۰۰ گرم زغال اخته خشک سنتی',
+      calories: 285,
+      proteinGrams: 2.8,
+      carbsGrams: 68.4,
+      fiberGrams: 8.5,
+      fatGrams: 0.9,
+      saturatedFatGrams: 0.1,
+      sugarGrams: 46.0,
+      sodiumMg: 15,
+      potassiumMg: 520,
+      calciumMg: 78,
+      ironMg: 2.4,
+      vitaminC_Mg: 54.0,
+      highlights: [
+        'بمب آنتی‌اکسیدانی و فلاونوئیدهای آنتوسیانین ضدالتهاب',
+        '۵۴ میلی‌گرم ویتامین C طبیعی برای تقویت ایمنی و سلامت پوست',
+        'پاک‌کننده طبیعی اسید اوریک و سم‌زدای کبد و کلیه'
+      ]
+    },
+    tags: ['زغال_اخته', 'الموت', 'ترش', 'میوه_خشک', 'کبد_چرب'],
+    isFeatured: true,
+    rating: 4.98,
+    reviewsCount: 52,
+    farmCost: 330000,
+    updatedAt: '۱۴۰۳/۰۷/۲۰'
+  },
+  {
+    id: 'org-prod-4',
+    title: 'لوبیا چیتی ارگانیک دست‌چین خمین (زودپز و بدون نفخ)',
+    slug: 'organic-khomein-pinto-beans',
+    category: 'legumes',
+    grade: 'درجه یک اعلا',
+    type: 'بوجاری شده و لیزری، بدون ضایعات و سنگ',
+    shortDescription: 'لوبیا چیتی محصول دشت‌های پاک خمین، زودپز در کمتر از ۴۰ دقیقه با لعاب عالی و پوست نازک بدون ایجاد نفخ.',
+    description: `<p><strong>لوبیا چیتی ارگانیک خمین</strong> قطب برتر تولید حبوبات باکیفیت ایران است. این محصول با آب قنات و بدون استفاده از فاضلاب یا کودهای شیمایی ناسالم کشت گردیده و در دستگاه‌های سورتینگ بوجار و پاکسازی شده است.</p>
+<h3>ویژگی‌های پخت و ارزش غذایی:</h3>
+<ul>
+  <li>زمان پخت سریع زیر ۴۰ دقیقه بدون له شدن یا جدا شدن پوسته</li>
+  <li>پروتئین گیاهی خالص و غنی از آهن، فولات و فیبر رژیمی</li>
+  <li>بسیار خوش‌خوراک و ایجادکننده لعاب بی‌نظیر در قورمه‌سبزی و خوراک لوبیا</li>
+</ul>`,
+    image: '/src/assets/images/organic_plums_beans_1792656171742.jpg',
+    galleryImages: [
+      '/src/assets/images/organic_store_banner_1792656193622.jpg'
+    ],
+    packageOptions: [
+      { id: 'pkg-b-900', weightLabel: '۹۰۰ گرم پاکتی', weightGrams: 900, price: 185000, originalPrice: 220000, inStock: true },
+      { id: 'pkg-b-2000', weightLabel: '۲ کیلوگرم خانگی', weightGrams: 2000, price: 395000, originalPrice: 460000, inStock: true },
+      { id: 'pkg-b-5000', weightLabel: '۵ کیلوگرم کیسه‌ای عمده', weightGrams: 5000, price: 940000, originalPrice: 1100000, inStock: true }
+    ],
+    basePrice: 195000,
+    originalBasePrice: 230000,
+    unit: 'کیلوگرم',
+    stockQuantityKg: 280,
+    harvestYear: 'پاییز ۱۴۰۳ (نوبرانه امسال)',
+    originRegion: 'مزارع نمونه خمین، استان مرکزی',
+    colorAndAppearance: 'طرح خال‌های صورتی و بنفش روی زمینه کرم، بدون سوراخ و کرم‌خوردگی',
+    dimensionsAndSize: 'دانه‌های تپل و یکدست با کالیبر درشت',
+    properties: [
+      'منبع غنی پروتئین گیاهی و آهن خون‌ساز',
+      'پخت سریع و هضم آسان بدون ایجاد نفخ',
+      'سرشار از فیبر و کاهنده جذب قند غذا'
+    ],
+    nutritionalFacts: {
+      servingSize: '۱۰۰ گرم دانه خام ارگانیک',
+      calories: 347,
+      proteinGrams: 21.4,
+      carbsGrams: 62.6,
+      fiberGrams: 15.5,
+      fatGrams: 1.2,
+      saturatedFatGrams: 0.2,
+      sugarGrams: 2.1,
+      sodiumMg: 12,
+      potassiumMg: 1390,
+      magnesiumMg: 176,
+      ironMg: 5.1,
+      calciumMg: 113,
+      zincMg: 2.3,
+      highlights: [
+        '۲۱.۴ گرم پروتئین گیاهی خالص (جایگزین فوق‌العاده برای رژیم‌های سلامت و ورزشی)',
+        '۱۵.۵ گرم فیبر رژیمی برای کنترل دیابت و کلسترول خون',
+        '۱۳۹۰ میلی‌گرم پتاسیم و ۵.۱ میلی‌گرم آهن خون‌ساز در هر ۱۰۰ گرم'
+      ]
+    },
+    tags: ['لوبیا_چیتی', 'خمین', 'حبوبات_ارگانیک', 'زودپز'],
+    isFeatured: true,
+    rating: 4.88,
+    reviewsCount: 29,
+    farmCost: 135000,
+    updatedAt: '۱۴۰۳/۰۷/۲۵'
+  },
+  {
+    id: 'org-prod-5',
+    title: 'آلو بخارا طلایی شمس نیشابور (آفتاب‌خشک طبیعی)',
+    slug: 'organic-neyshabur-golden-plum',
+    category: 'dried-fruits',
+    grade: 'ممتاز صادراتی',
+    type: 'آفتاب‌خشک سنتی، گوشتی و شیرین بدون تیزاب',
+    shortDescription: 'آلو بخارای زرین و آبدار نیشابور، فرآوری‌شده به روش سنتی با طعم ملس و ترشی ملایم مناسب انواع خورشت و مصرف روزانه.',
+    description: `<p><strong>آلو بخارای ممتاز نیشابور</strong> یکی از نام‌آورترین محصولات باغی خراسان است. باغات دامنه بینالود نیشابور بهترین خاک و آب را برای باردهی این آلوهای طلایی و گوشتی فراهم می‌آورند.</p>
+<h3>چرا آلوی ارگانیک نیشابور؟</h3>
+<ul>
+  <li>خشک شده به شیوه بهداشتی سنتی آفتاب بدون دود گوگرد یا اسید سیتریک</li>
+  <li>گوشت فراوان و بافت نرم و ملس که در پخت خورشت طعم شگفت‌انگیزی آزاد می‌کند</li>
+  <li>بهترین راهکار طبیعی برای تنظیم سلامت دستگاه گوارش و رفع یبوست مزمن</li>
+</ul>`,
+    image: '/src/assets/images/organic_plums_beans_1792656171742.jpg',
+    galleryImages: [
+      '/src/assets/images/organic_store_banner_1792656193622.jpg'
+    ],
+    packageOptions: [
+      { id: 'pkg-p-500', weightLabel: '۵۰۰ گرم', weightGrams: 500, price: 210000, originalPrice: 250000, inStock: true },
+      { id: 'pkg-p-1000', weightLabel: '۱ کیلوگرم ممتاز', weightGrams: 1000, price: 395000, originalPrice: 480000, inStock: true },
+      { id: 'pkg-p-2000', weightLabel: '۲ کیلوگرم', weightGrams: 2000, price: 760000, originalPrice: 920000, inStock: true }
+    ],
+    basePrice: 395000,
+    originalBasePrice: 480000,
+    unit: 'کیلوگرم',
+    stockQuantityKg: 14,
+    stockKg: 14,
+    lowStockThresholdKg: 25,
+    harvestYear: 'امسال ۱۴۰۳',
+    originRegion: 'باغات خرو و درود، نیشابور، خراسان رضوی',
+    colorAndAppearance: 'طلایی کهربایی روشن، براق، تمیز و گوشتی بدون پوسته سیاه',
+    dimensionsAndSize: 'درشت و گوشتی با هسته کوچک و جداشونده',
+    properties: [
+      'ملین پرقدرت و درمان قطعی تنبلی روده',
+      'منبع غنی پتاسیم و تعدیل فشار خون',
+      'سرشار از آنتی‌اکسیدان‌های سلامت چشم و پوست'
+    ],
+    nutritionalFacts: {
+      servingSize: '۱۰۰ گرم آلو بخارا گوشتی',
+      calories: 240,
+      proteinGrams: 2.2,
+      carbsGrams: 63.9,
+      fiberGrams: 7.1,
+      fatGrams: 0.4,
+      saturatedFatGrams: 0.05,
+      sugarGrams: 38.1,
+      sodiumMg: 2,
+      potassiumMg: 732,
+      magnesiumMg: 41,
+      ironMg: 2.1,
+      calciumMg: 51,
+      vitaminC_Mg: 12.0,
+      vitaminE_Mg: 0.5,
+      highlights: [
+        'درمان اثبات‌شده یبوست و تنبلی روده به کمک سوربیتول طبیعی و فیبر محلول',
+        '۷۳۲ میلی‌گرم پتاسیم فعال برای تنظیم فشار خون شریانی',
+        'خشک شده در آفتاب طبیعی، کاملاً عاری از تیزاب، پارافین و گاز گوگرد'
+      ]
+    },
+    tags: ['آلو_بخارا', 'نیشابور', 'میوه_خشک', 'خورشتی', 'ارگانیک'],
+    isFeatured: true,
+    rating: 4.93,
+    reviewsCount: 41,
+    farmCost: 275000,
+    updatedAt: '۱۴۰۳/۰۷/۱۸'
+  },
+  {
+    id: 'org-prod-6',
+    title: 'عسل کوهستان سبلان (گون و آویشن وحشی ۱۰۰٪ طبیعی)',
+    slug: 'organic-sabalan-wild-honey',
+    category: 'herbs-honey',
+    grade: 'ارگانیک وحشی کوهستان',
+    type: 'خام و تصفیه‌نشده، ساکارز ۱.۵ درصد با برگه آزمایش',
+    shortDescription: 'عسل طبیعی مراتع کوهپایه سبلان، عطر غلیظ آویشن و گون کوهی با تأییدیه آزمایشگاهی و ضمانت خلوص صددرصدی.',
+    description: `<p><strong>عسل ارگانیک کوهستان سبلان</strong> حاصل زنبورداری سنتی در ارتفاعات بالای ۲۵۰۰ متری دامنه کوه سبلان است. کندوها در فصل گل‌دهی آویشن و گون کوهی مستقر شده و هیچ‌گونه تغذیه با شکر یا شربت صنعتی به زنبورها داده نشده است.</p>
+<h3>مشخصات آزمایشگاهی:</h3>
+<ul>
+  <li>درصد ساکارز ۱.۵٪ (بسیار پایین‌تر از استاندارد ۵٪ عسل طبیعی)</li>
+  <li>رطوبت پایین و عطر کوهستانی تند و طبیعی</li>
+  <li>بهبود زخم‌های معده، تقویت قوای دفاعی بدن و تسکین گلو درد</li>
+</ul>`,
+    image: '/src/assets/images/organic_store_banner_1792656193622.jpg',
+    galleryImages: [
+      '/src/assets/images/organic_walnuts_1792656122598.jpg'
+    ],
+    packageOptions: [
+      { id: 'pkg-m-500', weightLabel: '۵۰۰ گرم شیشه‌ای', weightGrams: 500, price: 295000, originalPrice: 340000, inStock: true },
+      { id: 'pkg-m-1000', weightLabel: '۱ کیلوگرم شیشه‌ای پلمپ', weightGrams: 1000, price: 560000, originalPrice: 650000, inStock: true }
+    ],
+    basePrice: 560000,
+    originalBasePrice: 650000,
+    unit: 'کیلوگرم',
+    stockQuantityKg: 70,
+    harvestYear: 'تابستان ۱۴۰۳',
+    originRegion: 'ییلاقات سبلان، استان اردبیل',
+    colorAndAppearance: 'کهربایی تیره و زلال، عطر گل‌های وحشی بدون ذرات معلق',
+    dimensionsAndSize: 'غلظت بالا و چگالی طبیعی استاندارد عسل خام',
+    properties: [
+      'آنتی‌بیوتیک طبیعی و تقویت سیستم ایمنی',
+      'درمان سوزش و زخم معده و بیماری‌های گوارشی',
+      'فاقد قند صنعتی و مناسب افراد با رژیم سلامت'
+    ],
+    nutritionalFacts: {
+      servingSize: '۱۰۰ گرم عسل خام و خالص',
+      calories: 304,
+      proteinGrams: 0.3,
+      carbsGrams: 82.4,
+      fiberGrams: 0.2,
+      fatGrams: 0.0,
+      sugarGrams: 82.1,
+      sodiumMg: 4,
+      potassiumMg: 52,
+      calciumMg: 6,
+      ironMg: 0.4,
+      zincMg: 0.2,
+      vitaminC_Mg: 2.5,
+      highlights: [
+        'ساکارز طبیعی ۱.۵٪ با دیاستاز فعال و آنزیم‌های زنده زنبور عسل',
+        'منبع انرژی طبیعی فوری با جذب سلولی بدون آسیب به لوزالمعده',
+        'خاصیت ضدباکتری و ضدقارچ قوی برای بهبود زخم‌ها و التهاب گلو'
+      ]
+    },
+    tags: ['عسل', 'سبلان', 'طبیعی', 'آویشن', 'ارگانیک'],
+    isFeatured: true,
+    rating: 4.97,
+    reviewsCount: 38,
+    farmCost: 390000,
+    updatedAt: '۱۴۰۳/۰۸/۰۲'
+  }
+];
+
+export const INITIAL_ORGANIC_ORDERS: OrganicOrder[] = [
+  {
+    id: 'org-ord-101',
+    orderNumber: 'ORG-1403-8841',
+    customerName: 'مهندس محمدرضا حسینی',
+    customerPhone: '09123456789',
+    customerProvince: 'تهران',
+    customerCity: 'تهران',
+    customerPostalCode: '1998765432',
+    customerAddress: 'سعادت‌آباد، میدان کاج، خیابان سرو غربی، پلاک ۲۴، واحد ۶',
+    notes: 'لطفاً عصر بعد از ساعت ۱۶ تحویل شود. زنگ واحد ۶ را بزنید.',
+    items: [
+      {
+        productId: 'org-prod-1',
+        packageOptionId: 'pkg-w-1000',
+        title: 'گردوی کاغذی اعلا تویسرکان (سوپر ممتاز دست‌چین)',
+        weightLabel: '۱ کیلوگرم اعلا',
+        quantity: 1,
+        unitPrice: 650000,
+        totalPrice: 650000
+      },
+      {
+        productId: 'org-prod-3',
+        packageOptionId: 'pkg-c-500',
+        title: 'زغال اخته ترش و ملس الموت قزوین (آفتاب‌خشک سنتی)',
+        weightLabel: '۵۰۰ گرم',
+        quantity: 1,
+        unitPrice: 255000,
+        totalPrice: 255000
+      }
+    ],
+    subtotal: 905000,
+    shippingCost: 65000,
+    discountAmount: 0,
+    totalPayable: 970000,
+    shippingMethodId: 'tipax',
+    shippingMethodName: 'تیپاکس اکسپرس درب منزل (Tipax Courier)',
+    paymentMethod: 'online',
+    paymentStatus: 'paid',
+    shippingStatus: 'delivered',
+    trackingCode: 'TPX-9841203941',
+    isSettledWithFarm: true,
+    farmCost: 635000,
+    profitAmount: 270000,
+    createdAt: '۱۴۰۳/۰۷/۲۲'
+  },
+  {
+    id: 'org-ord-102',
+    orderNumber: 'ORG-1403-8842',
+    customerName: 'دکتر مریم شریفی',
+    customerPhone: '09132223344',
+    customerProvince: 'اصفهان',
+    customerCity: 'اصفهان',
+    customerPostalCode: '8145678901',
+    customerAddress: 'خیابان چهارباغ بالا، کوچه کاویان، ساختمان پزشکان صبا، طبقه دوم',
+    items: [
+      {
+        productId: 'org-prod-4',
+        packageOptionId: 'pkg-b-2000',
+        title: 'لوبیا چیتی ارگانیک دست‌چین خمین (زودپز و بدون نفخ)',
+        weightLabel: '۲ کیلوگرم خانگی',
+        quantity: 1,
+        unitPrice: 395000,
+        totalPrice: 395000
+      },
+      {
+        productId: 'org-prod-5',
+        packageOptionId: 'pkg-p-1000',
+        title: 'آلو بخارا طلایی شمس نیشابور (آفتاب‌خشک طبیعی)',
+        weightLabel: '۱ کیلوگرم ممتاز',
+        quantity: 1,
+        unitPrice: 395000,
+        totalPrice: 395000
+      }
+    ],
+    subtotal: 790000,
+    shippingCost: 45000,
+    discountAmount: 0,
+    totalPayable: 835000,
+    shippingMethodId: 'post_pishtaz',
+    shippingMethodName: 'پست پیشتاز سراسری (شرکت ملی پست)',
+    paymentMethod: 'online',
+    paymentStatus: 'paid',
+    shippingStatus: 'shipped',
+    trackingCode: 'POST-34509120491',
+    isSettledWithFarm: false,
+    farmCost: 545000,
+    profitAmount: 245000,
+    createdAt: '۱۴۰۳/۰۷/۲۸'
+  },
+  {
+    id: 'org-ord-103',
+    orderNumber: 'ORG-1403-8843',
+    customerName: 'مهندس رضا کمالی',
+    customerPhone: '09355556677',
+    customerProvince: 'البرز',
+    customerCity: 'کرج',
+    customerPostalCode: '3156789012',
+    customerAddress: 'عظیمیه، میدان مهران، خیابان ندای جنوبی، کوچه شقایق، پلاک ۱۲',
+    notes: 'تحویل با هماهنگی تلفنی قبل از ارسال',
+    items: [
+      {
+        productId: 'org-prod-2',
+        packageOptionId: 'pkg-h-1000',
+        title: 'فندق خندان اشکورات رودسر (کوهی و درشت)',
+        weightLabel: '۱ کیلوگرم اعلا',
+        quantity: 1,
+        unitPrice: 590000,
+        totalPrice: 590000
+      },
+      {
+        productId: 'org-prod-3',
+        packageOptionId: 'pkg-c-500',
+        title: 'زغال اخته ترش و ملس الموت قزوین (آفتاب‌خشک سنتی)',
+        weightLabel: '۵۰۰ گرم',
+        quantity: 1,
+        unitPrice: 255000,
+        totalPrice: 255000
+      }
+    ],
+    subtotal: 845000,
+    shippingCost: 85000,
+    discountAmount: 0,
+    totalPayable: 930000,
+    shippingMethodId: 'express_courier',
+    shippingMethodName: 'پیک ویژه موتوری روز (مخصوص تهران و کرج)',
+    paymentMethod: 'card_to_card',
+    paymentStatus: 'paid',
+    shippingStatus: 'packed',
+    cardRefNumber: 'CARD-REF-994102',
+    isSettledWithFarm: false,
+    farmCost: 585000,
+    profitAmount: 260000,
+    createdAt: '۱۴۰۳/۰۸/۰۲'
+  }
+];
+
+export const INITIAL_ORGANIC_SETTLEMENTS: OrganicSettlement[] = [
+  {
+    id: 'org-set-1',
+    settlementNumber: 'SET-1403-11',
+    farmName: 'مزرعه و باغ کهنسال گردوی سپهری (تویسرکان)',
+    farmerName: 'حاج قاسم سپهری',
+    farmerPhone: '09181112233',
+    farmerShaba: 'IR880120000000001234567890',
+    farmerBank: 'بانک کشاورزی شعبه مرکزی تویسرکان',
+    amount: 1880000,
+    orderIds: ['ORG-1403-8841'],
+    productSummary: 'تسویه خرید ۴ کیلوگرم گردوی کاغذی اعلا سفارشات مهرماه',
+    status: 'settled',
+    settlementDate: '۱۴۰۳/۰۷/۲۵',
+    trackingCode: 'PAY-AGRI-884210',
+    note: 'واریز پایا از حساب تجاری شرکت، پیامک تأیید برای باغدار ارسال شد.'
+  },
+  {
+    id: 'org-set-2',
+    settlementNumber: 'SET-1403-12',
+    farmName: 'تعاونی باغداران روستای دیورود اشکورات',
+    farmerName: 'کربلایی علی رحمانی',
+    farmerPhone: '09113334455',
+    farmerShaba: 'IR440170000000009876543210',
+    farmerBank: 'بانک ملی شعبه رحیم‌آباد رودسر',
+    amount: 840000,
+    orderIds: ['ORG-1403-8843'],
+    productSummary: 'تسویه ۲ کیلوگرم فندق خندان اشکورات درجه یک',
+    status: 'pending',
+    settlementDate: '۱۴۰۳/۰۸/۰۴',
+    note: 'در نوبت تسویه هفتگی پنج‌شنبه‌ها'
+  },
+  {
+    id: 'org-set-3',
+    settlementNumber: 'SET-1403-13',
+    farmName: 'باغ‌های زغال‌اخته منطقه هیر الموت',
+    farmerName: 'مهندس احمد کریمی الموتی',
+    farmerPhone: '09127778899',
+    farmerShaba: 'IR220190000000005544332211',
+    farmerBank: 'بانک صادرات قزوین',
+    amount: 660000,
+    orderIds: ['ORG-1403-8841', 'ORG-1403-8843'],
+    productSummary: 'تسویه خرید زغال‌اخته آفتاب‌خشک سنتی',
+    status: 'settled',
+    settlementDate: '۱۴۰۳/۰۷/۲۹',
+    trackingCode: 'PAY-SAD-441029',
+    note: 'تسویه کامل انجام شد.'
+  }
+];
+
+export const INITIAL_ORGANIC_REVIEWS: OrganicProductReview[] = [
+  {
+    id: 'rev-org-1',
+    productId: 'org-prod-1',
+    productTitle: 'گردوی کاغذی اعلا تویسرکان (سوپر ممتاز دست‌چین)',
+    userName: 'دکتر علیرضا صدری',
+    userPhone: '09121112233',
+    rating: 5,
+    comment: 'کیفیت گردوها خارق‌العاده بود. پوستش واقعاً کاغذی سوزنی است و با دو انگشت شکسته می‌شود. مغز سفید، بدون ذره‌ای تلخی یا سوختگی و بسیار روغنی و پرچرب. بسته‌بندی زیپ‌کیپ کرافت هم خیلی بهداشتی بود.',
+    createdAt: '۱۴۰۳/۰۸/۰۴',
+    isVerifiedBuyer: true,
+    purchasedPackage: '۱ کیلوگرم اعلا',
+    orderNumber: 'ORG-1403-8841',
+    recommended: true,
+    likesCount: 14
+  },
+  {
+    id: 'rev-org-2',
+    productId: 'org-prod-1',
+    productTitle: 'گردوی کاغذی اعلا تویسرکان (سوپر ممتاز دست‌چین)',
+    userName: 'مهندس زهرا موسوی',
+    userPhone: '09351234567',
+    rating: 5,
+    comment: 'برای صبحانه و فسنجان خانواده گرفتم. طعم اصیل گردوی باغات تویسرکان رو داره و کاملاً مشخصه تازه برداشت امساله. ارسال با بسته‌بندی محکم و تمیز بود.',
+    createdAt: '۱۴۰۳/۰۸/۱۰',
+    isVerifiedBuyer: true,
+    purchasedPackage: '۳ کیلوگرم خانگی',
+    orderNumber: 'ORG-1403-8890',
+    recommended: true,
+    likesCount: 8
+  },
+  {
+    id: 'rev-org-3',
+    productId: 'org-prod-2',
+    productTitle: 'فندق خندان اشکورات رودسر (کوهی و درشت)',
+    userName: 'رضا کمالی',
+    userPhone: '09355556677',
+    rating: 5,
+    comment: 'فندق‌ها کاملاً خندان، ترد و خوش‌طعم هستند. حتی یک دانه پوک یا کرم‌خورده هم داخل بسته نبود. از خریدم فوق‌العاده راضیم.',
+    createdAt: '۱۴۰۳/۰۸/۰۲',
+    isVerifiedBuyer: true,
+    purchasedPackage: '۱ کیلوگرم اعلا',
+    orderNumber: 'ORG-1403-8843',
+    recommended: true,
+    likesCount: 11
+  },
+  {
+    id: 'rev-org-4',
+    productId: 'org-prod-3',
+    productTitle: 'زغال اخته ترش و ملس الموت قزوین (آفتاب‌خشک سنتی)',
+    userName: 'فاطمه ابراهیمی',
+    userPhone: '09198765432',
+    rating: 5,
+    comment: 'دقیقاً همون زغال اخته ترش و ملس روستاهای الموته. گوشتی، تمیز و بدون گرد و غبار. بوی آفتاب‌خشک طبیعی میده و اصلاً گوگرد نداره. برای کبد چرب واقعاً معجزه‌ست.',
+    createdAt: '۱۴۰۳/۰۸/۰۶',
+    isVerifiedBuyer: true,
+    purchasedPackage: '۵۰۰ گرم',
+    orderNumber: 'ORG-1403-8843',
+    recommended: true,
+    likesCount: 19
+  },
+  {
+    id: 'rev-org-5',
+    productId: 'org-prod-4',
+    productTitle: 'لوبیا چیتی خمین دستچین بوجاری (زودپز و لعاب‌دار)',
+    userName: 'مریم حسینی',
+    userPhone: '09123334455',
+    rating: 5,
+    comment: 'بسیار زودپز و خوش‌پخت، لعاب بسیار عالی بدون نیاز به اضافه کردن نشاسته. تمیز و بدون سنگ‌ریزه. حتماً دوباره سفارش میدم.',
+    createdAt: '۱۴۰۳/۰۷/۲۲',
+    isVerifiedBuyer: true,
+    purchasedPackage: '۱ کیلوگرم اعلا',
+    orderNumber: 'ORG-1403-8799',
+    recommended: true,
+    likesCount: 6
+  },
+  {
+    id: 'rev-org-6',
+    productId: 'org-prod-6',
+    productTitle: 'عسل کوهستان سبلان (گون و آویشن وحشی ۱۰۰٪ طبیعی)',
+    userName: 'حسین نجفی',
+    userPhone: '09187778899',
+    rating: 5,
+    comment: 'عطر تند گیاهان کوهی و آویشن سبلان کاملاً حس میشه. طعم شیرینی زننده گلو رو نداره و برگه آزمایش ساکارز هم همراه سفارش بود. خدا برکت بده به زنبوردارش.',
+    createdAt: '۱۴۰۳/۰۸/۰۸',
+    isVerifiedBuyer: true,
+    purchasedPackage: '۱ کیلوگرم شیشه‌ای پلمپ',
+    orderNumber: 'ORG-1403-8902',
+    recommended: true,
+    likesCount: 15
+  }
+];
+
+export const INITIAL_ORGANIC_STOCK_ALERT_CONFIG: OrganicStockAlertConfig = {
+  enableSmsAlerts: true,
+  enableEmailAlerts: true,
+  adminPhoneNumbers: '09128845678, 09198765432',
+  adminEmailAddresses: 'admin@parsnet-academy.com, supply@parsnet-academy.com',
+  defaultThresholdKg: 25,
+  smsProvider: 'kavenegar',
+  smsApiKey: '7A56384210B99C441A9908...',
+  smsLineNumber: '10008585',
+  autoSendOnOrder: true,
+  smsTemplate: 'هشدار انبار پارس‌نت: موجودی محصول [نام_محصول] به [موجودی] کیلوگرم کاهش یافته است (زیر حدنصاب [حدنصاب] کیلوگرم). لطفاً نسبت به تأمین مجدد و تسویه با باغدار اقدام نمایید.',
+  emailSubjectTemplate: '⚠️ هشدار کمبود موجودی انبار: محصول [نام_محصول]'
+};
+
+export const INITIAL_ORGANIC_STOCK_ALERT_LOGS: OrganicStockAlertLog[] = [
+  {
+    id: 'alert-log-1',
+    productId: 'org-prod-3',
+    productTitle: 'زغال اخته ترش و ملس الموت قزوین (آفتاب‌خشک سنتی)',
+    currentStockKg: 18,
+    thresholdKg: 25,
+    channel: 'sms',
+    recipient: '09128845678',
+    status: 'sent',
+    messageText: 'هشدار انبار پارس‌نت: موجودی محصول زغال اخته ترش و ملس الموت به ۱۸ کیلوگرم کاهش یافته است (زیر حدنصاب ۲۵ کیلوگرم). لطفاً نسبت به تأمین مجدد و تسویه با باغدار اقدام نمایید.',
+    timestamp: '۱۴۰۳/۰۸/۱۰ - ۱۱:۳۰'
+  },
+  {
+    id: 'alert-log-2',
+    productId: 'org-prod-3',
+    productTitle: 'زغال اخته ترش و ملس الموت قزوین (آفتاب‌خشک سنتی)',
+    currentStockKg: 18,
+    thresholdKg: 25,
+    channel: 'email',
+    recipient: 'admin@parsnet-academy.com',
+    status: 'sent',
+    messageText: 'گزارش کسری انبار: موجودی محصول ارگانیک زغال اخته ترش و ملس الموت قزوین کمتر از حد نصاب استاندارد ۲۵ کیلوگرم شد.',
+    timestamp: '۱۴۰۳/۰۸/۱۰ - ۱۱:۳۱'
+  }
+];
+
 class Store {
   courses: Course[] = [];
   files: DigitalFile[] = [];
@@ -974,7 +2058,22 @@ class Store {
   isAdminLoggedIn: boolean = false;
   listeners: (() => void)[] = [];
 
+  // Dedicated Organic Store State
+  organicProducts: OrganicProduct[] = INITIAL_ORGANIC_PRODUCTS;
+  organicCart: OrganicCartItem[] = [];
+  organicOrders: OrganicOrder[] = INITIAL_ORGANIC_ORDERS;
+  organicSettlements: OrganicSettlement[] = INITIAL_ORGANIC_SETTLEMENTS;
+  organicReviews: OrganicProductReview[] = INITIAL_ORGANIC_REVIEWS;
+  organicStockAlertConfig: OrganicStockAlertConfig = INITIAL_ORGANIC_STOCK_ALERT_CONFIG;
+  organicStockAlertLogs: OrganicStockAlertLog[] = INITIAL_ORGANIC_STOCK_ALERT_LOGS;
+
+  // Dedicated Project Services & Client Requests State
+  projectServices: ITServiceItem[] = INITIAL_PROJECT_SERVICES;
+  projectRequests: ProjectRequest[] = INITIAL_PROJECT_REQUESTS;
+
   constructor() {
+
+
     this.loadFromStorage();
   }
 
@@ -1019,6 +2118,28 @@ class Store {
       const storedOfficialCerts = localStorage.getItem('parsnet_official_certs');
       this.officialCertificates = storedOfficialCerts ? JSON.parse(storedOfficialCerts) : INITIAL_OFFICIAL_CERTS;
 
+      // Load Organic Store Data
+      const storedOrgProds = localStorage.getItem('parsnet_organic_products');
+      this.organicProducts = storedOrgProds ? JSON.parse(storedOrgProds) : INITIAL_ORGANIC_PRODUCTS;
+
+      const storedOrgCart = localStorage.getItem('parsnet_organic_cart');
+      this.organicCart = storedOrgCart ? JSON.parse(storedOrgCart) : [];
+
+      const storedOrgOrders = localStorage.getItem('parsnet_organic_orders');
+      this.organicOrders = storedOrgOrders ? JSON.parse(storedOrgOrders) : INITIAL_ORGANIC_ORDERS;
+
+      const storedOrgSettlements = localStorage.getItem('parsnet_organic_settlements');
+      this.organicSettlements = storedOrgSettlements ? JSON.parse(storedOrgSettlements) : INITIAL_ORGANIC_SETTLEMENTS;
+
+      const storedOrgReviews = localStorage.getItem('parsnet_organic_reviews');
+      this.organicReviews = storedOrgReviews ? JSON.parse(storedOrgReviews) : INITIAL_ORGANIC_REVIEWS;
+
+      const storedOrgAlertConfig = localStorage.getItem('parsnet_organic_stock_alert_config');
+      this.organicStockAlertConfig = storedOrgAlertConfig ? JSON.parse(storedOrgAlertConfig) : INITIAL_ORGANIC_STOCK_ALERT_CONFIG;
+
+      const storedOrgAlertLogs = localStorage.getItem('parsnet_organic_stock_alert_logs');
+      this.organicStockAlertLogs = storedOrgAlertLogs ? JSON.parse(storedOrgAlertLogs) : INITIAL_ORGANIC_STOCK_ALERT_LOGS;
+
       const storedTheme = localStorage.getItem('parsnet_theme') as 'light' | 'dark';
       this.theme = storedTheme || 'light';
       if (typeof document !== 'undefined') {
@@ -1057,6 +2178,15 @@ class Store {
         this.settings = INITIAL_SETTINGS;
       }
 
+      // Ensure site rebranding to Mehradinet
+      if (this.settings.siteTitle.includes('پارس') || !this.settings.siteTitle.includes('مهرادینت')) {
+        this.settings.siteTitle = 'مهرادینت';
+        this.settings.tagline = 'آموزش تخصصی شبکه، وب، برنامه‌نویسی و انجام پروژه‌های کامپیوتری';
+      }
+
+      const storedProjectRequests = localStorage.getItem('mehradinet_project_requests');
+      this.projectRequests = storedProjectRequests ? JSON.parse(storedProjectRequests) : INITIAL_PROJECT_REQUESTS;
+
       const storedCart = localStorage.getItem('parsnet_cart');
       this.cart = storedCart ? JSON.parse(storedCart) : [];
 
@@ -1074,6 +2204,8 @@ class Store {
       this.coupons = INITIAL_COUPONS;
       this.quizzes = INITIAL_QUIZZES;
       this.officialCertificates = INITIAL_OFFICIAL_CERTS;
+      this.projectServices = INITIAL_PROJECT_SERVICES;
+      this.projectRequests = INITIAL_PROJECT_REQUESTS;
       this.theme = 'light';
       this.colorTheme = 'indigo';
       this.adminTheme = 'classic-dark';
@@ -1108,11 +2240,84 @@ class Store {
       localStorage.setItem('parsnet_settings', JSON.stringify(this.settings));
       localStorage.setItem('parsnet_cart', JSON.stringify(this.cart));
       localStorage.setItem('parsnet_admin_auth', this.isAdminLoggedIn ? 'true' : 'false');
+
+      // Save Organic Store Data
+      localStorage.setItem('parsnet_organic_products', JSON.stringify(this.organicProducts));
+      localStorage.setItem('parsnet_organic_cart', JSON.stringify(this.organicCart));
+      localStorage.setItem('parsnet_organic_orders', JSON.stringify(this.organicOrders));
+      localStorage.setItem('parsnet_organic_settlements', JSON.stringify(this.organicSettlements));
+      localStorage.setItem('parsnet_organic_reviews', JSON.stringify(this.organicReviews));
+      localStorage.setItem('parsnet_organic_stock_alert_config', JSON.stringify(this.organicStockAlertConfig));
+      localStorage.setItem('parsnet_organic_stock_alert_logs', JSON.stringify(this.organicStockAlertLogs));
+
+      // Save Project Services Requests
+      localStorage.setItem('mehradinet_project_requests', JSON.stringify(this.projectRequests));
     } catch (e) {
       console.error('Failed to save to localStorage', e);
     }
     this.notify();
   }
+
+  // Project Services Requests Management
+  createProjectRequest(data: Omit<ProjectRequest, 'id' | 'trackingCode' | 'createdAt' | 'status'>): ProjectRequest {
+    const codeNum = Math.floor(1000 + Math.random() * 9000);
+    const newReq: ProjectRequest = {
+      ...data,
+      id: `prj-${Date.now()}`,
+      trackingCode: `PRJ-1403-${codeNum}`,
+      status: 'pending',
+      statusNotes: 'سفارش شما با موفقیت ثبت شد و در صف ارزیابی اولیه مهندسان مهرادینت قرار گرفت. کارشناس مربوطه به زودی با شما تماس خواهد گرفت.',
+      createdAt: new Intl.DateTimeFormat('fa-IR', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date()).replace(/\//g, '/'),
+      updatedAt: new Intl.DateTimeFormat('fa-IR', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date()).replace(/\//g, '/')
+    };
+    this.projectRequests.unshift(newReq);
+    this.saveToStorage();
+    this.addToast({
+      id: `t-${Date.now()}`,
+      type: 'success',
+      title: 'سفارش پروژه ثبت شد',
+      message: `کد رهگیری اختصاصی شما: ${newReq.trackingCode}`
+    });
+    return newReq;
+  }
+
+  updateProjectRequestStatus(
+    id: string, 
+    status: ProjectStatus, 
+    notes?: string, 
+    adminNotes?: string, 
+    estimatedDelivery?: string, 
+    assignedEngineer?: string
+  ) {
+    const req = this.projectRequests.find(r => r.id === id);
+    if (req) {
+      req.status = status;
+      if (notes) req.statusNotes = notes;
+      if (adminNotes !== undefined) req.adminNotes = adminNotes;
+      if (estimatedDelivery !== undefined) req.estimatedDelivery = estimatedDelivery;
+      if (assignedEngineer !== undefined) req.assignedEngineer = assignedEngineer;
+      req.updatedAt = new Intl.DateTimeFormat('fa-IR', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date()).replace(/\//g, '/');
+      this.saveToStorage();
+      this.addToast({
+        id: `t-${Date.now()}`,
+        type: 'info',
+        title: 'وضعیت پروژه به‌روزرسانی شد',
+        message: `پروژه ${req.trackingCode} به وضعیت جدید منتقل شد.`
+      });
+    }
+  }
+
+  deleteProjectRequest(id: string) {
+    this.projectRequests = this.projectRequests.filter(r => r.id !== id);
+    this.saveToStorage();
+    this.addToast({
+      id: `t-${Date.now()}`,
+      type: 'info',
+      title: 'حذف درخواست',
+      message: 'درخواست پروژه با موفقیت حذف گردید.'
+    });
+  }
+
 
   subscribe(listener: () => void) {
     this.listeners.push(listener);
@@ -1377,6 +2582,15 @@ class Store {
     setTimeout(() => {
       this.dismissToast(id);
     }, 4000);
+  }
+
+  addToast(toast: { id?: string; type?: 'success' | 'error' | 'info'; title?: string; message: string } | string) {
+    if (typeof toast === 'string') {
+      this.showToast('info', toast);
+    } else {
+      const msg = toast.title ? `${toast.title}: ${toast.message}` : toast.message;
+      this.showToast(toast.type || 'info', msg);
+    }
   }
 
   dismissToast(id: string) {
@@ -1842,6 +3056,381 @@ class Store {
       expiresAt,
       expiresSeconds: 14400
     };
+  }
+
+  // ================= ORGANIC STORE METHODS ================= //
+  addOrganicProduct(productData: Omit<OrganicProduct, 'id' | 'createdAt'>) {
+    const newProduct: OrganicProduct = {
+      ...productData,
+      id: `org_prod_${Date.now()}`,
+      createdAt: new Date().toISOString()
+    };
+    this.organicProducts.unshift(newProduct);
+    this.saveToStorage();
+    this.showToast('success', `محصول ارگانیک "${newProduct.name}" با موفقیت اضافه شد.`);
+    return newProduct;
+  }
+
+  updateOrganicProduct(id: string, updates: Partial<OrganicProduct>) {
+    const idx = this.organicProducts.findIndex(p => p.id === id);
+    if (idx !== -1) {
+      this.organicProducts[idx] = { ...this.organicProducts[idx], ...updates };
+      this.saveToStorage();
+      this.showToast('success', 'اطلاعات محصول ارگانیک به‌روزرسانی شد.');
+    }
+  }
+
+  deleteOrganicProduct(id: string) {
+    const product = this.organicProducts.find(p => p.id === id);
+    this.organicProducts = this.organicProducts.filter(p => p.id !== id);
+    this.saveToStorage();
+    this.showToast('info', `محصول ارگانیک "${product?.name || ''}" حذف شد.`);
+  }
+
+  addToOrganicCart(product: OrganicProduct, selectedPackage: OrganicPackageOption, quantity: number = 1) {
+    const pkgWeight = selectedPackage.weightInGrams || selectedPackage.weightGrams || 500;
+    const existingIndex = this.organicCart.findIndex(
+      item => item.product?.id === product.id && (item.selectedPackage?.weightInGrams || item.selectedPackage?.weightGrams) === pkgWeight
+    );
+
+    if (existingIndex > -1) {
+      this.organicCart[existingIndex].quantity += quantity;
+    } else {
+      const newItem: OrganicCartItem = {
+        id: `org_cart_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+        product,
+        selectedPackage,
+        quantity,
+        title: product.name || product.title || '',
+        weightLabel: selectedPackage.weightLabel,
+        unitPrice: selectedPackage.discountPrice || selectedPackage.price
+      };
+      this.organicCart.push(newItem);
+    }
+    this.saveToStorage();
+    this.showToast('success', `بسته ${selectedPackage.weightLabel} "${product.name || product.title}" به سبد خرید ارگانیک اضافه شد.`);
+  }
+
+  updateOrganicCartQuantity(cartItemId: string, quantity: number) {
+    if (quantity <= 0) {
+      this.removeFromOrganicCart(cartItemId);
+      return;
+    }
+    const item = this.organicCart.find(i => i.id === cartItemId);
+    if (item) {
+      item.quantity = quantity;
+      this.saveToStorage();
+    }
+  }
+
+  removeFromOrganicCart(cartItemId: string) {
+    this.organicCart = this.organicCart.filter(i => i.id !== cartItemId);
+    this.saveToStorage();
+    this.showToast('info', 'محصول از سبد خرید ارگانیک حذف شد.');
+  }
+
+  clearOrganicCart() {
+    this.organicCart = [];
+    this.saveToStorage();
+  }
+
+  createOrganicOrder(data: {
+    customerName: string;
+    customerPhone: string;
+    province: string;
+    city: string;
+    postalCode: string;
+    address: string;
+    notes?: string;
+    shippingMethod: OrganicShippingMethodId;
+    paymentMethod: OrganicPaymentMethod;
+  }): OrganicOrder {
+    const shippingMethodObj = INITIAL_ORGANIC_SHIPPING_METHODS.find(m => m.id === data.shippingMethod);
+    const shippingCost = shippingMethodObj?.price || shippingMethodObj?.cost || 45000;
+
+    let subtotal = 0;
+    let totalWeightInGrams = 0;
+    const items: OrganicOrderItem[] = this.organicCart.map(c => {
+      const price = c.selectedPackage?.discountPrice || c.selectedPackage?.price || c.unitPrice || 0;
+      const itemTotal = price * c.quantity;
+      const weight = c.selectedPackage?.weightInGrams || c.selectedPackage?.weightGrams || c.weightGrams || 500;
+      subtotal += itemTotal;
+      totalWeightInGrams += weight * c.quantity;
+      return {
+        productId: c.product?.id || c.productId || '',
+        productName: c.product?.name || c.product?.title || c.title || 'محصول ارگانیک',
+        category: c.product?.category || c.category,
+        grade: c.product?.grade || c.grade,
+        packageLabel: c.selectedPackage?.weightLabel || c.weightLabel || '',
+        weightInGrams: weight,
+        unitPrice: price,
+        quantity: c.quantity,
+        totalPrice: itemTotal,
+        image: c.product?.image || c.image
+      };
+    });
+
+    const totalAmount = subtotal + shippingCost;
+    const orderNumber = `ORG-${new Date().getFullYear() % 100}${String(new Date().getMonth() + 1).padStart(2, '0')}${String(new Date().getDate()).padStart(2, '0')}-${Math.floor(1000 + Math.random() * 9000)}`;
+
+    const newOrder: OrganicOrder = {
+      id: `org_ord_${Date.now()}`,
+      orderNumber,
+      customerName: data.customerName,
+      customerPhone: data.customerPhone,
+      province: data.province,
+      city: data.city,
+      postalCode: data.postalCode,
+      address: data.address,
+      customerProvince: data.province,
+      customerCity: data.city,
+      customerPostalCode: data.postalCode,
+      customerAddress: data.address,
+      notes: data.notes,
+      items,
+      subtotal,
+      shippingCost,
+      shippingMethod: data.shippingMethod,
+      shippingTitle: shippingMethodObj?.title || 'ارسال پیشتاز',
+      totalWeightInGrams,
+      totalAmount,
+      totalPayable: totalAmount,
+      paymentMethod: data.paymentMethod,
+      paymentStatus: data.paymentMethod === 'cod' ? 'pending' : 'paid',
+      status: 'processing',
+      shippingStatus: 'processing',
+      trackingCode: data.shippingMethod === 'express_courier' ? `EXP-${Math.floor(100000 + Math.random() * 900000)}` : undefined,
+      createdAt: new Date().toLocaleDateString('fa-IR') + ' ' + new Date().toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' })
+    };
+
+    // Deduct stock for ordered items
+    items.forEach(item => {
+      const prod = this.organicProducts.find(p => p.id === item.productId);
+      if (prod) {
+        const deductKg = ((item.weightInGrams || 500) * item.quantity) / 1000;
+        if (typeof prod.stockKg === 'number') {
+          prod.stockKg = Math.max(0, Number((prod.stockKg - deductKg).toFixed(1)));
+        }
+        if (typeof prod.stockQuantityKg === 'number') {
+          prod.stockQuantityKg = Math.max(0, Number((prod.stockQuantityKg - deductKg).toFixed(1)));
+        }
+      }
+    });
+
+    this.organicOrders.unshift(newOrder);
+    this.clearOrganicCart();
+
+    // Check low stock and trigger notification if enabled
+    if (this.organicStockAlertConfig.autoSendOnOrder) {
+      this.checkAndTriggerLowStockAlerts(`ثبت سفارش شماره ${orderNumber}`);
+    }
+
+    this.saveToStorage();
+    this.showToast('success', `سفارش ارگانیک شما با شماره پیگیری ${orderNumber} با موفقیت ثبت شد.`);
+    return newOrder;
+  }
+
+  updateOrganicOrderStatus(orderId: string, status: OrganicOrder['status'], trackingCode?: string) {
+    const order = this.organicOrders.find(o => o.id === orderId);
+    if (order) {
+      order.status = status;
+      if (trackingCode !== undefined) {
+        order.trackingCode = trackingCode;
+      }
+      if (status === 'delivered' && order.paymentMethod === 'cod') {
+        order.paymentStatus = 'paid';
+      }
+      this.saveToStorage();
+      this.showToast('success', `وضعیت سفارش ${order.orderNumber} به‌روز شد.`);
+    }
+  }
+
+  addOrganicSettlement(settlementData: Omit<OrganicSettlement, 'id' | 'createdAt'>) {
+    const newSettlement: OrganicSettlement = {
+      ...settlementData,
+      id: `org_stl_${Date.now()}`,
+      createdAt: new Date().toLocaleDateString('fa-IR')
+    };
+    this.organicSettlements.unshift(newSettlement);
+    this.saveToStorage();
+    this.showToast('success', `تسویه مالی با ${newSettlement.farmerName} ثبت گردید.`);
+    return newSettlement;
+  }
+
+  updateOrganicSettlementStatus(settlementId: string, status: OrganicSettlement['status'], referenceNumber?: string) {
+    const settlement = this.organicSettlements.find(s => s.id === settlementId);
+    if (settlement) {
+      settlement.status = status;
+      if (referenceNumber) {
+        settlement.referenceNumber = referenceNumber;
+      }
+      if (status === 'completed' && !settlement.settlementDate) {
+        settlement.settlementDate = new Date().toLocaleDateString('fa-IR');
+      }
+      this.saveToStorage();
+      this.showToast('success', `وضعیت تسویه به "${status === 'completed' ? 'تکمیل شده' : status === 'processing' ? 'در حال پرداخت' : 'لغو شده'}" تغییر یافت.`);
+    }
+  }
+
+  // Organic Product Reviews
+  getOrganicReviews(productId?: string): OrganicProductReview[] {
+    if (!productId) return this.organicReviews;
+    return this.organicReviews.filter(r => r.productId === productId);
+  }
+
+  isVerifiedBuyerOfProduct(productId: string, identifier?: string): boolean {
+    if (!identifier) {
+      identifier = this.currentUser?.phone || this.currentUser?.email;
+    }
+    if (!identifier) return false;
+    const cleanId = identifier.trim().toLowerCase();
+    return this.organicOrders.some(order => 
+      (order.customerPhone?.trim().toLowerCase() === cleanId || 
+       order.orderNumber?.trim().toLowerCase() === cleanId ||
+       order.customerName?.trim().toLowerCase() === cleanId) &&
+      order.items?.some(item => item.productId === productId)
+    );
+  }
+
+  addOrganicReview(reviewData: Omit<OrganicProductReview, 'id' | 'createdAt' | 'likesCount'>): OrganicProductReview {
+    const newReview: OrganicProductReview = {
+      ...reviewData,
+      id: `rev_org_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+      createdAt: new Date().toLocaleDateString('fa-IR'),
+      likesCount: 0
+    };
+    this.organicReviews.unshift(newReview);
+
+    // Recompute product rating and review count
+    const productReviews = this.organicReviews.filter(r => r.productId === reviewData.productId);
+    const avgRating = Number((productReviews.reduce((sum, r) => sum + r.rating, 0) / productReviews.length).toFixed(2));
+    const prodIdx = this.organicProducts.findIndex(p => p.id === reviewData.productId);
+    if (prodIdx > -1) {
+      this.organicProducts[prodIdx].rating = avgRating;
+      this.organicProducts[prodIdx].reviewsCount = productReviews.length;
+    }
+
+    this.saveToStorage();
+    this.showToast('success', 'دیدگاه و امتیاز شما با موفقیت ثبت شد.');
+    return newReview;
+  }
+
+  likeOrganicReview(reviewId: string) {
+    const rev = this.organicReviews.find(r => r.id === reviewId);
+    if (rev) {
+      rev.likesCount = (rev.likesCount || 0) + 1;
+      this.saveToStorage();
+    }
+  }
+
+  // Organic Stock Alerts & SMS/Email Notifications
+  updateOrganicStockAlertConfig(updates: Partial<OrganicStockAlertConfig>) {
+    this.organicStockAlertConfig = {
+      ...this.organicStockAlertConfig,
+      ...updates
+    };
+    this.saveToStorage();
+    this.showToast('success', 'تنظیمات سامانه اطلاع‌رسانی پیامکی و ایمیلی انبار ذخیره شد.');
+  }
+
+  getLowStockOrganicProducts(): OrganicProduct[] {
+    const defaultThreshold = this.organicStockAlertConfig?.defaultThresholdKg || 25;
+    return this.organicProducts.filter(p => {
+      const stock = typeof p.stockKg === 'number' ? p.stockKg : (typeof p.stockQuantityKg === 'number' ? p.stockQuantityKg : 0);
+      const threshold = p.lowStockThresholdKg || defaultThreshold;
+      return stock <= threshold;
+    });
+  }
+
+  sendManualStockAlert(productId: string, channel: 'sms' | 'email' | 'both' = 'both'): { logs: OrganicStockAlertLog[]; count: number } {
+    const prod = this.organicProducts.find(p => p.id === productId);
+    if (!prod) return { logs: [], count: 0 };
+
+    const prodName = prod.name || prod.title || 'محصول ارگانیک';
+    const currentStock = typeof prod.stockKg === 'number' ? prod.stockKg : (typeof prod.stockQuantityKg === 'number' ? prod.stockQuantityKg : 0);
+    const threshold = prod.lowStockThresholdKg || this.organicStockAlertConfig.defaultThresholdKg || 25;
+    const nowStr = new Date().toLocaleDateString('fa-IR') + ' - ' + new Date().toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' });
+
+    const generatedLogs: OrganicStockAlertLog[] = [];
+
+    // Send SMS alert
+    if (channel === 'sms' || channel === 'both') {
+      const phones = (this.organicStockAlertConfig.adminPhoneNumbers || '09128845678').split(',').map(s => s.trim()).filter(Boolean);
+      phones.forEach(phone => {
+        const text = (this.organicStockAlertConfig.smsTemplate || 'هشدار انبار: موجودی [نام_محصول] به [موجودی] کیلوگرم کاهش یافته است.')
+          .replace('[نام_محصول]', prodName)
+          .replace('[موجودی]', String(currentStock))
+          .replace('[حدنصاب]', String(threshold));
+
+        const log: OrganicStockAlertLog = {
+          id: `log_sms_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+          productId: prod.id,
+          productTitle: prodName,
+          currentStockKg: currentStock,
+          thresholdKg: threshold,
+          channel: 'sms',
+          recipient: phone,
+          status: 'sent',
+          messageText: text,
+          timestamp: nowStr
+        };
+        generatedLogs.push(log);
+        this.organicStockAlertLogs.unshift(log);
+      });
+    }
+
+    // Send Email alert
+    if (channel === 'email' || channel === 'both') {
+      const emails = (this.organicStockAlertConfig.adminEmailAddresses || 'admin@parsnet-academy.com').split(',').map(s => s.trim()).filter(Boolean);
+      emails.forEach(email => {
+        const text = `گزارش کسری انبار پارس‌نت: موجودی انبار محصول ارگانیک «${prodName}» به ${currentStock} کیلوگرم کاهش یافته که کمتر از حدنصاب مجاز ${threshold} کیلوگرم است. جهت جلوگیری از اتمام موجودی در سایت، لطفاً نسبت به تأمین مجدد و تسویه نقدی با باغدار اقدام فرمایید.`;
+        const log: OrganicStockAlertLog = {
+          id: `log_email_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+          productId: prod.id,
+          productTitle: prodName,
+          currentStockKg: currentStock,
+          thresholdKg: threshold,
+          channel: 'email',
+          recipient: email,
+          status: 'sent',
+          messageText: text,
+          timestamp: nowStr
+        };
+        generatedLogs.push(log);
+        this.organicStockAlertLogs.unshift(log);
+      });
+    }
+
+    this.saveToStorage();
+    const channelLabel = channel === 'both' ? 'پیامک و ایمیل' : (channel === 'sms' ? 'پیامک' : 'ایمیل');
+    this.showToast('success', `اطلاع‌رسانی ${channelLabel} کمبود موجودی «${prodName}» به شماره و ایمیل مدیر ارسال گردید.`);
+    return { logs: generatedLogs, count: generatedLogs.length };
+  }
+
+  checkAndTriggerLowStockAlerts(triggerReason?: string): OrganicStockAlertLog[] {
+    if (!this.organicStockAlertConfig.enableSmsAlerts && !this.organicStockAlertConfig.enableEmailAlerts) {
+      return [];
+    }
+    const lowStockProds = this.getLowStockOrganicProducts();
+    const newLogs: OrganicStockAlertLog[] = [];
+
+    lowStockProds.forEach(prod => {
+      // Send alerts
+      const channel = (this.organicStockAlertConfig.enableSmsAlerts && this.organicStockAlertConfig.enableEmailAlerts)
+        ? 'both'
+        : (this.organicStockAlertConfig.enableSmsAlerts ? 'sms' : 'email');
+      
+      const res = this.sendManualStockAlert(prod.id, channel);
+      newLogs.push(...res.logs);
+    });
+
+    return newLogs;
+  }
+
+  clearOrganicStockAlertLogs() {
+    this.organicStockAlertLogs = [];
+    this.saveToStorage();
+    this.showToast('info', 'تاریخچه هشدارهای انبار پاکسازی شد.');
   }
 }
 

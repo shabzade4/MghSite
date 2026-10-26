@@ -66,7 +66,7 @@ export const AboutUsView: React.FC<AboutUsViewProps> = ({
   const pillars = [
     {
       title: 'آموزش کاملاً کاربردی و پروژه‌محور',
-      desc: 'هیچ دوره‌ای در پارس‌نت تئوری محض نیست. تمام مفاهیم با فایل‌های واقعی Cisco Packet Tracer، EVE-NG و سورس‌کدهای تست شده آموزش داده می‌شوند.',
+      desc: 'هیچ دوره‌ای در مهرادینت تئوری محض نیست. تمام مفاهیم با فایل‌های واقعی Cisco Packet Tracer، EVE-NG و سورس‌کدهای تست شده آموزش داده می‌شوند.',
       icon: Cpu,
       color: 'text-indigo-600 bg-indigo-50'
     },
@@ -98,16 +98,17 @@ export const AboutUsView: React.FC<AboutUsViewProps> = ({
         <div className="max-w-5xl mx-auto text-center relative z-10 space-y-6">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-400/20 text-indigo-300 text-xs font-mono">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>درباره آکادمی شبکه و وب پارس‌نت</span>
+            <span>درباره مجموعه مهندسی و آکادمی مهرادینت</span>
           </div>
 
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">
-            مرجع تخصصی آموزش زیرساخت شبکه، کامپیوتر و طراحی سایت مدرن
+            آموزش تخصصی شبکه، وب، برنامه‌نویسی و انجام پروژه‌های کامپیوتری
           </h1>
 
           <p className="text-slate-300 text-sm sm:text-base leading-relaxed max-w-3xl mx-auto font-light">
-            هدف ما تربیت متخصصانی است که از روز اول توانایی راه‌اندازی و مدیریت تجهیزات شبکه واقعی، کانفیگ سوئیچ و روتر سیسکو و کدنویسی وب‌سایت‌های حرفه‌ای را داشته باشند.
+            هدف ما تربیت متخصصان کارآزموده و اجرای پروژه‌های استاندارد فناوری اطلاعات در سازمان‌ها و شرکت‌های سراسر کشور است.
           </p>
+
 
           <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
             <button
@@ -158,8 +159,8 @@ export const AboutUsView: React.FC<AboutUsViewProps> = ({
               <Terminal className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-xl font-black text-slate-900">داستان و چشم‌انداز آکادمی پارس‌نت</h2>
-              <p className="text-xs text-slate-400">تعهد ما به کیفیت علمی و مهارت‌های مورد نیاز بازار کار</p>
+              <h2 className="text-xl font-black text-slate-900">داستان و چشم‌انداز مجموعه مهندسی و آکادمی مهرادینت</h2>
+              <p className="text-xs text-slate-400">تعهد ما به کیفیت علمی، اجرای استاندارد پروژه‌ها و مهارت‌های مورد نیاز بازار کار</p>
             </div>
           </div>
 
@@ -169,11 +170,12 @@ export const AboutUsView: React.FC<AboutUsViewProps> = ({
         </div>
       </section>
 
-      {/* 4 Pillars of ParsNet */}
+      {/* 4 Pillars of Mehradinet */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-10">
-          <h2 className="text-2xl font-black text-slate-900">چرا متخصصان، آکادمی پارس‌نت را انتخاب می‌کنند؟</h2>
-          <p className="text-xs text-slate-500 mt-2">اصول کاری و استانداردهایی که در تمام دوره‌ها به آن پایبندیم</p>
+          <h2 className="text-2xl font-black text-slate-900">چرا متخصصان و شرکت‌ها، مهرادینت را انتخاب می‌کنند؟</h2>
+          <p className="text-xs text-slate-500 mt-2">اصول کاری، تعهدات قراردادی و استانداردهایی که در آموزش و پروژه‌ها به آن پایبندیم</p>
+
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

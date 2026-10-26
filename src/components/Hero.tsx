@@ -6,13 +6,15 @@ interface HeroProps {
   onSearchChange: (query: string) => void;
   onSelectCategory: (category: string) => void;
   selectedCategory: string;
+  onNavigate?: (tab: any) => void;
 }
 
 export const Hero: React.FC<HeroProps> = ({
   searchQuery,
   onSearchChange,
   onSelectCategory,
-  selectedCategory
+  selectedCategory,
+  onNavigate
 }) => {
   return (
     <div className="relative bg-slate-900 text-white overflow-hidden">
@@ -20,7 +22,7 @@ export const Hero: React.FC<HeroProps> = ({
       <div className="absolute inset-0 z-0">
         <img
           src="/src/assets/images/hero_tech_academy_1791894522996.jpg"
-          alt="ParsNet Academy Laboratory"
+          alt="Mehradinet Engineering & Academy"
           className="w-full h-full object-cover opacity-25 filter blur-[0.5px]"
           referrerPolicy="no-referrer"
         />
@@ -29,20 +31,43 @@ export const Hero: React.FC<HeroProps> = ({
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12 lg:pt-20 lg:pb-16">
         <div className="max-w-3xl">
-          {/* Subtle text kicker without pill boxes */}
-          <div className="flex items-center gap-2 text-xs text-indigo-400 font-mono tracking-wide mb-4">
-            <span>آکادمی تخصصی فناوری پارس‌نت</span>
+          {/* Subtle text kicker */}
+          <div className="flex flex-wrap items-center gap-2 text-xs text-indigo-400 font-mono tracking-wide mb-4">
+            <span className="font-bold text-white">مهرادینت (Mehradinet)</span>
             <span aria-hidden="true">·</span>
-            <span>مرجع مهندسی شبکه، طراحی وب و سناریوهای IT</span>
+            <span>آموزش تخصصی شبکه، وب، برنامه‌نویسی و انجام پروژه‌های کامپیوتری</span>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white leading-tight mb-6" style={{ textWrap: 'balance' }}>
-            مهارت‌های عملی کامپیوتر، شبکه و برنامه‌نویسی وب را برای بازار کار بیاموزید
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white leading-tight mb-5" style={{ textWrap: 'balance' }}>
+            آموزش تخصصی مهارت‌های IT و اجرای حرفه‌ای پروژه‌های شبکه و برنامه‌نویسی
           </h1>
 
-          <p className="text-base sm:text-lg text-slate-300 leading-relaxed mb-8 max-w-2xl font-light">
-            یادگیری اصولی سیسکو، میکروتیک، لینوکس سرور و ری‌اکت ۱۹ به همراه دانلود فوری سورس‌کدها، فایل‌های پکت‌تریسر و سناریوهای عملی آماده برای محیط‌های سازمانی.
+          <p className="text-base sm:text-lg text-slate-300 leading-relaxed mb-6 max-w-2xl font-light">
+            یادگیری اصولی سیسکو، میکروتیک، ویندوز/لینوکس سرور، مجازی‌سازی و ری‌اکت ۱۹ به همراه خدمات مهندسی و قبول پروژه‌های کابل‌کشی پسیو، کانفیگ اکتیو، طراحی وب‌سایت و توسعه نرم‌افزارهای سفارشی.
           </p>
+
+          {/* Dual Action CTAs */}
+          <div className="flex flex-wrap items-center gap-3 mb-8">
+            {onNavigate && (
+              <button
+                onClick={() => onNavigate('projects-services')}
+                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 via-blue-600 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 text-white text-xs font-bold shadow-lg shadow-indigo-600/30 transition-all flex items-center gap-2 cursor-pointer"
+              >
+                <Server className="w-4 h-4" />
+                <span>سفارش و ثبت پروژه کامپیوتری و شبکه</span>
+                <ArrowLeft className="w-3.5 h-3.5" />
+              </button>
+            )}
+
+            {onNavigate && (
+              <button
+                onClick={() => onNavigate('courses')}
+                className="px-4 py-2.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-bold transition-all cursor-pointer"
+              >
+                مشاهده دوره‌های آموزشی
+              </button>
+            )}
+          </div>
 
           {/* Search box */}
           <div className="relative max-w-xl mb-8">

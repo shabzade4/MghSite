@@ -150,14 +150,68 @@ export const ArticleDetailModal: React.FC<ArticleDetailModalProps> = ({
             {article.excerpt}
           </div>
 
-          {/* Full Content */}
-          <div className="text-sm text-slate-800 leading-loose whitespace-pre-wrap font-normal space-y-4">
-            {article.content}
+          {/* Full Content (Rich HTML support from Editor) */}
+          {article.content.includes('<') ? (
+            <div
+              dangerouslySetInnerHTML={{ __html: article.content }}
+              className="text-sm text-slate-800 leading-loose font-normal space-y-3 prose prose-slate max-w-none rich-article-body"
+            />
+          ) : (
+            <div className="text-sm text-slate-800 leading-loose whitespace-pre-wrap font-normal space-y-4">
+              {article.content}
+            </div>
+          )}
+
+          {/* Additional Gallery Images */}
+          {article.galleryImages && article.galleryImages.length > 0 && (
+            <div className="pt-6 border-t border-slate-100 space-y-3">
+              <h4 className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                <span>تصاویر و اسناد ضمیمه مطلب:</span>
+              </h4>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {article.galleryImages.map((img, idx) => (
+                  <a
+                    key={idx}
+                    href={img}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="aspect-[4/3] rounded-xl overflow-hidden border border-slate-200 block group"
+                  >
+                    <img
+                      src={img}
+                      alt={`تصویر ${idx + 1}`}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                    />
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* WordPress-style Permalink and Slug Bar */}
+          <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+            <div className="flex items-center gap-2 text-slate-500 font-mono text-[11px] truncate">
+              <span className="font-bold font-sans text-slate-700">پیوند یکتا (Permalink):</span>
+              <span dir="ltr" className="text-indigo-600 truncate">
+                https://parsnet-academy.com/blog/{article.slug || article.id}
+              </span>
+            </div>
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(`https://parsnet-academy.com/blog/${article.slug || article.id}`);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+              }}
+              className="text-slate-600 hover:text-indigo-600 flex items-center gap-1 text-[11px] font-bold self-start sm:self-auto cursor-pointer"
+            >
+              {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Share2 className="w-3.5 h-3.5" />}
+              <span>{copied ? 'کپی شد' : 'کپی آدرس مطلب'}</span>
+            </button>
           </div>
 
           {/* Tags */}
           {article.tags && article.tags.length > 0 && (
-            <div className="pt-6 border-t border-slate-100 flex items-center gap-2 flex-wrap">
+            <div className="pt-4 border-t border-slate-100 flex items-center gap-2 flex-wrap">
               <span className="text-xs text-slate-400 flex items-center gap-1">
                 <Tag className="w-3.5 h-3.5" />
                 <span>برچسب‌ها:</span>

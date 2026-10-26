@@ -23,8 +23,11 @@ import { CertificateModal } from './components/CertificateModal';
 import { CertificateVerifyModal } from './components/CertificateVerifyModal';
 import { RoadmapsView } from './components/RoadmapsView';
 import { ToastContainer } from './components/ToastContainer';
+import { OrganicStoreView } from './components/OrganicStoreView';
+import { OrganicCartModal } from './components/OrganicCartModal';
+import { ProjectsServicesView } from './components/ProjectsServicesView';
 
-import { Course, DigitalFile, Order, OrderItem, Article, NavigationTab, Certificate } from './types';
+import { Course, DigitalFile, Order, OrderItem, Article, NavigationTab, Certificate, OrganicProduct, OrganicCartItem } from './types';
 import { store } from './services/store';
 import { BookOpen, Download, Terminal, ArrowLeft, Radio } from 'lucide-react';
 
@@ -39,6 +42,8 @@ export default function App() {
   const [courses, setCourses] = useState<Course[]>(store.courses);
   const [files, setFiles] = useState<DigitalFile[]>(store.files);
   const [articles, setArticles] = useState<Article[]>(store.articles);
+  const [organicProducts, setOrganicProducts] = useState<OrganicProduct[]>(store.organicProducts);
+  const [organicCart, setOrganicCart] = useState<OrganicCartItem[]>(store.organicCart);
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState<boolean>(store.isAdminLoggedIn);
 
   // Modals & Drawers state
@@ -51,6 +56,7 @@ export default function App() {
   const [selectedFileForDetails, setSelectedFileForDetails] = useState<DigitalFile | null>(null);
   const [selectedArticleForDetails, setSelectedArticleForDetails] = useState<Article | null>(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isOrganicCartOpen, setIsOrganicCartOpen] = useState(false);
 
   // Checkout & Payment State
   const [isPaymentGatewayOpen, setIsPaymentGatewayOpen] = useState(false);
@@ -65,6 +71,8 @@ export default function App() {
       setCourses([...store.courses]);
       setFiles([...store.files]);
       setArticles([...store.articles]);
+      setOrganicProducts([...store.organicProducts]);
+      setOrganicCart([...store.organicCart]);
       setIsAdminLoggedIn(store.isAdminLoggedIn);
     });
   }, []);
@@ -207,11 +215,21 @@ export default function App() {
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
         onOpenCart={() => setIsCartOpen(true)}
+        onOpenOrganicCart={() => setIsOrganicCartOpen(true)}
         onOpenVerifyModal={() => handleOpenVerifyModal()}
       />
 
       {/* Main Views Container */}
       <main className="flex-1">
+        {/* VIEW: DEDICATED ORGANIC PRODUCTS STORE */}
+        {currentTab === 'organic-shop' && (
+          <OrganicStoreView
+            products={organicProducts}
+            onOpenCart={() => setIsOrganicCartOpen(true)}
+            cartCount={organicCart.length}
+          />
+        )}
+
         {/* VIEW: STUDENT PANEL */}
         {currentTab === 'student-panel' && (
           <StudentPanel
@@ -298,6 +316,11 @@ export default function App() {
           />
         )}
 
+        {/* VIEW: PROJECTS & SERVICES */}
+        {currentTab === 'projects-services' && (
+          <ProjectsServicesView onBackToHome={() => setCurrentTab('home')} />
+        )}
+
         {/* VIEW: HOME, COURSES, FILES */}
         {(currentTab === 'home' || currentTab === 'courses' || currentTab === 'files') && (
           <>
@@ -308,6 +331,10 @@ export default function App() {
                 onSearchChange={setSearchQuery}
                 onSelectCategory={setSelectedCategory}
                 selectedCategory={selectedCategory}
+                onNavigate={(tab) => {
+                  setCurrentTab(tab);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
               />
             )}
 
@@ -329,6 +356,46 @@ export default function App() {
 
             {/* CONTENT SECTIONS */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16">
+              {/* FEATURED SERVICES & PROJECT ACCEPTANCE STRIP (HOME ONLY) */}
+              {currentTab === 'home' && (
+                <section className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-3xl p-6 sm:p-8 border border-slate-800 shadow-xl">
+                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                    <div className="max-w-2xl">
+                      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 text-xs font-mono mb-3">
+                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                        <span>پذیرش رسمی پروژه‌های مهندسی مهرادینت</span>
+                      </div>
+                      <h2 className="text-xl sm:text-2xl font-black text-white mb-2">
+                        نیاز به اجرای پروژه شبکه، سرور یا برنامه‌نویسی دارید؟
+                      </h2>
+                      <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-light">
+                        نصب نرم‌افزارهای تخصصی، استقرار ویندوز/لینوکس سرور با اکتیو دایرکتوری، مجازی‌سازی با VMware و Proxmox، طراحی و اجرای پسیو (کابل‌کشی و رک) و اکتیو (سیسکو، میکروتیک و فایروال)، طراحی انواع سایت و توسعه اختصاصی نرم‌افزار با قرارداد رسمی و گارانتی معتبر.
+                      </p>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row lg:flex-col gap-3 shrink-0">
+                      <button
+                        onClick={() => {
+                          setCurrentTab('projects-services');
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }}
+                        className="px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-lg shadow-indigo-600/30 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                      >
+                        <span>مشاهده خدمات و ثبت آنلاین پروژه</span>
+                        <ArrowLeft className="w-3.5 h-3.5" />
+                      </button>
+
+                      <a
+                        href="tel:02188456789"
+                        className="px-5 py-2.5 rounded-2xl bg-white/10 hover:bg-white/15 text-slate-200 border border-white/15 text-xs font-medium text-center transition-all"
+                      >
+                        مشاوره تلفنی: ۰۲۱-۸۸۴۵۶۷۸۹
+                      </a>
+                    </div>
+                  </div>
+                </section>
+              )}
+
               {/* SECTION 1: Featured Courses */}
               {(currentTab === 'home' || currentTab === 'courses') && (
                 <section>
@@ -338,6 +405,7 @@ export default function App() {
                         <BookOpen className="w-4 h-4" />
                         <span>دوره‌های آموزشی با گارانتی یادگیری</span>
                       </div>
+
                       <h2 className="text-xl sm:text-2xl font-black text-slate-900">
                         {selectedCategory === 'network'
                           ? 'دوره‌های تخصصی مهندسی شبکه و سیسکو'
@@ -653,6 +721,14 @@ export default function App() {
           }}
         />
       )}
+
+      {/* 12. Dedicated Organic Shopping Cart & Checkout Modal */}
+      <OrganicCartModal
+        isOpen={isOrganicCartOpen}
+        onClose={() => setIsOrganicCartOpen(false)}
+        cart={organicCart}
+        currentUserWalletBalance={store.currentUser.walletBalance}
+      />
 
       {/* Global Interactive Toast Feedback */}
       <ToastContainer />

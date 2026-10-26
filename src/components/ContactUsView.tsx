@@ -83,13 +83,14 @@ export const ContactUsView: React.FC = () => {
       {/* Sub-header Banner */}
       <section className="bg-slate-900 text-white py-14 px-4 sm:px-6 lg:px-8 border-b border-slate-800 text-center relative overflow-hidden">
         <div className="max-w-4xl mx-auto space-y-4 relative z-10">
-          <div className="text-xs text-indigo-400 font-mono">SUPPORT & DIRECT CONTACT</div>
+          <div className="text-xs text-indigo-400 font-mono">SUPPORT & PROJECT CONSULTATION</div>
           <h1 className="text-3xl sm:text-4xl font-black text-white">
-            ارتباط با کارشناسان و پشتیبانی آکادمی پارس‌نت
+            ارتباط با کارشناسان مهندسی و پشتیبانی مهرادینت
           </h1>
           <p className="text-xs sm:text-sm text-slate-300 max-w-2xl mx-auto font-light">
-            همواره پاسخگوی سوالات، پیشنهادات و درخواست‌های مشاوره ثبت‌نام شما هستیم.
+            همواره پاسخگوی سوالات، مشاوره ثبت‌نام دوره‌ها و برآورد فنی پروژه‌های شبکه و برنامه‌نویسی شما هستیم.
           </p>
+
         </div>
       </section>
 

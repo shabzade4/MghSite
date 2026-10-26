@@ -59,12 +59,12 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenVerifyModal })
             </div>
 
             <p className="text-xs text-slate-400 leading-relaxed font-light max-w-sm">
-              آکادمی تخصصی پارس‌نت به عنوان مرجع یادگیری علوم کامپیوتر، سیسکو، میکروتیک، لینوکس و برنامه‌نویسی وب فرانت‌اند و بک‌اند با ارائه سورس‌کدهای آماده و پروژه‌های عملی به متخصصان کشور خدمت‌رسانی می‌کند.
+              مجموعه مهندسی و آکادمی تخصصی مهرادینت به عنوان مرجع آموزش تخصصی شبکه، وب، برنامه‌نویسی و انجام پروژه‌های کامپیوتری، کابل‌کشی پسیو، کانفیگ اکتیو، سرور و مجازی‌سازی به متخصصان و شرکت‌های سراسر کشور خدمت‌رسانی می‌کند.
             </p>
 
             <div className="flex items-center gap-2 pt-2 text-xs text-slate-400 font-mono">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>کلیه دوره‌ها دارای گواهینامه رسمی با استعلام آنلاین هستند</span>
+              <span>پذیرش پروژه‌های سازمانی همراه با قرارداد رسمی و گارانتی SLA</span>
             </div>
           </div>
 
@@ -72,6 +72,11 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenVerifyModal })
           <div className="md:col-span-3 space-y-3">
             <h4 className="text-xs font-bold text-white uppercase tracking-wider">بخش‌های وب‌سایت</h4>
             <ul className="space-y-2 text-xs text-slate-400">
+              <li>
+                <button onClick={() => onNavigate('projects-services')} className="text-indigo-400 hover:text-indigo-300 font-bold transition-colors flex items-center gap-1">
+                  <span>خدمات و سفارش پروژه IT و شبکه</span>
+                </button>
+              </li>
               <li>
                 <button onClick={() => onNavigate('courses')} className="hover:text-white transition-colors">
                   دوره‌های آموزش شبکه و سیسکو
@@ -82,6 +87,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenVerifyModal })
                   آموزش طراحی سایت و برنامه‌نویسی
                 </button>
               </li>
+
               <li>
                 <button onClick={() => onNavigate('files')} className="hover:text-white transition-colors">
                   پکیج سناریوهای پکت‌تریسر و اسکریپت‌ها
@@ -95,6 +101,11 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenVerifyModal })
               <li>
                 <button onClick={() => onNavigate('blog')} className="hover:text-white transition-colors">
                   نوشته‌ها، اطلاعیه‌ها و رویدادها
+                </button>
+              </li>
+              <li>
+                <button onClick={() => onNavigate('organic-shop')} className="text-emerald-400 hover:text-emerald-300 font-bold transition-colors flex items-center gap-1">
+                  <span>فروشگاه محصولات ارگانیک (خشکبار و گردو)</span>
                 </button>
               </li>
               <li>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Upload, Search, Check, Image as ImageIcon, Tag, HardDrive } from 'lucide-react';
+import { X, Upload, Search, Check, Image as ImageIcon, Tag, HardDrive, CheckCircle2, AlertCircle } from 'lucide-react';
 import { MediaItem } from '../types';
 import { store } from '../services/store';
 
@@ -23,6 +23,14 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({
   const [selectedUrl, setSelectedUrl] = useState<string>(currentSelectedUrl || '');
   const [isUploading, setIsUploading] = useState(false);
 
+  // Staged upload state
+  const [stagedFile, setStagedFile] = useState<{
+    file: File;
+    previewUrl: string;
+    title: string;
+    sizeFormatted: string;
+  } | null>(null);
+
   React.useEffect(() => {
     return store.subscribe(() => {
       setMediaList([...store.media]);
@@ -42,37 +50,57 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({
     );
   });
 
-  // Handle direct file upload
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Handle file select (stages the file without immediate upload)
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setIsUploading(true);
     const reader = new FileReader();
     reader.onload = (event) => {
       const dataUrl = event.target?.result as string;
       const sizeKb = Math.round(file.size / 1024);
       const sizeStr = sizeKb > 1024 ? `${(sizeKb / 1024).toFixed(1)} مگابایت` : `${sizeKb} کیلوبایت`;
 
+      setStagedFile({
+        file,
+        previewUrl: dataUrl,
+        title: file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' '),
+        sizeFormatted: sizeStr
+      });
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
+
+  // Confirm upload of staged file
+  const handleConfirmUpload = () => {
+    if (!stagedFile) return;
+    setIsUploading(true);
+
+    setTimeout(() => {
       const newMedia: MediaItem = {
         id: `media-${Date.now()}`,
-        title: file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' '),
-        fileName: file.name,
-        fileType: file.type.startsWith('image/') ? 'image' : 'document',
-        url: dataUrl,
-        size: sizeStr,
+        title: stagedFile.title,
+        fileName: stagedFile.file.name,
+        fileType: stagedFile.file.type.startsWith('image/') ? 'image' : 'document',
+        url: stagedFile.previewUrl,
+        size: stagedFile.sizeFormatted,
         dimensions: 'کیفیت بالا',
-        altText: file.name,
+        altText: stagedFile.title,
         tags: ['شاخص', 'آپلود جدید'],
         uploadedAt: new Date().toLocaleDateString('fa-IR')
       };
 
       store.addMediaItem(newMedia);
-      setSelectedUrl(dataUrl);
+      setSelectedUrl(stagedFile.previewUrl);
+      setStagedFile(null);
       setIsUploading(false);
-    };
+      store.showToast('success', 'تصویر با موفقیت بارگذاری و انتخاب شد.');
+    }, 300);
+  };
 
-    reader.readAsDataURL(file);
+  const handleCancelStaged = () => {
+    setStagedFile(null);
   };
 
   const handleConfirm = () => {
@@ -93,7 +121,7 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-200 transition-colors"
+            className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-200 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -113,19 +141,60 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({
             />
           </div>
 
-          {/* Upload Button */}
+          {/* Upload Button (triggers staging, does NOT immediate upload) */}
           <label className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold cursor-pointer transition-colors shrink-0 shadow-sm">
             <Upload className="w-4 h-4" />
-            <span>{isUploading ? 'در حال پردازش...' : 'آپلود تصویر جدید از سیستم'}</span>
+            <span>انتخاب فایل جدید از سیستم</span>
             <input
               type="file"
               accept="image/*"
-              onChange={handleFileUpload}
+              onChange={handleFileSelect}
               className="hidden"
               disabled={isUploading}
             />
           </label>
         </div>
+
+        {/* Staged Upload Review Box (Only shown after user picks a file!) */}
+        {stagedFile && (
+          <div className="mx-6 mt-4 p-4 rounded-2xl border-2 border-indigo-500/40 bg-indigo-50/50 flex flex-col sm:flex-row items-center justify-between gap-4 animate-in fade-in duration-200">
+            <div className="flex items-center gap-3">
+              <img
+                src={stagedFile.previewUrl}
+                alt="Preview"
+                className="w-16 h-12 rounded-xl object-cover border border-indigo-200 shadow-xs"
+              />
+              <div className="text-xs space-y-1">
+                <div className="font-bold text-slate-900 flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-indigo-600" />
+                  <span>فایل برای آپلود انتخاب شد: <strong>{stagedFile.file.name}</strong></span>
+                </div>
+                <div className="text-[11px] text-slate-500 font-mono">
+                  حجم: {stagedFile.sizeFormatted} | برای ذخیره و استفاده روی دکمه «تأیید و بارگذاری» کلیک کنید.
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <button
+                type="button"
+                onClick={handleConfirmUpload}
+                disabled={isUploading}
+                className="flex-1 sm:flex-initial px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+              >
+                <Upload className="w-3.5 h-3.5" />
+                <span>{isUploading ? 'در حال آپلود...' : 'تأیید و بارگذاری تصویر'}</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleCancelStaged}
+                className="px-3 py-2 bg-white border border-slate-200 text-slate-600 hover:text-red-600 hover:bg-red-50 text-xs font-bold rounded-xl transition-colors cursor-pointer"
+              >
+                انصراف
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Media Grid */}
         <div className="flex-1 overflow-y-auto p-6 bg-slate-50/50">
@@ -194,7 +263,7 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors"
+              className="px-4 py-2 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
             >
               انصراف
             </button>
@@ -202,7 +271,7 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({
               type="button"
               onClick={handleConfirm}
               disabled={!selectedUrl}
-              className="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-colors shadow-sm disabled:opacity-50 disabled:pointer-events-none"
+              className="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-colors shadow-sm disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
             >
               انتخاب و درج در فرم
             </button>
