@@ -258,21 +258,21 @@ export const ProjectsServicesView: React.FC<ProjectsServicesViewProps> = ({ onBa
 
           {/* 4 Trust Metrics */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-14 pt-10 border-t border-slate-800/80">
-            <div className="bg-slate-850/60 p-4 rounded-2xl border border-slate-800">
-              <div className="text-2xl font-black text-white font-mono">+۱۴۰</div>
-              <div className="text-xs text-slate-400 mt-1">پروژه موفق شبکه و سرور اجرا شده</div>
+            <div className="group bg-slate-850/60 hover:bg-slate-800/90 p-4 rounded-2xl border border-slate-800 hover:border-indigo-500/50 hover:shadow-xl hover:shadow-indigo-500/10 hover:-translate-y-1.5 hover:scale-105 transition-all duration-300">
+              <div className="text-2xl font-black text-white font-mono group-hover:scale-105 group-hover:text-indigo-300 transition-all origin-right">+۱۴۰</div>
+              <div className="text-xs text-slate-400 group-hover:text-slate-200 mt-1 transition-colors">پروژه موفق شبکه و سرور اجرا شده</div>
             </div>
-            <div className="bg-slate-850/60 p-4 rounded-2xl border border-slate-800">
-              <div className="text-2xl font-black text-emerald-400 font-mono">۱۰۰٪</div>
-              <div className="text-xs text-slate-400 mt-1">قرارداد رسمی و صدور فاکتور معتبر</div>
+            <div className="group bg-slate-850/60 hover:bg-slate-800/90 p-4 rounded-2xl border border-slate-800 hover:border-emerald-500/50 hover:shadow-xl hover:shadow-emerald-500/10 hover:-translate-y-1.5 hover:scale-105 transition-all duration-300">
+              <div className="text-2xl font-black text-emerald-400 font-mono group-hover:scale-105 group-hover:text-emerald-300 transition-all origin-right">۱۰۰٪</div>
+              <div className="text-xs text-slate-400 group-hover:text-slate-200 mt-1 transition-colors">قرارداد رسمی و صدور فاکتور معتبر</div>
             </div>
-            <div className="bg-slate-850/60 p-4 rounded-2xl border border-slate-800">
-              <div className="text-2xl font-black text-cyan-400 font-mono">۲۴/۷</div>
-              <div className="text-xs text-slate-400 mt-1">پشتیبانی و رفع عیب اضطراری SLA</div>
+            <div className="group bg-slate-850/60 hover:bg-slate-800/90 p-4 rounded-2xl border border-slate-800 hover:border-cyan-500/50 hover:shadow-xl hover:shadow-cyan-500/10 hover:-translate-y-1.5 hover:scale-105 transition-all duration-300">
+              <div className="text-2xl font-black text-cyan-400 font-mono group-hover:scale-105 group-hover:text-cyan-300 transition-all origin-right">۲۴/۷</div>
+              <div className="text-xs text-slate-400 group-hover:text-slate-200 mt-1 transition-colors">پشتیبانی و رفع عیب اضطراری SLA</div>
             </div>
-            <div className="bg-slate-850/60 p-4 rounded-2xl border border-slate-800">
-              <div className="text-2xl font-black text-amber-400 font-mono">۱۲ ماه</div>
-              <div className="text-xs text-slate-400 mt-1">گارانتی کتبی خدمات پسیو و نرم‌افزار</div>
+            <div className="group bg-slate-850/60 hover:bg-slate-800/90 p-4 rounded-2xl border border-slate-800 hover:border-amber-500/50 hover:shadow-xl hover:shadow-amber-500/10 hover:-translate-y-1.5 hover:scale-105 transition-all duration-300">
+              <div className="text-2xl font-black text-amber-400 font-mono group-hover:scale-105 group-hover:text-amber-300 transition-all origin-right">۱۲ ماه</div>
+              <div className="text-xs text-slate-400 group-hover:text-slate-200 mt-1 transition-colors">گارانتی کتبی خدمات پسیو و نرم‌افزار</div>
             </div>
           </div>
         </div>
@@ -322,55 +322,55 @@ export const ProjectsServicesView: React.FC<ProjectsServicesViewProps> = ({ onBa
           {filteredServices.map(service => (
             <div 
               key={service.id}
-              className={`bg-white rounded-3xl border transition-all duration-300 flex flex-col justify-between overflow-hidden group hover:shadow-xl ${
+              className={`rounded-3xl border transition-all duration-300 flex flex-col justify-between overflow-hidden group hover:shadow-2xl hover:shadow-indigo-500/20 hover:-translate-y-2 hover:scale-[1.02] ${
                 service.isPopular 
-                  ? 'border-indigo-300 ring-1 ring-indigo-200 shadow-md' 
-                  : 'border-slate-200/90 hover:border-indigo-300 shadow-sm'
+                  ? 'bg-slate-50/70 hover:bg-white border-indigo-400 ring-2 ring-indigo-200/80 shadow-md' 
+                  : 'bg-slate-50/50 hover:bg-white border-slate-200/90 hover:border-indigo-400 shadow-sm'
               }`}
             >
               {/* Card Top */}
               <div className="p-6">
                 <div className="flex items-start justify-between gap-4 mb-4">
-                  <div className="w-14 h-14 rounded-2xl bg-slate-900 flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
+                  <div className="w-14 h-14 rounded-2xl bg-slate-900 group-hover:bg-indigo-600 flex items-center justify-center shadow-md group-hover:shadow-indigo-600/30 group-hover:scale-110 transition-all duration-300">
                     {renderServiceIcon(service.category)}
                   </div>
                   {service.isPopular && (
-                    <span className="px-2.5 py-1 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-[11px] font-bold">
+                    <span className="px-2.5 py-1 rounded-full bg-indigo-50 border border-indigo-200 group-hover:bg-indigo-600 group-hover:text-white group-hover:border-transparent text-indigo-700 text-[11px] font-bold group-hover:scale-105 transition-all duration-300 shadow-xs">
                       پرتکرار و پرطرفدار
                     </span>
                   )}
                 </div>
 
-                <div className="text-[11px] font-mono text-indigo-600 font-semibold mb-1">
+                <div className="text-[11px] font-mono text-indigo-600 group-hover:text-indigo-700 font-bold mb-1 transition-colors">
                   {service.englishTitle}
                 </div>
 
-                <h3 className="text-lg font-black text-slate-900 group-hover:text-indigo-600 transition-colors mb-2.5 leading-snug">
+                <h3 className="text-lg font-black text-slate-900 group-hover:text-indigo-600 group-hover:font-black transition-colors mb-2.5 leading-snug">
                   {service.title}
                 </h3>
 
-                <p className="text-xs text-slate-600 leading-relaxed font-light mb-5">
+                <p className="text-xs text-slate-600 group-hover:text-slate-800 leading-relaxed font-light group-hover:font-normal mb-5 transition-colors">
                   {service.shortDescription}
                 </p>
 
                 {/* Key Features Checklist */}
-                <div className="space-y-2 pt-2 border-t border-slate-100 mb-5">
-                  <div className="text-[11px] font-bold text-slate-700 mb-1.5">شاخص‌های فنی و اجرایی:</div>
+                <div className="space-y-2 pt-2 border-t border-slate-100 group-hover:border-indigo-100 mb-5 transition-colors">
+                  <div className="text-[11px] font-bold text-slate-700 group-hover:text-slate-900 mb-1.5 transition-colors">شاخص‌های فنی و اجرایی:</div>
                   {service.features.slice(0, 3).map((feat, idx) => (
-                    <div key={idx} className="flex items-start gap-2 text-xs text-slate-600">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                    <div key={idx} className="flex items-start gap-2 text-xs text-slate-600 group-hover:text-slate-800 transition-colors">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 group-hover:text-emerald-500 group-hover:scale-110 shrink-0 mt-0.5 transition-transform" />
                       <span className="line-clamp-1">{feat}</span>
                     </div>
                   ))}
                 </div>
 
                 {/* Deliverables snippet */}
-                <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200/70 mb-4 text-xs text-slate-700">
-                  <div className="font-bold text-[11px] text-slate-800 mb-1 flex items-center gap-1">
-                    <Award className="w-3.5 h-3.5 text-amber-600" />
+                <div className="bg-slate-50 group-hover:bg-indigo-50/50 p-3 rounded-2xl border border-slate-200/70 group-hover:border-indigo-200/80 mb-4 text-xs transition-colors duration-300">
+                  <div className="font-bold text-[11px] text-slate-800 group-hover:text-indigo-900 mb-1 flex items-center gap-1 transition-colors">
+                    <Award className="w-3.5 h-3.5 text-amber-600 group-hover:scale-110 group-hover:text-amber-500 transition-all" />
                     <span>خروجی و تعهد تحویل:</span>
                   </div>
-                  <div className="text-[11px] text-slate-500 font-light line-clamp-2">
+                  <div className="text-[11px] text-slate-500 group-hover:text-slate-700 font-light group-hover:font-medium line-clamp-2 transition-colors">
                     {service.deliverables[0]}
                   </div>
                 </div>
@@ -378,7 +378,7 @@ export const ProjectsServicesView: React.FC<ProjectsServicesViewProps> = ({ onBa
                 {/* Tech tags */}
                 <div className="flex flex-wrap gap-1.5 mb-2">
                   {service.techStack.slice(0, 4).map((tech, idx) => (
-                    <span key={idx} className="text-[10px] font-mono bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md">
+                    <span key={idx} className="text-[10px] font-mono bg-slate-100 group-hover:bg-white text-slate-600 group-hover:text-indigo-700 group-hover:border group-hover:border-indigo-200 px-2 py-0.5 rounded-md transition-all duration-300">
                       {tech}
                     </span>
                   ))}
@@ -386,18 +386,18 @@ export const ProjectsServicesView: React.FC<ProjectsServicesViewProps> = ({ onBa
               </div>
 
               {/* Card Footer */}
-              <div className="px-6 py-4 bg-slate-50/80 border-t border-slate-100 flex items-center justify-between gap-2">
+              <div className="px-6 py-4 bg-slate-50/80 group-hover:bg-white border-t border-slate-100 group-hover:border-indigo-100 flex items-center justify-between gap-2 transition-colors duration-300">
                 <div>
-                  <div className="text-[10px] text-slate-400 font-light">زمان تحویل برآوردی:</div>
-                  <div className="text-xs font-bold text-slate-800">{service.estimatedDelivery}</div>
+                  <div className="text-[10px] text-slate-400 group-hover:text-slate-500 font-light transition-colors">زمان تحویل برآوردی:</div>
+                  <div className="text-xs font-bold text-slate-800 group-hover:text-indigo-900 font-mono transition-colors">{service.estimatedDelivery}</div>
                 </div>
 
                 <button
                   onClick={() => handleSelectServiceToOrder(service)}
-                  className="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition-colors flex items-center gap-1 shadow-sm cursor-pointer"
+                  className="px-3.5 py-2 rounded-xl bg-indigo-600 group-hover:bg-indigo-700 text-white font-bold text-xs transition-all flex items-center gap-1 shadow-sm group-hover:shadow-md group-hover:shadow-indigo-600/30 group-hover:scale-105 cursor-pointer"
                 >
                   <span>سفارش این خدمت</span>
-                  <ArrowLeft className="w-3.5 h-3.5" />
+                  <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
                 </button>
               </div>
             </div>
@@ -447,12 +447,12 @@ export const ProjectsServicesView: React.FC<ProjectsServicesViewProps> = ({ onBa
                 icon: ShieldCheck
               }
             ].map((st, idx) => (
-              <div key={idx} className="relative p-6 rounded-3xl bg-slate-50 border border-slate-200/90 text-right">
-                <div className="w-12 h-12 rounded-2xl bg-indigo-600 text-white font-black text-base flex items-center justify-center mb-4 shadow-md shadow-indigo-600/20 font-mono">
+              <div key={idx} className="group relative p-6 rounded-3xl bg-slate-50/80 hover:bg-white border border-slate-200/90 hover:border-indigo-400 hover:shadow-xl hover:shadow-indigo-500/10 hover:-translate-y-1.5 hover:scale-[1.02] text-right transition-all duration-300">
+                <div className="w-12 h-12 rounded-2xl bg-indigo-600 text-white font-black text-base flex items-center justify-center mb-4 shadow-md shadow-indigo-600/20 font-mono group-hover:scale-115 group-hover:bg-indigo-700 group-hover:shadow-indigo-600/40 transition-all duration-300">
                   {st.step}
                 </div>
-                <h3 className="text-base font-bold text-slate-900 mb-2">{st.title}</h3>
-                <p className="text-xs text-slate-600 leading-relaxed font-light">{st.desc}</p>
+                <h3 className="text-base font-bold text-slate-900 group-hover:text-indigo-600 group-hover:font-black mb-2 transition-colors">{st.title}</h3>
+                <p className="text-xs text-slate-600 group-hover:text-slate-800 leading-relaxed font-light group-hover:font-medium transition-colors">{st.desc}</p>
               </div>
             ))}
           </div>

@@ -153,6 +153,54 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenVerifyModal })
                 </button>
               </li>
               <li>
+                <button
+                  onClick={() => {
+                    onNavigate('home');
+                    setTimeout(() => {
+                      const testEl = document.getElementById('testimonials-section');
+                      if (testEl) {
+                        testEl.scrollIntoView({ behavior: 'smooth' });
+                      }
+                    }, 100);
+                  }}
+                  className="hover:text-indigo-400 font-medium transition-colors"
+                >
+                  داستان‌های موفقیت و نظرات مشتریان
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => {
+                    onNavigate('home');
+                    setTimeout(() => {
+                      const faqEl = document.getElementById('faq-section');
+                      if (faqEl) {
+                        faqEl.scrollIntoView({ behavior: 'smooth' });
+                      }
+                    }, 100);
+                  }}
+                  className="hover:text-indigo-400 font-medium transition-colors"
+                >
+                  پرسش‌های متداول (FAQ)
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => {
+                    onNavigate('home');
+                    setTimeout(() => {
+                      const newsEl = document.getElementById('newsletter-section');
+                      if (newsEl) {
+                        newsEl.scrollIntoView({ behavior: 'smooth' });
+                      }
+                    }, 100);
+                  }}
+                  className="hover:text-indigo-400 font-medium transition-colors"
+                >
+                  عضویت در خبرنامه تخصصی
+                </button>
+              </li>
+              <li>
                 <button onClick={() => onNavigate('sitemap')} className="hover:text-indigo-400 transition-colors">
                   نقشه کامل سایت (Sitemap)
                 </button>

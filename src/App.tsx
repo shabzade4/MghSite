@@ -26,6 +26,12 @@ import { ToastContainer } from './components/ToastContainer';
 import { OrganicStoreView } from './components/OrganicStoreView';
 import { OrganicCartModal } from './components/OrganicCartModal';
 import { ProjectsServicesView } from './components/ProjectsServicesView';
+import { FAQ } from './components/FAQ';
+import { Testimonials } from './components/Testimonials';
+import { Newsletter } from './components/Newsletter';
+import { Breadcrumb } from './components/Breadcrumb';
+import { MobileBottomBar } from './components/MobileBottomBar';
+import { BackToTop } from './components/BackToTop';
 
 import { Course, DigitalFile, Order, OrderItem, Article, NavigationTab, Certificate, OrganicProduct, OrganicCartItem } from './types';
 import { store } from './services/store';
@@ -76,6 +82,45 @@ export default function App() {
       setIsAdminLoggedIn(store.isAdminLoggedIn);
     });
   }, []);
+
+  // Dynamic SEO Page Title & Meta Description Sync
+  useEffect(() => {
+    const titles: Record<NavigationTab, string> = {
+      home: 'مهرادینت | آموزش تخصصی شبکه، وب، برنامه‌نویسی و انجام پروژه‌های کامپیوتری',
+      'projects-services': 'خدمات و سفارش پروژه‌های تخصصی IT، شبکه و برنامه‌نویسی | مهرادینت',
+      'organic-shop': 'فروشگاه محصولات و سوغات ارگانیک روستایی | مهرادینت',
+      courses: 'دوره‌های تخصصی مهندسی شبکه، سیسکو و وب | مهرادینت',
+      files: 'سناریوهای شبکه، اسکریپت‌ها و فایل‌های دانلودی | مهرادینت',
+      roadmaps: 'نقشه‌های راه شغلی و تخصصی فناوری اطلاعات | مهرادینت',
+      blog: 'پایگاه دانش، مقالات تخصصی، اخبار و وبینارها | مهرادینت',
+      'student-panel': 'میز کار دانشجویان، سفارشات و رهگیری پروژه‌ها | مهرادینت',
+      'admin-panel': 'پیشخوان مدیریت جامع وردپرس | مهرادینت',
+      about: 'درباره ما، اساتید و سوابق کاری | مهرادینت',
+      contact: 'تماس با ما، مشاوره رایگان و پشتیبانی | مهرادینت',
+      terms: 'قوانین و مقررات، حریم خصوصی و دستورالعمل‌ها | مهرادینت',
+      sitemap: 'نقشه کامل سایت و دسترسی سریع | مهرادینت'
+    };
+
+    const newTitle = titles[currentTab] || 'مهرادینت | آموزش تخصصی و خدمات IT';
+    document.title = newTitle;
+
+    const ogTitle = document.querySelector('meta[property="og:title"]');
+    if (ogTitle) ogTitle.setAttribute('content', newTitle);
+
+    const twitterTitle = document.querySelector('meta[name="twitter:title"]');
+    if (twitterTitle) twitterTitle.setAttribute('content', newTitle);
+
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) {
+      if (currentTab === 'projects-services') {
+        metaDesc.setAttribute('content', 'سفارش آنلاین پروژه‌های پسیو و اکتیو شبکه، مجازی‌سازی سرور با VMware و Proxmox، نصب نرم‌افزار، لینوکس سرور و برنامه‌نویسی با گارانتی معتبر در مهرادینت.');
+      } else if (currentTab === 'organic-shop') {
+        metaDesc.setAttribute('content', 'خرید آنلاین محصولات ارگانیک اصیل: گردوی پوست‌کاغذی طالقان، فندق اشکورات، زغال‌اخته الموت، عسل سبلان با ارسال سریع و ضمانت بازگشت وجه.');
+      } else {
+        metaDesc.setAttribute('content', 'مهرادینت (Mehradinet): مرجع آموزش تخصصی مهندسی شبکه، طراحی وب و برنامه‌نویسی، و مجری پروژه‌های پسیو، اکتیو، مجازی‌سازی سرور و توسعه نرم‌افزار.');
+      }
+    }
+  }, [currentTab]);
 
   // Filtered and sorted courses
   const filteredCourses = courses.filter(c => {
@@ -220,7 +265,20 @@ export default function App() {
       />
 
       {/* Main Views Container */}
-      <main className="flex-1">
+      <main className="flex-1 pb-16 lg:pb-0">
+        {/* Responsive Breadcrumb Navigation for inner views */}
+        {currentTab !== 'home' && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+            <Breadcrumb
+              currentTab={currentTab}
+              onNavigate={(tab) => {
+                setCurrentTab(tab);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+            />
+          </div>
+        )}
+
         {/* VIEW: DEDICATED ORGANIC PRODUCTS STORE */}
         {currentTab === 'organic-shop' && (
           <OrganicStoreView
@@ -554,18 +612,18 @@ export default function App() {
                       <div
                         key={article.id}
                         onClick={() => setSelectedArticleForDetails(article)}
-                        className="bg-white rounded-2xl border border-slate-200/90 p-5 hover:border-indigo-300 hover:shadow-md transition-all flex flex-col justify-between cursor-pointer group"
+                        className="bg-slate-50/60 hover:bg-white rounded-3xl border border-slate-200/90 hover:border-indigo-400 hover:shadow-2xl hover:shadow-indigo-500/15 p-5 flex flex-col justify-between transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] cursor-pointer group"
                       >
                         <div>
-                          <div className="flex items-center justify-between gap-2 mb-2">
-                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
+                          <div className="flex items-center justify-between gap-2 mb-2.5">
+                            <span className={`text-[10px] font-bold px-2.5 py-1 rounded-lg transition-transform group-hover:scale-105 ${
                               article.type === 'announcement'
-                                ? 'bg-red-50 text-red-700'
+                                ? 'bg-red-50 text-red-700 border border-red-100'
                                 : article.type === 'event'
-                                ? 'bg-amber-50 text-amber-700'
+                                ? 'bg-amber-50 text-amber-700 border border-amber-100'
                                 : article.type === 'news'
-                                ? 'bg-cyan-50 text-cyan-700'
-                                : 'bg-indigo-50 text-indigo-700'
+                                ? 'bg-cyan-50 text-cyan-700 border border-cyan-100'
+                                : 'bg-indigo-50 text-indigo-700 border border-indigo-100'
                             }`}>
                               {article.type === 'announcement'
                                 ? 'اطلاعیه'
@@ -575,29 +633,54 @@ export default function App() {
                                 ? 'خبر'
                                 : 'مقاله'}
                             </span>
-                            <span className="text-[11px] font-mono text-slate-400">{article.createdAt}</span>
+                            <span className="text-[11px] font-mono text-slate-400 group-hover:text-slate-600 transition-colors">{article.createdAt}</span>
                           </div>
 
-                          <h3 className="text-sm font-bold text-slate-900 group-hover:text-indigo-600 transition-colors mb-2 line-clamp-2 leading-snug">
+                          <h3 className="text-sm font-bold text-slate-900 group-hover:text-indigo-600 group-hover:font-black transition-colors mb-2 line-clamp-2 leading-snug">
                             {article.title}
                           </h3>
 
-                          <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed font-light mb-4">
+                          <p className="text-xs text-slate-500 group-hover:text-slate-800 line-clamp-2 leading-relaxed font-light group-hover:font-normal mb-4 transition-colors">
                             {article.excerpt}
                           </p>
                         </div>
 
-                        <div className="flex items-center justify-between pt-3 border-t border-slate-100 text-xs">
-                          <span className="text-slate-400 font-mono text-[11px] truncate max-w-[140px]">{article.author}</span>
-                          <span className="text-indigo-600 font-bold group-hover:text-indigo-800 flex items-center gap-1">
+                        <div className="flex items-center justify-between pt-3 border-t border-slate-100 group-hover:border-indigo-100 text-xs transition-colors">
+                          <span className="text-slate-400 group-hover:text-slate-700 font-mono text-[11px] truncate max-w-[140px] transition-colors">{article.author}</span>
+                          <span className="text-indigo-600 font-bold group-hover:text-indigo-700 group-hover:scale-105 flex items-center gap-1 transition-all">
                             <span>مطالعه</span>
-                            <ArrowLeft className="w-3.5 h-3.5" />
+                            <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
                           </span>
                         </div>
                       </div>
                     ))}
                   </div>
                 </section>
+              )}
+
+              {/* SECTION 4: Testimonials & Social Proof */}
+              {currentTab === 'home' && (
+                <Testimonials
+                  onNavigate={(tab) => {
+                    setCurrentTab(tab);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                />
+              )}
+
+              {/* SECTION 5: Frequently Asked Questions (FAQ) */}
+              {currentTab === 'home' && (
+                <FAQ
+                  onNavigate={(tab) => {
+                    setCurrentTab(tab);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                />
+              )}
+
+              {/* SECTION 6: Technical Updates & Organic Offers Newsletter */}
+              {currentTab === 'home' && (
+                <Newsletter />
               )}
             </div>
           </>
@@ -729,6 +812,22 @@ export default function App() {
         cart={organicCart}
         currentUserWalletBalance={store.currentUser.walletBalance}
       />
+
+      {/* Dedicated Mobile Sticky Navigation Bar */}
+      <MobileBottomBar
+        currentTab={currentTab}
+        onNavigate={(tab) => {
+          setCurrentTab(tab);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        organicCartCount={organicCart.length}
+        cartCount={store.cart.length}
+        onOpenOrganicCart={() => setIsOrganicCartOpen(true)}
+        onOpenCart={() => setIsCartOpen(true)}
+      />
+
+      {/* Floating Back to Top Button with Circular Progress */}
+      <BackToTop />
 
       {/* Global Interactive Toast Feedback */}
       <ToastContainer />

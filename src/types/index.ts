@@ -600,3 +600,49 @@ export interface OrganicStockAlertLog {
   messageText: string;
   timestamp: string;
 }
+
+export type FAQCategory = 'all' | 'projects-services' | 'organic-products' | 'academy';
+
+export interface FAQItem {
+  id: string;
+  category: 'projects-services' | 'organic-products' | 'academy';
+  question: string;
+  answer: string;
+  tags: string[];
+  actionLabel?: string;
+  actionTab?: NavigationTab;
+  highlight?: boolean;
+}
+
+export type TestimonialCategory = 'all' | 'project-clients' | 'students' | 'organic-buyers';
+
+export interface TestimonialItem {
+  id: string;
+  category: 'project-clients' | 'students' | 'organic-buyers';
+  name: string;
+  role: string;
+  organization?: string;
+  avatar: string;
+  rating: number;
+  quote: string;
+  projectOrSubject: string;
+  date: string;
+  verified: boolean;
+  verifiedBadgeLabel: string;
+  tags?: string[];
+  helpfulCount?: number;
+  featured?: boolean;
+}
+
+export type NewsletterTopic = 'tech_updates' | 'organic_offers' | 'course_discounts';
+
+export interface NewsletterSubscription {
+  id: string;
+  email: string;
+  name?: string;
+  topics: NewsletterTopic[];
+  createdAt: string;
+}
+
+
+

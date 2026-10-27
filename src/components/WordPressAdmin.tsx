@@ -66,7 +66,8 @@ import {
   Package,
   Scale,
   Truck,
-  Printer
+  Printer,
+  BarChart3
 } from 'lucide-react';
 import { 
   Course, DigitalFile, Order, Ticket, User, SiteSettings, Article, MediaItem, 
@@ -81,6 +82,7 @@ import { MediaPickerModal } from './MediaPickerModal';
 import { RichTextEditor } from './RichTextEditor';
 import { UploadReviewModal, PendingUploadFile } from './UploadReviewModal';
 import { OrganicAdminSection } from './OrganicAdminSection';
+import { AdminAnalyticsDashboard } from './AdminAnalyticsDashboard';
 
 export const ADMIN_THEMES: Record<AdminTheme, {
   name: string;
@@ -184,7 +186,7 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
   onOpenInvoice
 }) => {
   const [activeMenu, setActiveMenu] = useState<
-    'dashboard' | 'courses' | 'files' | 'roadmaps' | 'quizzes' | 'certificates' | 'media' | 'articles' | 'coupons' | 'reviews' | 'orders' | 'users' | 'tickets' | 'contact-messages' | 'settings' | 'organic-products' | 'organic-finance' | 'project-requests'
+    'dashboard' | 'analytics' | 'courses' | 'files' | 'roadmaps' | 'quizzes' | 'certificates' | 'media' | 'articles' | 'coupons' | 'reviews' | 'orders' | 'users' | 'tickets' | 'contact-messages' | 'settings' | 'organic-products' | 'organic-finance' | 'project-requests'
   >('dashboard');
 
   const [courses, setCourses] = useState<Course[]>(store.courses);
@@ -1172,6 +1174,25 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
               {!isSidebarCollapsed && <span>پیشخوان</span>}
             </button>
 
+            {/* 1.1. Analytics Dashboard */}
+            <button
+              onClick={() => setActiveMenu('analytics')}
+              className={`w-full ${isSidebarCollapsed ? 'px-0 justify-center' : 'px-3.5'} py-2.5 text-right flex items-center gap-2.5 transition-colors cursor-pointer ${
+                activeMenu === 'analytics' ? currentThemeStyle.sidebarActive : currentThemeStyle.sidebarHover
+              }`}
+              title="داشبورد تحلیلی و نمودارهای فروش (Recharts)"
+            >
+              <BarChart3 className="w-4 h-4 shrink-0 text-emerald-400" />
+              {!isSidebarCollapsed && (
+                <>
+                  <span className="flex-1 font-bold">داشبورد تحلیلی فروش</span>
+                  <span className="bg-emerald-500/20 text-emerald-300 px-1.5 py-0.2 text-[9px] rounded font-mono font-bold">
+                    Recharts
+                  </span>
+                </>
+              )}
+            </button>
+
             {/* 2. Courses */}
             <button
               onClick={() => { setActiveMenu('courses'); setIsEditingCourse(false); }}
@@ -1675,7 +1696,17 @@ export const WordPressAdmin: React.FC<WordPressAdminProps> = ({
                   </table>
                 </div>
               </div>
+
+              {/* EMBEDDED ANALYTICS CHARTS SECTION */}
+              <div className="pt-4 border-t border-slate-200">
+                <AdminAnalyticsDashboard />
+              </div>
             </div>
+          )}
+
+          {/* ===================== VIEW 1.1: DEDICATED ANALYTICS DASHBOARD ===================== */}
+          {activeMenu === 'analytics' && (
+            <AdminAnalyticsDashboard />
           )}
 
           {/* ===================== VIEW 2: COURSES ===================== */}

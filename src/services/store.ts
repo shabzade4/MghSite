@@ -4,7 +4,8 @@ import {
   OrganicProduct, OrganicCartItem, OrganicOrder, OrganicSettlement, OrganicShippingMethod, OrganicPaymentMethod,
   OrganicPackageOption, OrganicShippingMethodId, OrganicOrderItem, OrganicProductReview,
   OrganicStockAlertConfig, OrganicStockAlertLog,
-  ProjectRequest, ITServiceItem, ProjectServiceCategory, ProjectStatus, ProjectUrgency
+  ProjectRequest, ITServiceItem, ProjectServiceCategory, ProjectStatus, ProjectUrgency,
+  NewsletterSubscription, NewsletterTopic
 } from '../types';
 
 
@@ -2070,6 +2071,7 @@ class Store {
   // Dedicated Project Services & Client Requests State
   projectServices: ITServiceItem[] = INITIAL_PROJECT_SERVICES;
   projectRequests: ProjectRequest[] = INITIAL_PROJECT_REQUESTS;
+  newsletterSubscriptions: NewsletterSubscription[] = [];
 
   constructor() {
 
@@ -2187,6 +2189,9 @@ class Store {
       const storedProjectRequests = localStorage.getItem('mehradinet_project_requests');
       this.projectRequests = storedProjectRequests ? JSON.parse(storedProjectRequests) : INITIAL_PROJECT_REQUESTS;
 
+      const storedNewsletters = localStorage.getItem('mehradinet_newsletter_subscribers');
+      this.newsletterSubscriptions = storedNewsletters ? JSON.parse(storedNewsletters) : [];
+
       const storedCart = localStorage.getItem('parsnet_cart');
       this.cart = storedCart ? JSON.parse(storedCart) : [];
 
@@ -2206,6 +2211,7 @@ class Store {
       this.officialCertificates = INITIAL_OFFICIAL_CERTS;
       this.projectServices = INITIAL_PROJECT_SERVICES;
       this.projectRequests = INITIAL_PROJECT_REQUESTS;
+      this.newsletterSubscriptions = [];
       this.theme = 'light';
       this.colorTheme = 'indigo';
       this.adminTheme = 'classic-dark';
@@ -2250,12 +2256,55 @@ class Store {
       localStorage.setItem('parsnet_organic_stock_alert_config', JSON.stringify(this.organicStockAlertConfig));
       localStorage.setItem('parsnet_organic_stock_alert_logs', JSON.stringify(this.organicStockAlertLogs));
 
-      // Save Project Services Requests
+      // Save Project Services Requests & Newsletter
       localStorage.setItem('mehradinet_project_requests', JSON.stringify(this.projectRequests));
+      localStorage.setItem('mehradinet_newsletter_subscribers', JSON.stringify(this.newsletterSubscriptions));
     } catch (e) {
       console.error('Failed to save to localStorage', e);
     }
     this.notify();
+  }
+
+  // Newsletter Subscriptions
+  subscribeNewsletter(email: string, topics: NewsletterTopic[] = ['tech_updates', 'organic_offers'], name?: string): { success: boolean; message: string } {
+    const cleanEmail = email.trim().toLowerCase();
+    if (!cleanEmail || !cleanEmail.includes('@') || !cleanEmail.includes('.')) {
+      return { success: false, message: 'لطفاً یک آدرس ایمیل معتبر وارد نمایید.' };
+    }
+
+    const existingIndex = this.newsletterSubscriptions.findIndex(s => s.email === cleanEmail);
+    const dateNow = new Intl.DateTimeFormat('fa-IR', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+
+    if (existingIndex >= 0) {
+      this.newsletterSubscriptions[existingIndex].topics = topics;
+      if (name) this.newsletterSubscriptions[existingIndex].name = name.trim();
+      this.saveToStorage();
+      this.addToast({
+        id: `news-${Date.now()}`,
+        type: 'success',
+        title: 'به‌روزرسانی علاقه‌مندی‌ها',
+        message: 'موضوعات دریافت خبرنامه برای این ایمیل با موفقیت به‌روزرسانی شد.'
+      });
+      return { success: true, message: 'علاقه‌مندی‌های شما با موفقیت به‌روزرسانی گردید.' };
+    }
+
+    const newSub: NewsletterSubscription = {
+      id: `sub-${Date.now()}`,
+      email: cleanEmail,
+      name: name?.trim() || undefined,
+      topics,
+      createdAt: dateNow
+    };
+
+    this.newsletterSubscriptions.unshift(newSub);
+    this.saveToStorage();
+    this.addToast({
+      id: `news-${Date.now()}`,
+      type: 'success',
+      title: 'عضویت در خبرنامه مهرادینت',
+      message: 'ایمیل شما با موفقیت در فهرست مشترکین خبرنامه ثبت شد.'
+    });
+    return { success: true, message: 'اشتراک شما در خبرنامه با موفقیت ثبت شد.' };
   }
 
   // Project Services Requests Management

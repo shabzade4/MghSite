@@ -1201,14 +1201,14 @@ export const OrganicStoreView: React.FC<OrganicStoreViewProps> = ({
                   return (
                     <div
                       key={product.id}
-                      className="bg-white dark:bg-stone-900 rounded-3xl border border-stone-200 dark:border-stone-800 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group relative"
+                      className="bg-stone-50/70 hover:bg-white dark:bg-stone-900/90 dark:hover:bg-stone-900 rounded-3xl border border-stone-200/90 hover:border-emerald-500 dark:hover:border-emerald-500/80 overflow-hidden shadow-sm hover:shadow-2xl hover:shadow-emerald-600/15 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] flex flex-col group relative"
                     >
                       {/* Image & Badges */}
                       <div className="relative aspect-4/3 overflow-hidden bg-stone-100 dark:bg-stone-800">
                         <img
                           src={product.image}
                           alt={prodName}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ease-out"
                         />
                         
                         {/* Wishlist Heart Button (Top-Left) */}
@@ -1249,7 +1249,7 @@ export const OrganicStoreView: React.FC<OrganicStoreViewProps> = ({
                         <div className="absolute top-3 right-3 flex flex-col gap-1.5 items-end">
                           {getGradeBadge(product.grade)}
                           {product.harvestYear && (
-                            <span className="bg-stone-900/70 backdrop-blur-md text-white text-[11px] px-2 py-0.5 rounded-full flex items-center gap-1 font-medium">
+                            <span className="bg-stone-900/70 backdrop-blur-md text-white text-[11px] px-2 py-0.5 rounded-full flex items-center gap-1 font-medium group-hover:scale-105 transition-transform">
                               <Calendar className="w-3 h-3 text-amber-300" />
                               <span>{product.harvestYear}</span>
                             </span>
@@ -1268,16 +1268,16 @@ export const OrganicStoreView: React.FC<OrganicStoreViewProps> = ({
                             setActiveImageIndex(0);
                             setModalTab('specs');
                           }}
-                          className="absolute bottom-3 left-3 bg-stone-900/80 hover:bg-stone-900 text-white p-2 rounded-xl backdrop-blur-md transition-all shadow-md cursor-pointer flex items-center gap-1 text-xs"
+                          className="absolute bottom-3 left-3 bg-stone-900/80 hover:bg-emerald-600 group-hover:bg-emerald-600/90 text-white p-2 rounded-xl backdrop-blur-md transition-all shadow-md cursor-pointer flex items-center gap-1 text-xs group-hover:scale-105"
                           title="مشاهده شناسنامه و مشخصات فنی"
                         >
-                          <Eye className="w-3.5 h-3.5 text-emerald-400" />
+                          <Eye className="w-3.5 h-3.5 text-white" />
                           <span className="text-[11px] font-medium hidden sm:inline">شناسنامه</span>
                         </button>
 
                         {/* Region Tag */}
                         {product.originRegion && (
-                          <div className="absolute bottom-3 right-3 bg-emerald-950/80 text-emerald-200 px-2.5 py-1 rounded-lg text-[11px] font-medium flex items-center gap-1 backdrop-blur-md border border-emerald-500/20">
+                          <div className="absolute bottom-3 right-3 bg-emerald-950/80 text-emerald-200 px-2.5 py-1 rounded-lg text-[11px] font-medium flex items-center gap-1 backdrop-blur-md border border-emerald-500/20 group-hover:scale-105 transition-transform">
                             <MapPin className="w-3 h-3 text-emerald-400" />
                             <span>{product.originRegion}</span>
                           </div>
@@ -1289,7 +1289,7 @@ export const OrganicStoreView: React.FC<OrganicStoreViewProps> = ({
                         <div>
                           {/* Title & Wishlist tag */}
                           <div className="flex items-start justify-between gap-2 mb-1">
-                            <h3 className="font-bold text-base text-stone-900 dark:text-stone-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors line-clamp-1 flex-1">
+                            <h3 className="font-bold text-base text-stone-900 dark:text-stone-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 group-hover:font-black transition-colors line-clamp-1 flex-1">
                               {prodName}
                             </h3>
                             {wishlisted && (
@@ -1312,12 +1312,12 @@ export const OrganicStoreView: React.FC<OrganicStoreViewProps> = ({
                             title="مشاهده نظرات و امتیازات خریداران"
                           >
                             <div className="flex items-center text-amber-400">
-                              <Star className="w-3.5 h-3.5 fill-current" />
+                              <Star className="w-3.5 h-3.5 fill-current group-hover:scale-125 group-hover:fill-amber-400 text-amber-400 transition-transform duration-300 drop-shadow-xs" />
                             </div>
-                            <span className="font-extrabold text-stone-800 dark:text-stone-200 text-xs">
+                            <span className="font-extrabold text-stone-800 dark:text-stone-200 group-hover:text-stone-950 dark:group-hover:text-white group-hover:scale-110 text-xs transition-all">
                               {stats.avgRating.toLocaleString('fa-IR')}
                             </span>
-                            <span className="text-[11px] text-stone-400 group-hover/rating:underline">
+                            <span className="text-[11px] text-stone-400 group-hover/rating:underline group-hover:text-stone-500 dark:group-hover:text-stone-300 transition-colors">
                               ({stats.totalCount.toLocaleString('fa-IR')} نظر خریداران)
                             </span>
                           </button>
@@ -1325,18 +1325,18 @@ export const OrganicStoreView: React.FC<OrganicStoreViewProps> = ({
                           {/* Grain / Color / Appearance Specs */}
                           <div className="flex flex-wrap items-center gap-1.5 my-2">
                             {product.grainSize && (
-                              <span className="bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 text-[11px] px-2 py-0.5 rounded-md">
+                              <span className="bg-stone-100 group-hover:bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 group-hover:text-stone-800 dark:group-hover:text-stone-100 group-hover:border group-hover:border-stone-200 dark:group-hover:border-stone-700 text-[11px] px-2 py-0.5 rounded-md transition-all duration-300">
                                 اندازه: {product.grainSize}
                               </span>
                             )}
                             {product.colorAppearance && (
-                              <span className="bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 text-[11px] px-2 py-0.5 rounded-md">
+                              <span className="bg-stone-100 group-hover:bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 group-hover:text-stone-800 dark:group-hover:text-stone-100 group-hover:border group-hover:border-stone-200 dark:group-hover:border-stone-700 text-[11px] px-2 py-0.5 rounded-md transition-all duration-300">
                                 رنگ: {product.colorAppearance}
                               </span>
                             )}
                           </div>
 
-                          <p className="text-xs text-stone-500 dark:text-stone-400 line-clamp-2 mb-3">
+                          <p className="text-xs text-stone-500 group-hover:text-stone-700 dark:text-stone-400 dark:group-hover:text-stone-200 line-clamp-2 mb-3 transition-colors">
                             {product.shortDescription || product.description}
                           </p>
 
@@ -1380,7 +1380,7 @@ export const OrganicStoreView: React.FC<OrganicStoreViewProps> = ({
                         </div>
 
                         {/* Pricing & Add to Cart */}
-                        <div className="pt-3 border-t border-stone-100 dark:border-stone-800">
+                        <div className="pt-3 border-t border-stone-100 group-hover:border-emerald-100 dark:border-stone-800 dark:group-hover:border-emerald-900/40 transition-colors">
                           <div className="flex items-baseline justify-between mb-3">
                             <div className="flex flex-col">
                               {hasDiscount && (
@@ -1389,10 +1389,10 @@ export const OrganicStoreView: React.FC<OrganicStoreViewProps> = ({
                                 </span>
                               )}
                               <div className="flex items-baseline gap-1">
-                                <span className="text-base sm:text-lg font-extrabold text-stone-900 dark:text-white">
+                                <span className="text-base sm:text-lg font-extrabold text-stone-900 dark:text-white group-hover:text-emerald-700 dark:group-hover:text-emerald-400 group-hover:scale-105 origin-right transition-all duration-300">
                                   {unitPrice.toLocaleString('fa-IR')}
                                 </span>
-                                <span className="text-[11px] text-stone-500 dark:text-stone-400">تومان</span>
+                                <span className="text-[11px] text-stone-500 dark:text-stone-400 group-hover:text-emerald-600 transition-colors">تومان</span>
                               </div>
                             </div>
 
@@ -1440,7 +1440,7 @@ export const OrganicStoreView: React.FC<OrganicStoreViewProps> = ({
                             <button
                               type="button"
                               onClick={() => handleAddToCart(product)}
-                              className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md shadow-emerald-600/20 transition-all cursor-pointer"
+                              className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 group-hover:bg-emerald-500 active:scale-98 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md shadow-emerald-600/20 group-hover:shadow-lg group-hover:shadow-emerald-600/40 group-hover:scale-[1.02] transition-all duration-300 cursor-pointer"
                             >
                               <ShoppingBag className="w-4 h-4" />
                               <span>افزودن به سبد ارگانیک</span>
